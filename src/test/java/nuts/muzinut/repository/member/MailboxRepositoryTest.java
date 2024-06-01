@@ -65,7 +65,7 @@ class MailboxRepositoryTest {
     }
 
     /**
-     * 회원 삭제시 해당 회원의 우편함도 삭제한다
+     * 회원 삭제시 해당 회원의 우편함도 삭제한다..
      */
     @Test
     void delete_with_member() {

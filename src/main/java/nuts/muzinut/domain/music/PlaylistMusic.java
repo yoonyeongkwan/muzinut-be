@@ -10,15 +10,13 @@ public class PlaylistMusic {
     @Column(name = "playlist_music_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "playlist_id")
+    @ManyToOne(fetch =  FetchType.LAZY, cascade =  CascadeType.ALL)
     private Playlist playlist;
 
-    @Column(name = "music_id")
-    private Long musicId;
+    private Long music_id;
 
     //편의 메서드
-    public void addPlaylistMusic(Playlist playlist) {
+    public void addRecord(Playlist playlist) {
         this.playlist = playlist;
         playlist.getPlaylistMusics().add(this);
     }

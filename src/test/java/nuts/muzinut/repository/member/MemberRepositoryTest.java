@@ -33,7 +33,7 @@ class MemberRepositoryTest {
 
         //given
         Member member = new Member("email", "password");
-        member.setRole(Role.ROLE_USER); //enum type test
+        member.setRole(Role.USER); //enum type test
 
         //when
         memberRepository.save(member);
@@ -42,7 +42,7 @@ class MemberRepositoryTest {
         Optional<Member> findMember = memberRepository.findById(member.getId());
         assertThat(findMember.get().getEmail()).isEqualTo("email");
         assertThat(findMember.get().getPassword()).isEqualTo("password");
-        assertThat(findMember.get().getRole().toString().equals("ROLE_USER")).isTrue();
+        assertThat(findMember.get().getRole().toString().equals("USER")).isTrue();
     }
 
     @Test

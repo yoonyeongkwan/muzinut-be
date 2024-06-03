@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Entity
 @Getter
-public class Following {
+public class Follow {
 
     @Id @GeneratedValue
-    @Column(name = "following_id")
+    @Column(name = "follow_id")
     private Long id;
 
     @ManyToOne

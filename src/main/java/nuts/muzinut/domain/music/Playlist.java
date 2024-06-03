@@ -12,13 +12,14 @@ import java.util.List;
 public class Playlist {
 
     @Id @GeneratedValue
-    @Column(name = "playlist_id")
+    @Column(name = "playlist_record")
     private Long id;
 
+    //Todo
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "playlist")
     private List<PlaylistMusic> playlistMusics = new ArrayList<>();
 }

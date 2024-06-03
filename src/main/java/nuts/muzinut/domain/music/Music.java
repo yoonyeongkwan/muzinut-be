@@ -1,11 +1,16 @@
 package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import nuts.muzinut.domain.baseEntity.BaseBoardEntity;
 import nuts.muzinut.domain.baseEntity.BaseTimeEntity;
 import nuts.muzinut.domain.member.Member;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
+@Getter
 public class Music extends BaseBoardEntity {
 
     @Id @GeneratedValue
@@ -30,4 +35,10 @@ public class Music extends BaseBoardEntity {
 
     @Column(name = "music_img_store_filename")
     private String musicImgStoreFilename;
+
+    @OneToMany
+    private List<MusicGenre> musicGenres = new ArrayList<>();
+
+    @OneToMany
+    private List<MusicCorpArtist> musicCorpArtists = new ArrayList<>();
 }

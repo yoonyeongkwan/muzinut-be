@@ -8,19 +8,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "playback_record")
 @Getter
-public class PlaybackRecord {
+public class PleNut {
 
     @Id @GeneratedValue
-    @Column(name = "playback_record")
+    @Column(name = "plenut_id")
     private Long id;
 
-    //Todo
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "playbackRecord")
-    private List<PlaybackRecordList> playbackRecordLists = new ArrayList<>();
+    @OneToMany(mappedBy = "pleNut", cascade = CascadeType.ALL)
+    private List<PleNutMusic> plenutMusics = new ArrayList<>();
 }

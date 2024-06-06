@@ -2,6 +2,7 @@ package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nuts.muzinut.domain.baseEntity.BaseBoardEntity;
 import nuts.muzinut.domain.baseEntity.BaseTimeEntity;
 import nuts.muzinut.domain.member.Member;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
 @Getter
 public class Music extends BaseBoardEntity {
 
@@ -36,9 +38,15 @@ public class Music extends BaseBoardEntity {
     @Column(name = "music_img_store_filename")
     private String musicImgStoreFilename;
 
-    @OneToMany
+    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL)
     private List<MusicGenre> musicGenres = new ArrayList<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL)
     private List<MusicCorpArtist> musicCorpArtists = new ArrayList<>();
+
+    //연관 관계 편의 메서드
+    public void addMusic(Member member) {
+        this.member = member;
+        member.getMusicList().add(this);
+    }
 }

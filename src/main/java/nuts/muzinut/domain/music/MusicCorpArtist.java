@@ -1,9 +1,11 @@
 package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import nuts.muzinut.domain.member.Member;
 
 @Entity
+@Getter
 @Table(name = "music_corp_artist")
 public class MusicCorpArtist {
 

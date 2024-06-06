@@ -15,11 +15,16 @@ public class Playlist {
     @Column(name = "playlist_record")
     private Long id;
 
-    //Todo
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "playlist")
+    @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)
     private List<PlaylistMusic> playlistMusics = new ArrayList<>();
+
+    //연관 관계 메서드
+    public void createPlaylist(Member member) {
+        this.member = member;
+        member.setPlaylist(this);
+    }
 }

@@ -21,4 +21,10 @@ public class PleNut {
 
     @OneToMany(mappedBy = "pleNut", cascade = CascadeType.ALL)
     private List<PleNutMusic> plenutMusics = new ArrayList<>();
+
+    //연관관계 메서드
+    public void createPleNut(Member member) {
+        this.member = member;
+        member.getPleNut().add(this);
+    }
 }

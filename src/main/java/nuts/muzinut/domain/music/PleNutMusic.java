@@ -1,8 +1,10 @@
 package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 
 @Entity
+@Getter
 @Table(name = "playlist_music")
 public class PleNutMusic {
 
@@ -18,8 +20,9 @@ public class PleNutMusic {
     private Long musicId;
 
     //연관 관계 메서드
-    public void addPlaylistMusic(PleNut playlist) {
+    public void addPlaylistMusic(PleNut playlist, Music music) {
         this.pleNut = playlist;
+        this.musicId = music.getId();
         playlist.getPlenutMusics().add(this);
     }
 }

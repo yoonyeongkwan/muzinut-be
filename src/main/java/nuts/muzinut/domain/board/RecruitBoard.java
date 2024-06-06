@@ -32,6 +32,14 @@ public class RecruitBoard extends BaseBoardEntity {
     private LocalDateTime start_work_duration;
     private LocalDateTime end_work_duration;
 
-    @OneToMany
+    @OneToMany(mappedBy = "recruitBoard", cascade = CascadeType.ALL)
     private List<RecruitBoardGenre> recruitBoardGenres = new ArrayList<>();
+
+    //연관 관계 메서드
+    public void createRecruitBoard(Member member) {
+        this.member = member;
+        this.setCreated_dt(LocalDateTime.now());
+        this.setModified_dt(LocalDateTime.now());
+        member.getRecruitBoards().add(this);
+    }
 }

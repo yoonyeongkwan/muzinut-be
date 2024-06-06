@@ -5,10 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nuts.muzinut.domain.baseEntity.BaseTimeEntity;
-import nuts.muzinut.domain.board.Bookmark;
-import nuts.muzinut.domain.board.Comment;
-import nuts.muzinut.domain.board.Lounge;
-import nuts.muzinut.domain.board.RecruitBoard;
+import nuts.muzinut.domain.board.*;
+import nuts.muzinut.domain.chat.ChatMember;
+import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.music.Music;
 import nuts.muzinut.domain.music.Playlist;
 import nuts.muzinut.domain.music.PleNut;
@@ -51,16 +50,17 @@ public class Member extends BaseTimeEntity {
         this.password = password;
     }
 
-    //관계
+    //관계 매핑
+
+    //회원 관련
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Mailbox> mailboxes = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<NutsUsageHistory> nutsUsageHistories = new ArrayList<>();
 
+    //음악 관련
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Music> musicList = new ArrayList<>();
 
@@ -70,8 +70,12 @@ public class Member extends BaseTimeEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Playlist playlist;
 
+    //게시판 관련
     @OneToMany(mappedBy = "member")
     private List<RecruitBoard> recruitBoards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<FreeBoard> freeBoards = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Lounge> lounges = new ArrayList<>();
@@ -79,12 +83,23 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
+    //후원 관련
     @OneToMany(mappedBy = "member")
     private List<PaymentHistory> paymentHistories = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<SupportMsg> supportMsgs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<NutsUsageHistory> nutsUsageHistories = new ArrayList<>();
+
+    //채팅 관련
+    @OneToMany(mappedBy = "member")
+    private List<ChatMember> chatMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Message> messages = new ArrayList<>();
 }

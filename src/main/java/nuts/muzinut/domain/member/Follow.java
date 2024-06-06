@@ -15,7 +15,8 @@ public class Follow {
     @JoinColumn(name = "member_id")
     private Member member; //팔로잉을 하는 주체
 
-    private Long following_member_id; //팔로잉 하는 대상
+    @Column(name = "following_member_id")
+    private Long followingMemberId; //팔로잉 하는 대상
     private Boolean notification;
 
     /**
@@ -25,7 +26,8 @@ public class Follow {
      */
     public void createFollowing(Member member, Member followingMember) {
         this.member = member;
-        this.following_member_id = followingMember.getId();
+        this.followingMemberId = followingMember.getId();
+        this.notification = true; //처음 팔로우 했을 때 알림 설정은 기본적으로 켜져있음
         member.getFollowings().add(this);
     }
 }

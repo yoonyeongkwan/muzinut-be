@@ -3,7 +3,6 @@ package nuts.muzinut.repository.music;
 import nuts.muzinut.domain.member.Member;
 import nuts.muzinut.domain.music.Music;
 import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -30,7 +28,7 @@ class MusicRepositoryTest {
         Member member = new Member();
         memberRepository.save(member);
         Music music = new Music();
-        music.addMusic(member);
+        music.createMusic(member);
 
         //when
         musicRepository.save(music);

@@ -44,6 +44,7 @@ class MailboxRepositoryTest {
         //then
         Optional<Mailbox> findMailbox = mailboxRepository.findById(mailbox.getId());
         assertThat(findMailbox.get().getMember()).isEqualTo(member); //저장된 메일함의 멤버를 확인
+        assertThat(findMailbox.get()).isEqualTo(mailbox); //저장된 메일함의 멤버를 확인
     }
 
     @Test

@@ -21,7 +21,7 @@ public class ReadMessage {
     private Long memberId;
 
     //연관 관계 메서드
-    public void read(Member member ,Message message) {
+    public void read(Member member, Message message) {
         this.message = message;
         this.memberId = member.getId();
         message.getReadMessages().add(this);

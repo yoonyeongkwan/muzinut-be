@@ -22,12 +22,20 @@ public class Like {
     @Enumerated(EnumType.STRING)
     private BoardType boardType;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    public Like(Long boardId, BoardType boardType, Long memberId) {
+    /**
+     *
+     * @param boardId: 좋아요를 누른 게시판 pk
+     * @param boardType: 좋아요를 누른 게시판 타입 (팀 모집, 음악...)
+     * @param member: 좋아요를 누른 회원
+     */
+    public Like(Long boardId, BoardType boardType, Member member) {
         this.boardId = boardId;
         this.boardType = boardType;
-        this.memberId = memberId;
+        this.member = member;
+        member.getLikeList().add(this);
     }
 }

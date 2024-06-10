@@ -59,7 +59,6 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();
 
-
     //음악 관련
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Music> musicList = new ArrayList<>();
@@ -86,11 +85,14 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
-    //후원 관련
     @OneToMany(mappedBy = "member")
+    private List<Like> likeList = new ArrayList<>();
+
+    //후원 관련
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<PaymentHistory> paymentHistories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<SupportMsg> supportMsgs = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)

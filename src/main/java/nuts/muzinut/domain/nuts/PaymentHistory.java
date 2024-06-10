@@ -1,11 +1,13 @@
 package nuts.muzinut.domain.nuts;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import nuts.muzinut.domain.member.Member;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "payment_history")
 public class PaymentHistory {
 

@@ -26,12 +26,21 @@ public class Message {
     private Member member;
 
     private String message;
-    private int read;
+    private int read; //읽은 사람 수
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime send_time;
 
+    @OneToMany(mappedBy = "message")
+    List<ReadMessage> readMessages = new ArrayList<>();
+
     //연관 관계 메서드
+
+    /**
+     * @param member:  채팅 작성자
+     * @param chat:    채팅방
+     * @param message: 메시지
+     */
     public void createMessage(Member member, Chat chat, String message) {
         this.member = member;
         this.chat = chat;
@@ -41,7 +50,6 @@ public class Message {
         chat.getMessages().add(this);
     }
 
-    @OneToMany(mappedBy = "message")
-    List<ReadMessage> readMessages = new ArrayList<>();
+    //비지니스 로직
 
 }

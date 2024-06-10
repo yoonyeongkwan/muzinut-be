@@ -4,7 +4,6 @@ import nuts.muzinut.domain.member.Member;
 import nuts.muzinut.domain.music.Music;
 import nuts.muzinut.domain.music.MusicCorpArtist;
 import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
 class MusicCorpArtistRepositoryTest {
@@ -40,7 +39,7 @@ class MusicCorpArtistRepositoryTest {
         memberRepository.save(corpArtist2);
 
         Music music = new Music();
-        music.addMusic(member);
+        music.createMusic(member);
         musicRepository.save(music);
 
         MusicCorpArtist corp1 = new MusicCorpArtist();
@@ -96,7 +95,7 @@ class MusicCorpArtistRepositoryTest {
         memberRepository.save(corpArtist2);
 
         Music music = new Music();
-        music.addMusic(member);
+        music.createMusic(member);
         musicRepository.save(music);
 
         MusicCorpArtist corp1 = new MusicCorpArtist();

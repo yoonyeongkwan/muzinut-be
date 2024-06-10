@@ -1,9 +1,11 @@
 package nuts.muzinut.domain.nuts;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import nuts.muzinut.domain.member.Member;
 
 @Entity
+@Getter
 @Table(name = "support_msg")
 public class SupportMsg {
 
@@ -22,14 +24,15 @@ public class SupportMsg {
 
     /**
      * 연관관계 편의 메서드
-     * @param artist: 후원 받는 아티스트
+     * @param member:  후원 받는 회원
      * @param sponsor: 후원하는 팬
      * @param message: 후원 메시지
+     * @param nuts:    후원 nuts
      */
-    public void addSupportMsg(Member artist, Member sponsor, String message) {
-        this.member = artist;
+    public void addSupportMsg(Member member, Member sponsor, String message, int nuts) {
+        this.member = member;
         this.sponsorId = sponsor.getId();
         this.message = message;
-        artist.getSupportMsgs().add(this);
+        member.getSupportMsgs().add(this);
     }
 }

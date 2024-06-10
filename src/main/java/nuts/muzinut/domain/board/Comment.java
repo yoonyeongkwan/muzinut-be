@@ -17,6 +17,7 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
+    @Column(name = "board_id")
     private Long boardId; //music, recruitBoard .. 's pk
 
     @Column(name = "board_type")

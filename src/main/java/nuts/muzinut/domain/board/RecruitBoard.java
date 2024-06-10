@@ -26,11 +26,21 @@ public class RecruitBoard extends BaseBoardEntity {
     private Member member;
 
     private String content;
-    private int recruit_member;
-    private LocalDateTime start_duration;
-    private LocalDateTime end_duration;
-    private LocalDateTime start_work_duration;
-    private LocalDateTime end_work_duration;
+
+    @Column(name = "recruit_member")
+    private int recruitMember;
+
+    @Column(name = "start_duration")
+    private LocalDateTime startDuration;
+
+    @Column(name = "end_duration")
+    private LocalDateTime endDuration;
+
+    @Column(name = "start_work_duration")
+    private LocalDateTime startWorkDuration;
+
+    @Column(name = "end_work_duration")
+    private LocalDateTime endWorkDuration;
 
     @OneToMany(mappedBy = "recruitBoard", cascade = CascadeType.ALL)
     private List<RecruitBoardGenre> recruitBoardGenres = new ArrayList<>();

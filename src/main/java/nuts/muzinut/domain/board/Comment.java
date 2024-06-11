@@ -48,5 +48,4 @@ public class Comment extends BaseTimeEntity {
         this.content = content;
         member.getComments().add(this);
     }
-
 }

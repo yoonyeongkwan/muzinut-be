@@ -12,9 +12,5 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class MemberService {
 
-    private static final String AUTH_CODE_PREFIX = "AuthCode ";
-
     private final MemberRepository memberRepository;
-
-    private final MailService mailService;
 }

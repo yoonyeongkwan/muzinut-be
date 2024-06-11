@@ -48,8 +48,6 @@ public class RecruitBoard extends BaseBoardEntity {
     //연관 관계 메서드
     public void createRecruitBoard(Member member) {
         this.member = member;
-        this.setCreated_dt(LocalDateTime.now());
-        this.setModified_dt(LocalDateTime.now());
         member.getRecruitBoards().add(this);
     }
 }

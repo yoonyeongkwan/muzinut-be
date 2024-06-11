@@ -27,7 +27,6 @@ public class Like {
     private Member member;
 
     /**
-     *
      * @param boardId: 좋아요를 누른 게시판 pk
      * @param boardType: 좋아요를 누른 게시판 타입 (팀 모집, 음악...)
      * @param member: 좋아요를 누른 회원

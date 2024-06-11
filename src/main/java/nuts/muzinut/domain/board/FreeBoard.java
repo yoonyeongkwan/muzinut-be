@@ -24,8 +24,6 @@ public class FreeBoard extends BaseBoardEntity {
 
     //연관 관계 메서드
     public void createFreeBoard(Member member) {
-        this.setCreated_dt(LocalDateTime.now());
-        this.setModified_dt(LocalDateTime.now());
         this.member = member;
         member.getFreeBoards().add(this);
     }

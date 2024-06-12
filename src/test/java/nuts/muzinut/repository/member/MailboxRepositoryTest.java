@@ -44,6 +44,7 @@ class MailboxRepositoryTest {
         //then
         Optional<Mailbox> findMailbox = mailboxRepository.findById(mailbox.getId());
         assertThat(findMailbox.get().getMember()).isEqualTo(member); //저장된 메일함의 멤버를 확인
+        assertThat(findMailbox.get()).isEqualTo(mailbox); //저장된 메일함의 멤버를 확인
     }
 
     @Test
@@ -65,7 +66,7 @@ class MailboxRepositoryTest {
     }
 
     /**
-     * 회원 삭제시 해당 회원의 우편함도 삭제한다
+     * 회원 삭제시 해당 회원의 우편함도 삭제한다..
      */
     @Test
     void delete_with_member() {

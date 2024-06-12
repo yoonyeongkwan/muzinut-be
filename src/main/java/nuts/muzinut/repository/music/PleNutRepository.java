@@ -1,7 +1,7 @@
 package nuts.muzinut.repository.music;
 
-import nuts.muzinut.domain.music.PleNut;
+import nuts.muzinut.domain.music.PlayNut;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PleNutRepository extends JpaRepository<PleNut, Long> {
+public interface PleNutRepository extends JpaRepository<PlayNut, Long> {
 }

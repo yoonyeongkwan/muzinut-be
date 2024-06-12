@@ -1,8 +1,8 @@
 package nuts.muzinut.repository.music;
 
 import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.domain.music.Music;
-import nuts.muzinut.domain.music.MusicCorpArtist;
+import nuts.muzinut.domain.music.Song;
+import nuts.muzinut.domain.music.SongCorpArtist;
 import nuts.muzinut.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MusicCorpArtistRepositoryTest {
+class SongCorpArtistRepositoryTest {
 
     @Autowired
     MusicRepository musicRepository;
@@ -38,26 +38,26 @@ class MusicCorpArtistRepositoryTest {
         memberRepository.save(corpArtist1);
         memberRepository.save(corpArtist2);
 
-        Music music = new Music();
-        music.createMusic(member);
-        musicRepository.save(music);
+        Song song = new Song();
+        song.createMusic(member);
+        musicRepository.save(song);
 
-        MusicCorpArtist corp1 = new MusicCorpArtist();
-        MusicCorpArtist corp2 = new MusicCorpArtist();
+        SongCorpArtist corp1 = new SongCorpArtist();
+        SongCorpArtist corp2 = new SongCorpArtist();
 
         //when
-        corp1.addCorpArtist(music, corpArtist1);
-        corp2.addCorpArtist(music, corpArtist2);
+        corp1.addCorpArtist(song, corpArtist1);
+        corp2.addCorpArtist(song, corpArtist2);
         musicCorpArtistRepository.save(corp1);
         musicCorpArtistRepository.save(corp2);
 
         //then
-        List<MusicCorpArtist> result = musicCorpArtistRepository.findAll();
+        List<SongCorpArtist> result = musicCorpArtistRepository.findAll();
 
         //저장된 음악은 1개
         assertThat(result)
-                .extracting("music")
-                .containsOnly(music);
+                .extracting("song")
+                .containsOnly(song);
 
         //1개의 음악에 대해서 협력한 가수는 2명
         assertThat(result)
@@ -69,14 +69,14 @@ class MusicCorpArtistRepositoryTest {
     void delete() {
 
         //given
-        MusicCorpArtist corp = new MusicCorpArtist();
+        SongCorpArtist corp = new SongCorpArtist();
         musicCorpArtistRepository.save(corp);
 
         //when
         musicCorpArtistRepository.delete(corp);
 
         //then
-        Optional<MusicCorpArtist> findCorp = musicCorpArtistRepository.findById(corp.getId());
+        Optional<SongCorpArtist> findCorp = musicCorpArtistRepository.findById(corp.getId());
         assertThat(findCorp.isEmpty()).isTrue();
     }
 
@@ -94,23 +94,23 @@ class MusicCorpArtistRepositoryTest {
         memberRepository.save(corpArtist1);
         memberRepository.save(corpArtist2);
 
-        Music music = new Music();
-        music.createMusic(member);
-        musicRepository.save(music);
+        Song song = new Song();
+        song.createMusic(member);
+        musicRepository.save(song);
 
-        MusicCorpArtist corp1 = new MusicCorpArtist();
-        MusicCorpArtist corp2 = new MusicCorpArtist();
+        SongCorpArtist corp1 = new SongCorpArtist();
+        SongCorpArtist corp2 = new SongCorpArtist();
 
-        corp1.addCorpArtist(music, corpArtist1);
-        corp2.addCorpArtist(music, corpArtist2);
+        corp1.addCorpArtist(song, corpArtist1);
+        corp2.addCorpArtist(song, corpArtist2);
         musicCorpArtistRepository.save(corp1);
         musicCorpArtistRepository.save(corp2);
 
         //when
-        musicRepository.delete(music);
+        musicRepository.delete(song);
 
         //then
-        List<MusicCorpArtist> result = musicCorpArtistRepository.findAll();
+        List<SongCorpArtist> result = musicCorpArtistRepository.findAll();
         assertThat(result.size()).isEqualTo(0);
     }
 }

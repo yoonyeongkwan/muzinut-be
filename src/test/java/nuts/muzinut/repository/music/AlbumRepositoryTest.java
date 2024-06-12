@@ -1,8 +1,7 @@
 package nuts.muzinut.repository.music;
 
 import nuts.muzinut.domain.music.Album;
-import nuts.muzinut.domain.music.Music;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.music.Song;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -24,11 +22,11 @@ class AlbumRepositoryTest {
     void save() {
 
         //given
-        Music music = new Music();
-        musicRepository.save(music);
+        Song song = new Song();
+        musicRepository.save(song);
 
         Album album = new Album();
-        album.addSongIntoAlbum(music);
+        album.addSongIntoAlbum(song);
 
         //when
         albumRepository.save(album);
@@ -36,7 +34,7 @@ class AlbumRepositoryTest {
         //then
         Optional<Album> findAlbum = albumRepository.findById(album.getId());
         assertThat(findAlbum.get()).isEqualTo(album);
-        assertThat(findAlbum.get().getMusicList().size()).isEqualTo(1); //앨범에 수록된 음악은 1개
+        assertThat(findAlbum.get().getSongList().size()).isEqualTo(1); //앨범에 수록된 음악은 1개
     }
 
     //하나의 앨범에 여러 곡을 저장
@@ -44,15 +42,15 @@ class AlbumRepositoryTest {
     void saveMultipleMusic() {
 
         //given
-        Music music1 = new Music();
-        Music music2 = new Music();
-        musicRepository.save(music1);
-        musicRepository.save(music2);
+        Song song1 = new Song();
+        Song song2 = new Song();
+        musicRepository.save(song1);
+        musicRepository.save(song2);
 
         Album album = new Album();
         //앨범에 2개의 곡 저장
-        album.addSongIntoAlbum(music1);
-        album.addSongIntoAlbum(music2);
+        album.addSongIntoAlbum(song1);
+        album.addSongIntoAlbum(song2);
         albumRepository.save(album);
 
         //when
@@ -63,10 +61,10 @@ class AlbumRepositoryTest {
         assertThat(findAlbum.get()).isEqualTo(album);
 
         //앨범에 수록된 음악은 2개
-        assertThat(findAlbum.get().getMusicList().size()).isEqualTo(2);
-        assertThat(findAlbum.get().getMusicList())
+        assertThat(findAlbum.get().getSongList().size()).isEqualTo(2);
+        assertThat(findAlbum.get().getSongList())
                 .extracting("id")
-                .contains(music1.getId(), music2.getId()); //pk 를 직접 비교
+                .contains(song1.getId(), song2.getId()); //pk 를 직접 비교
     }
 
     @Test

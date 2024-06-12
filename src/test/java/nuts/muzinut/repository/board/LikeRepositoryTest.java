@@ -3,10 +3,9 @@ package nuts.muzinut.repository.board;
 import jakarta.transaction.Transactional;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.domain.music.Music;
+import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.repository.member.MemberRepository;
 import nuts.muzinut.repository.music.MusicRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -34,10 +32,10 @@ class LikeRepositoryTest {
         Member member = new Member();
         memberRepository.save(member);
 
-        Music music = new Music();
-        musicRepository.save(music);
+        Song song = new Song();
+        musicRepository.save(song);
 
-        Like like = new Like(music.getId(), BoardType.MUSIC, member);
+        Like like = new Like(song.getId(), BoardType.MUSIC, member);
 
         //when
         likeRepository.save(like);
@@ -46,7 +44,7 @@ class LikeRepositoryTest {
         Optional<Like> findLike = likeRepository.findById(like.getId());
         assertThat(findLike.get()).isEqualTo(like);
         assertThat(findLike.get().getMember()).isEqualTo(member);
-        assertThat(findLike.get().getBoardId()).isEqualTo(music.getId());
+        assertThat(findLike.get().getBoardId()).isEqualTo(song.getId());
     }
 
     @Test

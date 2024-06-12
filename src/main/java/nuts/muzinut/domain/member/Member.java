@@ -8,9 +8,9 @@ import nuts.muzinut.domain.baseEntity.BaseTimeEntity;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.chat.ChatMember;
 import nuts.muzinut.domain.chat.Message;
-import nuts.muzinut.domain.music.Music;
+import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.domain.music.Playlist;
-import nuts.muzinut.domain.music.PleNut;
+import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.nuts.NutsUsageHistory;
 import nuts.muzinut.domain.nuts.PaymentHistory;
 import nuts.muzinut.domain.nuts.SupportMsg;
@@ -61,10 +61,10 @@ public class Member extends BaseTimeEntity {
 
     //음악 관련
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Music> musicList = new ArrayList<>();
+    private List<Song> songList = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<PleNut> pleNut = new ArrayList<>();
+    private List<PlayNut> playNutList = new ArrayList<>();
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     private Playlist playlist;

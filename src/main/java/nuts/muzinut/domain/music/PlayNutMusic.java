@@ -5,24 +5,24 @@ import lombok.Getter;
 
 @Entity
 @Getter
-@Table(name = "playlist_music")
-public class PleNutMusic {
+@Table(name = "playnut_music")
+public class PlayNutMusic {
 
     @Id @GeneratedValue
-    @Column(name = "playlist_music_id")
+    @Column(name = "playnut_music_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "playlist_id")
-    private PleNut pleNut;
+    private PlayNut playNut;
 
     @Column(name = "music_id")
     private Long musicId;
 
     //연관 관계 메서드
-    public void addPlaylistMusic(PleNut playlist, Music music) {
-        this.pleNut = playlist;
-        this.musicId = music.getId();
-        playlist.getPlenutMusics().add(this);
+    public void addPlaylistMusic(PlayNut playlist, Song song) {
+        this.playNut = playlist;
+        this.musicId = song.getId();
+        playlist.getPlayNutMusics().add(this);
     }
 }

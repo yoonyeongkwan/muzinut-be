@@ -39,8 +39,13 @@ dependencies {
 	testImplementation 'org.projectlombok:lombok' // 테스트를 위한 세팅
 
 	//이메일 인증
-	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '2.6.3'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis' //이메일 인증 번호를 잠시 메모리에 저장시켜줌
+
+	//jwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
+	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 }
 
 tasks.named('test') {

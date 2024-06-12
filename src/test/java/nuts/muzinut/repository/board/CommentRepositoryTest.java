@@ -2,20 +2,17 @@ package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.domain.music.Music;
+import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.repository.member.MemberRepository;
 import nuts.muzinut.repository.music.MusicRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -35,11 +32,11 @@ class CommentRepositoryTest {
         Member member = new Member();
         memberRepository.save(member);
 
-        Music music = new Music();
-        musicRepository.save(music);
+        Song song = new Song();
+        musicRepository.save(song);
 
         Comment comment = new Comment();
-        comment.addComment(member, music.getId(), BoardType.MUSIC, "content");
+        comment.addComment(member, song.getId(), BoardType.MUSIC, "content");
 
         //when
         commentRepository.save(comment);
@@ -48,7 +45,7 @@ class CommentRepositoryTest {
         Optional<Comment> findComment = commentRepository.findById(comment.getId());
         assertThat(findComment.get()).isEqualTo(comment);
         assertThat(findComment.get().getMember()).isEqualTo(member);
-        assertThat(findComment.get().getBoardId()).isEqualTo(music.getId());
+        assertThat(findComment.get().getBoardId()).isEqualTo(song.getId());
     }
 
     @Test

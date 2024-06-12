@@ -19,9 +19,9 @@ public class PlaylistMusic {
     private Long musicId;
 
     //편의 메서드
-    public void addRecord(Playlist playlist, Music music) {
+    public void addRecord(Playlist playlist, Song song) {
         this.playlist = playlist;
-        this.musicId = music.getId();
+        this.musicId = song.getId();
         playlist.getPlaylistMusics().add(this);
     }
 }

@@ -1,11 +1,10 @@
 package nuts.muzinut.repository.music;
 
 import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.domain.music.Music;
+import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.domain.music.Playlist;
 import nuts.muzinut.domain.music.PlaylistMusic;
 import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,11 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class PlaylistMusicRepositoryTest {
+class PlaylistSongRepositoryTest {
 
     @Autowired
     PlaylistRepository playlistRepository;
@@ -36,11 +34,11 @@ class PlaylistMusicRepositoryTest {
         Playlist playlist = new Playlist();
         playlistRepository.save(playlist);
 
-        Music music = new Music();
-        musicRepository.save(music);
+        Song song = new Song();
+        musicRepository.save(song);
 
         PlaylistMusic playlistMusic = new PlaylistMusic();
-        playlistMusic.addRecord(playlist, music);
+        playlistMusic.addRecord(playlist, song);
 
         //when
         playlistMusicRepository.save(playlistMusic);
@@ -48,7 +46,7 @@ class PlaylistMusicRepositoryTest {
         //then
         Optional<PlaylistMusic> findPlaylistMusic = playlistMusicRepository.findById(playlistMusic.getId());
         assertThat(findPlaylistMusic.get()).isEqualTo(playlistMusic);
-        assertThat(findPlaylistMusic.get().getMusicId()).isEqualTo(music.getId());
+        assertThat(findPlaylistMusic.get().getMusicId()).isEqualTo(song.getId());
         assertThat(findPlaylistMusic.get().getPlaylist()).isEqualTo(playlist);
     }
 
@@ -75,11 +73,11 @@ class PlaylistMusicRepositoryTest {
         Playlist playlist = new Playlist();
         playlistRepository.save(playlist);
 
-        Music music = new Music();
-        musicRepository.save(music);
+        Song song = new Song();
+        musicRepository.save(song);
 
         PlaylistMusic playlistMusic = new PlaylistMusic();
-        playlistMusic.addRecord(playlist, music);
+        playlistMusic.addRecord(playlist, song);
         playlistMusicRepository.save(playlistMusic);
 
         //when
@@ -102,11 +100,11 @@ class PlaylistMusicRepositoryTest {
         playlist.createPlaylist(member);
         playlistRepository.save(playlist);
 
-        Music music = new Music();
-        musicRepository.save(music);
+        Song song = new Song();
+        musicRepository.save(song);
 
         PlaylistMusic playlistMusic = new PlaylistMusic();
-        playlistMusic.addRecord(playlist, music);
+        playlistMusic.addRecord(playlist, song);
         playlistMusicRepository.save(playlistMusic);
 
         //when

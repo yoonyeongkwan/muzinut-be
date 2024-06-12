@@ -1,7 +1,7 @@
 package nuts.muzinut.repository.music;
 
 import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.domain.music.Music;
+import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class MusicRepositoryTest {
+class SongRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
@@ -27,30 +27,30 @@ class MusicRepositoryTest {
         //given
         Member member = new Member();
         memberRepository.save(member);
-        Music music = new Music();
-        music.createMusic(member);
+        Song song = new Song();
+        song.createMusic(member);
 
         //when
-        musicRepository.save(music);
+        musicRepository.save(song);
 
         //then
-        Optional<Music> findMusic = musicRepository.findById(music.getId());
-        assertThat(findMusic.get()).isEqualTo(music);
-        assertThat(findMusic.get()).isEqualTo(member.getMusicList().getFirst());
+        Optional<Song> findMusic = musicRepository.findById(song.getId());
+        assertThat(findMusic.get()).isEqualTo(song);
+        assertThat(findMusic.get()).isEqualTo(member.getSongList().getFirst());
     }
 
     @Test
     void delete() {
 
         //given
-        Music music = new Music();
-        musicRepository.save(music);
+        Song song = new Song();
+        musicRepository.save(song);
 
         //when
-        musicRepository.delete(music);
+        musicRepository.delete(song);
 
         //then
-        Optional<Music> findMusic = musicRepository.findById(music.getId());
+        Optional<Song> findMusic = musicRepository.findById(song.getId());
         assertThat(findMusic.isEmpty()).isTrue();
 
     }

@@ -1,9 +1,8 @@
 package nuts.muzinut.repository.music;
 
 import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.domain.music.PleNut;
+import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,11 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class PleNutRepositoryTest {
+class PlayNutRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
@@ -30,15 +28,15 @@ class PleNutRepositoryTest {
         Member member = new Member();
         memberRepository.save(member);
 
-        PleNut pleNut = new PleNut();
-        pleNut.createPleNut(member);
+        PlayNut playNut = new PlayNut();
+        playNut.createPleNut(member);
 
         //when
-        pleNutRepository.save(pleNut);
+        pleNutRepository.save(playNut);
 
         //then
-        Optional<PleNut> findPleNut = pleNutRepository.findById(pleNut.getId());
-        assertThat(findPleNut.get()).isEqualTo(pleNut);
+        Optional<PlayNut> findPleNut = pleNutRepository.findById(playNut.getId());
+        assertThat(findPleNut.get()).isEqualTo(playNut);
         assertThat(findPleNut.get().getMember()).isEqualTo(member);
     }
 
@@ -46,14 +44,14 @@ class PleNutRepositoryTest {
     void delete() {
 
         //given
-        PleNut pleNut = new PleNut();
-        pleNutRepository.save(pleNut);
+        PlayNut playNut = new PlayNut();
+        pleNutRepository.save(playNut);
 
         //when
-        pleNutRepository.delete(pleNut);
+        pleNutRepository.delete(playNut);
 
         //then
-        Optional<PleNut> findPleNut = pleNutRepository.findById(pleNut.getId());
+        Optional<PlayNut> findPleNut = pleNutRepository.findById(playNut.getId());
         assertThat(findPleNut.isEmpty()).isTrue();
     }
 
@@ -65,15 +63,15 @@ class PleNutRepositoryTest {
         Member member = new Member();
         memberRepository.save(member);
 
-        PleNut pleNut = new PleNut();
-        pleNut.createPleNut(member);
-        pleNutRepository.save(pleNut);
+        PlayNut playNut = new PlayNut();
+        playNut.createPleNut(member);
+        pleNutRepository.save(playNut);
 
         //when
         memberRepository.delete(member);
 
         //then
-        Optional<PleNut> findPleNut = pleNutRepository.findById(pleNut.getId());
+        Optional<PlayNut> findPleNut = pleNutRepository.findById(playNut.getId());
         assertThat(findPleNut.isEmpty()).isTrue();
     }
 }

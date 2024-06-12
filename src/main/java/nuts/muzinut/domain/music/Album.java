@@ -21,11 +21,11 @@ public class Album {
     private String albumImg;
 
     @OneToMany(mappedBy = "album")
-    private List<Music> musicList = new ArrayList<>();
+    private List<Song> songList = new ArrayList<>();
 
     //연관 관계 메서드
-    public void addSongIntoAlbum(Music music) {
-        this.musicList.add(music);
-        music.setAlbum(this);
+    public void addSongIntoAlbum(Song song) {
+        this.songList.add(song);
+        song.setAlbum(this);
     }
 }

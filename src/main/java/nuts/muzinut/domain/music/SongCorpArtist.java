@@ -7,21 +7,21 @@ import nuts.muzinut.domain.member.Member;
 @Entity
 @Getter
 @Table(name = "music_corp_artist")
-public class MusicCorpArtist {
+public class SongCorpArtist {
 
     @Id @GeneratedValue
     @Column(name = "music_corp_artist_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Music music;
+    private Song song;
 
     @Column(name = "member_id")
     private Long memberId;
 
-    public void addCorpArtist(Music music, Member member) {
-        this.music = music;
+    public void addCorpArtist(Song song, Member member) {
+        this.song = song;
         this.memberId = member.getId();
-        music.getMusicCorpArtists().add(this);
+        song.getSongCorpArtists().add(this);
     }
 }

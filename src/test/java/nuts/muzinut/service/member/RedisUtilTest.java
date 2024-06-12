@@ -30,15 +30,4 @@ class RedisUtilTest {
         assertThat(redisUtil.getData(email)).isEqualTo("aaa111");
         assertThat(redisUtil.existData(email)).isTrue();
     }
-
-    @Test
-    void mailTest() {
-
-        //given
-
-        //when
-
-        //then
-
-    }
 }

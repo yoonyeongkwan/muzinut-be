@@ -13,10 +13,10 @@ import java.util.List;
 @Entity
 @NoArgsConstructor
 @Getter @Setter
-public class Music extends BaseBoardEntity {
+public class Song extends BaseBoardEntity {
 
     @Id @GeneratedValue
-    @Column(name = "music_id")
+    @Column(name = "song_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -32,11 +32,11 @@ public class Music extends BaseBoardEntity {
     @Column(name = "music_store_filename")
     private String musicStoreFilename;
 
-    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL)
-    private List<MusicGenre> musicGenres = new ArrayList<>();
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    private List<SongGenre> songGenres = new ArrayList<>();
 
-    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL)
-    private List<MusicCorpArtist> musicCorpArtists = new ArrayList<>();
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    private List<SongCorpArtist> songCorpArtists = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
@@ -45,6 +45,6 @@ public class Music extends BaseBoardEntity {
     //연관 관계 편의 메서드
     public void createMusic(Member member) {
         this.member = member;
-        member.getMusicList().add(this);
+        member.getSongList().add(this);
     }
 }

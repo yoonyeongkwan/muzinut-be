@@ -9,22 +9,22 @@ import java.util.List;
 
 @Entity
 @Getter
-public class PleNut {
+public class PlayNut {
 
     @Id @GeneratedValue
-    @Column(name = "plenut_id")
+    @Column(name = "playnut_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "pleNut", cascade = CascadeType.ALL)
-    private List<PleNutMusic> plenutMusics = new ArrayList<>();
+    @OneToMany(mappedBy = "playNut", cascade = CascadeType.ALL)
+    private List<PlayNutMusic> playNutMusics = new ArrayList<>();
 
     //연관관계 메서드
     public void createPleNut(Member member) {
         this.member = member;
-        member.getPleNut().add(this);
+        member.getPlayNutList().add(this);
     }
 }

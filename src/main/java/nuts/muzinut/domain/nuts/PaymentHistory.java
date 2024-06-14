@@ -2,7 +2,7 @@ package nuts.muzinut.domain.nuts;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 import java.time.LocalDateTime;
 
@@ -16,8 +16,8 @@ public class PaymentHistory {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "charge_amount")
     private int chargeAmount; //충전금액
@@ -28,9 +28,9 @@ public class PaymentHistory {
     private NutsStatus nutsStatus;
 
     //연관관계 메서드
-    public void newPayment(Member member, int money) {
-        this.member = member;
+    public void newPayment(User user, int money) {
+        this.user = user;
         this.chargeAmount = money;
-        member.getPaymentHistories().add(this);
+        user.getPaymentHistories().add(this);
     }
 }

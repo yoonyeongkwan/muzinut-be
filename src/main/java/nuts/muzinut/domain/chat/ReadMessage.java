@@ -2,7 +2,7 @@ package nuts.muzinut.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter
@@ -21,9 +21,9 @@ public class ReadMessage {
     private Long memberId;
 
     //연관 관계 메서드
-    public void read(Member member, Message message) {
+    public void read(User user, Message message) {
         this.message = message;
-        this.memberId = member.getId();
+        this.memberId = user.getId();
         message.getReadMessages().add(this);
     }
 }

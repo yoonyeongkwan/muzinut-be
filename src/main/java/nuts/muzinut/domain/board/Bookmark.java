@@ -2,7 +2,7 @@ package nuts.muzinut.domain.board;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter
@@ -13,7 +13,8 @@ public class Bookmark {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "board_id")
     private Long boardId;
@@ -23,10 +24,10 @@ public class Bookmark {
     private BoardType boardType;
 
     //연관 관계 메서드
-    public void addBookmark(Member member, Long boardId, BoardType boardType) {
-        this.member = member;
+    public void addBookmark(User user, Long boardId, BoardType boardType) {
+        this.user = user;
         this.boardId = boardId;
         this.boardType = boardType;
-        member.getBookmarks().add(this);
+        user.getBookmarks().add(this);
     }
 }

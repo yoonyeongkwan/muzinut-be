@@ -2,8 +2,7 @@ package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.board.RecruitBoardGenre;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,14 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class RecruitBoardGenreRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     RecruitBoardRepository recruitBoardRepository;
     @Autowired

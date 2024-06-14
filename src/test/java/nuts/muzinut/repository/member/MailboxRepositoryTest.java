@@ -3,19 +3,15 @@ package nuts.muzinut.repository.member;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import nuts.muzinut.domain.member.Mailbox;
-import nuts.muzinut.domain.member.Member;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import nuts.muzinut.domain.member.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -25,7 +21,7 @@ class MailboxRepositoryTest {
     EntityManager em;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private UserRepository userRepository;
     @Autowired
     private MailboxRepository mailboxRepository;
 
@@ -33,17 +29,17 @@ class MailboxRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member("email", "password");
-        memberRepository.save(member);
+        User user = new User("email", "password");
+        userRepository.save(user);
         Mailbox mailbox = new Mailbox();
-        mailbox.createMailbox(member);
+        mailbox.createMailbox(user);
 
         //when
         mailboxRepository.save(mailbox);
 
         //then
         Optional<Mailbox> findMailbox = mailboxRepository.findById(mailbox.getId());
-        assertThat(findMailbox.get().getMember()).isEqualTo(member); //저장된 메일함의 멤버를 확인
+        assertThat(findMailbox.get().getUser()).isEqualTo(user); //저장된 메일함의 멤버를 확인
         assertThat(findMailbox.get()).isEqualTo(mailbox); //저장된 메일함의 멤버를 확인
     }
 
@@ -51,10 +47,10 @@ class MailboxRepositoryTest {
     void delete() {
 
         //given
-        Member member = new Member("email", "password");
-        memberRepository.save(member);
+        User user = new User("email", "password");
+        userRepository.save(user);
         Mailbox mailbox = new Mailbox();
-        mailbox.createMailbox(member);
+        mailbox.createMailbox(user);
         mailboxRepository.save(mailbox);
 
         //when
@@ -72,14 +68,14 @@ class MailboxRepositoryTest {
     void delete_with_member() {
 
         //given
-        Member member = new Member("email", "password");
-        memberRepository.save(member);
+        User user = new User("email", "password");
+        userRepository.save(user);
         Mailbox mailbox = new Mailbox();
-        mailbox.createMailbox(member);
+        mailbox.createMailbox(user);
         mailboxRepository.save(mailbox);
 
         //when
-        memberRepository.delete(member);
+        userRepository.delete(user);
 
         //then
         Optional<Mailbox> findMailbox = mailboxRepository.findById(mailbox.getId());

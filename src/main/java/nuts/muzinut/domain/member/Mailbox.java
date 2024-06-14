@@ -12,15 +12,15 @@ public class Mailbox {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String message;
     private Boolean isChecked;
 
      //연관관계 편의 메서드
-    public void createMailbox(Member member) {
-        this.member = member;
-        member.getMailboxes().add(this);
+    public void createMailbox(User user) {
+        this.user = user;
+        user.getMailboxes().add(this);
     }
 }

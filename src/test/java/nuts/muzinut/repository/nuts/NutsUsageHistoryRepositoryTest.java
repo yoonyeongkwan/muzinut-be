@@ -1,9 +1,8 @@
 package nuts.muzinut.repository.nuts;
 
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.nuts.NutsUsageHistory;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,24 +11,24 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class NutsUsageHistoryRepositoryTest {
 
     @Autowired NutsUsageHistoryRepository nutsUsageHistoryRepository;
-    @Autowired MemberRepository memberRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Test
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         NutsUsageHistory nutsUsageHistory = new NutsUsageHistory();
-        nutsUsageHistory.createNutsHistory(member);
+        nutsUsageHistory.createNutsHistory(user);
 
         //when
         nutsUsageHistoryRepository.save(nutsUsageHistory);
@@ -37,7 +36,7 @@ class NutsUsageHistoryRepositoryTest {
         //then
         Optional<NutsUsageHistory> result = nutsUsageHistoryRepository.findById(nutsUsageHistory.getId());
         assertThat(result.get()).isEqualTo(nutsUsageHistory);
-        assertThat(result.get().getMember()).isEqualTo(member);
+        assertThat(result.get().getUser()).isEqualTo(user);
     }
 
     @Test
@@ -60,15 +59,15 @@ class NutsUsageHistoryRepositoryTest {
     void deleteMember() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         NutsUsageHistory nutsUsageHistory = new NutsUsageHistory();
-        nutsUsageHistory.createNutsHistory(member);
+        nutsUsageHistory.createNutsHistory(user);
         nutsUsageHistoryRepository.save(nutsUsageHistory);
 
         //when
-        memberRepository.delete(member);
+        userRepository.delete(user);
 
         //then
         Optional<NutsUsageHistory> result = nutsUsageHistoryRepository.findById(nutsUsageHistory.getId());

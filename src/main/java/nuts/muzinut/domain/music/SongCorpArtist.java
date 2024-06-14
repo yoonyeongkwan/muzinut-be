@@ -2,7 +2,7 @@ package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter
@@ -19,9 +19,9 @@ public class SongCorpArtist {
     @Column(name = "member_id")
     private Long memberId;
 
-    public void addCorpArtist(Song song, Member member) {
+    public void addCorpArtist(Song song, User user) {
         this.song = song;
-        this.memberId = member.getId();
+        this.memberId = user.getId();
         song.getSongCorpArtists().add(this);
     }
 }

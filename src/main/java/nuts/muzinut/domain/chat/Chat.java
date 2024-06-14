@@ -3,7 +3,6 @@ package nuts.muzinut.domain.chat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nuts.muzinut.domain.member.Member;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

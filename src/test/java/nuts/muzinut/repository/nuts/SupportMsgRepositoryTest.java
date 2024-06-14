@@ -1,26 +1,23 @@
 package nuts.muzinut.repository.nuts;
 
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.nuts.SupportMsg;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class SupportMsgRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     SupportMsgRepository supportMsgRepository;
 
@@ -28,10 +25,10 @@ class SupportMsgRepositoryTest {
     void save() {
 
         //given
-        Member artist = new Member();
-        memberRepository.save(artist);
-        Member sponsor = new Member();
-        memberRepository.save(sponsor);
+        User artist = new User();
+        userRepository.save(artist);
+        User sponsor = new User();
+        userRepository.save(sponsor);
 
         SupportMsg supportMsg = new SupportMsg();
         supportMsg.addSupportMsg(artist, sponsor, "후원받아라", 100);
@@ -42,7 +39,7 @@ class SupportMsgRepositoryTest {
         //then
         Optional<SupportMsg> findSupportMsg = supportMsgRepository.findById(supportMsg.getId());
         assertThat(findSupportMsg.get()).isEqualTo(supportMsg);
-        assertThat(findSupportMsg.get().getMember()).isEqualTo(artist);
+        assertThat(findSupportMsg.get().getUser()).isEqualTo(artist);
         assertThat(findSupportMsg.get().getSponsorId()).isEqualTo(sponsor.getId());
     }
 
@@ -66,17 +63,17 @@ class SupportMsgRepositoryTest {
     void deleteMember() {
 
         //given
-        Member artist = new Member();
-        memberRepository.save(artist);
-        Member sponsor = new Member();
-        memberRepository.save(sponsor);
+        User artist = new User();
+        userRepository.save(artist);
+        User sponsor = new User();
+        userRepository.save(sponsor);
 
         SupportMsg supportMsg = new SupportMsg();
         supportMsg.addSupportMsg(artist, sponsor, "후원받아라", 100);
         supportMsgRepository.save(supportMsg);
 
         //when
-        memberRepository.delete(artist);
+        userRepository.delete(artist);
 
         //then
         Optional<SupportMsg> findSupportMsg = supportMsgRepository.findById(supportMsg.getId());

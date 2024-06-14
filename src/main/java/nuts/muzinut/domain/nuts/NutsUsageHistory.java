@@ -2,7 +2,7 @@ package nuts.muzinut.domain.nuts;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 import java.time.LocalDateTime;
 
@@ -16,8 +16,8 @@ public class NutsUsageHistory {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "used_nuts_count")
     private int usedNutsCount; //너츠 사용 개수
@@ -35,8 +35,8 @@ public class NutsUsageHistory {
     private String supportMsg; //후원 메시지
 
     //연관 관계 편의 메서드
-    public void createNutsHistory(Member member) {
-        this.member = member;
-        member.getNutsUsageHistories().add(this);
+    public void createNutsHistory(User user) {
+        this.user = user;
+        user.getNutsUsageHistories().add(this);
     }
 }

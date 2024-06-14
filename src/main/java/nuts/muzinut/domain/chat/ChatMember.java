@@ -3,7 +3,7 @@ package nuts.muzinut.domain.chat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter @Setter
@@ -15,8 +15,8 @@ public class ChatMember {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
@@ -36,9 +36,9 @@ public class ChatMember {
     }
 
     //채팅창에 참가
-    public void joinChatRoom(Member member, Chat chat) {
-        this.member = member;
-        member.getChatMembers().add(this);
+    public void joinChatRoom(User user, Chat chat) {
+        this.user = user;
+        user.getChatMembers().add(this);
         chat.addParticipate(); //채팅방 인원수 증가
     }
 }

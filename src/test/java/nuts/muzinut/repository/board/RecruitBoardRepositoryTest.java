@@ -1,9 +1,8 @@
 package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.RecruitBoard;
-import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,13 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+
 @SpringBootTest
 @Transactional
 class RecruitBoardRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     RecruitBoardRepository recruitBoardRepository;
 
@@ -26,11 +25,11 @@ class RecruitBoardRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         RecruitBoard recruitBoard = new RecruitBoard();
-        recruitBoard.createRecruitBoard(member);
+        recruitBoard.createRecruitBoard(user);
 
         //when
         recruitBoardRepository.save(recruitBoard);
@@ -38,7 +37,7 @@ class RecruitBoardRepositoryTest {
         //then
         Optional<RecruitBoard> findRecruitBoard = recruitBoardRepository.findById(recruitBoard.getId());
         assertThat(findRecruitBoard.get()).isEqualTo(recruitBoard);
-        assertThat(findRecruitBoard.get().getMember()).isEqualTo(member);
+        assertThat(findRecruitBoard.get().getUser()).isEqualTo(user);
     }
 
     @Test

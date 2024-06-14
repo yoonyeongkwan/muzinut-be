@@ -2,9 +2,8 @@ package nuts.muzinut.repository.chat;
 
 import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.ChatMember;
-import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,22 +13,22 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ChatMemberRepositoryTest {
+class ChatUsersRepositoryTest {
 
     @Autowired ChatMemberRepository chatMemberRepository;
-    @Autowired MemberRepository memberRepository;
+    @Autowired
+    UserRepository userRepository;
     @Autowired ChatRepository chatRepository;
 
     @Test
     void participate() {
 
         //given
-        Member m1 = new Member();
-        Member m2 = new Member();
+        User m1 = new User();
+        User m2 = new User();
 
         Chat chat = new Chat();
         ChatMember chatMember = new ChatMember();
@@ -47,8 +46,8 @@ class ChatMemberRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Chat chat = new Chat();
         chatRepository.save(chat);
@@ -56,7 +55,7 @@ class ChatMemberRepositoryTest {
         //회원이 생성된 채팅방에 들어감
         ChatMember chatMember = new ChatMember();
         chatMember.createChat(chat);
-        chatMember.joinChatRoom(member, chat);
+        chatMember.joinChatRoom(user, chat);
 
         //when
         chatMemberRepository.save(chatMember);
@@ -64,14 +63,14 @@ class ChatMemberRepositoryTest {
         //then
         Optional<ChatMember> findChatMember = chatMemberRepository.findById(chatMember.getId());
         assertThat(findChatMember.get().getChat()).isEqualTo(chat);
-        assertThat(findChatMember.get().getMember()).isEqualTo(member);
+        assertThat(findChatMember.get().getUser()).isEqualTo(user);
 
         //채팅 연관관계 테스트
         Optional<Chat> findChat = chatRepository.findById(chat.getId());
         assertThat(findChat.get()).isEqualTo(chat);
 
         //회원 연관관계 테스트
-        Optional<Member> findMember = memberRepository.findById(member.getId());
+        Optional<User> findMember = userRepository.findById(user.getId());
         assertThat(findMember.get().getChatMembers().getFirst()).isEqualTo(chatMember);
     }
 
@@ -80,8 +79,8 @@ class ChatMemberRepositoryTest {
     void joinSeveralChatRoom() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Chat chat1 = new Chat();
         Chat chat2 = new Chat();
@@ -91,12 +90,12 @@ class ChatMemberRepositoryTest {
         //회원이 첫번째 채팅방에 들어감
         ChatMember chatMember1 = new ChatMember();
         chatMember1.createChat(chat1);
-        chatMember1.joinChatRoom(member, chat1);
+        chatMember1.joinChatRoom(user, chat1);
 
         //회원이 두번째 채팅방에 들어감
         ChatMember chatMember2 = new ChatMember();
         chatMember2.createChat(chat2);
-        chatMember2.joinChatRoom(member, chat2);
+        chatMember2.joinChatRoom(user, chat2);
 
         //when
         chatMemberRepository.save(chatMember1);
@@ -116,15 +115,15 @@ class ChatMemberRepositoryTest {
         //회원은 1명
         assertThat(result)
                 .extracting("member")
-                .containsOnly(member);
+                .containsOnly(user);
     }
 
     @Test
     void delete() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Chat chat1 = new Chat();
         Chat chat2 = new Chat();
@@ -134,7 +133,7 @@ class ChatMemberRepositoryTest {
         //회원이 첫번째 채팅방에 들어감
         ChatMember chatMember = new ChatMember();
         chatMember.createChat(chat1);
-        chatMember.joinChatRoom(member, chat1);
+        chatMember.joinChatRoom(user, chat1);
         chatMemberRepository.save(chatMember);
 
         //when

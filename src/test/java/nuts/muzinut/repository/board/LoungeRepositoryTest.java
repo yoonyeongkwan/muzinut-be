@@ -1,9 +1,8 @@
 package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.Lounge;
-import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 class LoungeRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     LoungeRepository loungeRepository;
 
@@ -26,11 +25,11 @@ class LoungeRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Lounge lounge = new Lounge();
-        lounge.createLounge(member);
+        lounge.createLounge(user);
 
         //when
         loungeRepository.save(lounge);
@@ -38,7 +37,7 @@ class LoungeRepositoryTest {
         //then
         Optional<Lounge> findLounge = loungeRepository.findById(lounge.getId());
         assertThat(findLounge.get()).isEqualTo(lounge);
-        assertThat(findLounge.get().getMember()).isEqualTo(member);
+        assertThat(findLounge.get().getUser()).isEqualTo(user);
     }
 
     @Test

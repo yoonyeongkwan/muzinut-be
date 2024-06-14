@@ -2,12 +2,9 @@ package nuts.muzinut.repository.member;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.validation.constraints.Size;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.Follow;
-import nuts.muzinut.domain.member.Member;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
+import nuts.muzinut.domain.member.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +19,7 @@ import static org.assertj.core.api.Assertions.*;
 @Slf4j
 class FollowRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
+    @Autowired UserRepository userRepository;
     @Autowired FollowRepository followRepository;
     @PersistenceContext EntityManager em;
 
@@ -33,13 +30,13 @@ class FollowRepositoryTest {
     void basicAddFollow() {
 
         //given
-        Member m1 = new Member("m1", "1234");
-        Member m2 = new Member("m2", "1234");
-        Member m3 = new Member("m3", "1234");
+        User m1 = new User("m1@naver.com", "1234");
+        User m2 = new User("m2@naver.com", "1234");
+        User m3 = new User("m3@naver.com", "1234");
 
-        memberRepository.save(m1);
-        memberRepository.save(m2);
-        memberRepository.save(m3);
+        userRepository.save(m1);
+        userRepository.save(m2);
+        userRepository.save(m3);
 
         Follow follow1 = new Follow();
         Follow follow2 = new Follow();

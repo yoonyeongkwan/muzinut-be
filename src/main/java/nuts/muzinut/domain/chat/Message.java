@@ -2,7 +2,7 @@ package nuts.muzinut.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
@@ -22,8 +22,8 @@ public class Message {
     private Chat chat;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String message;
     private int read; //읽은 사람 수
@@ -37,16 +37,16 @@ public class Message {
     //연관 관계 메서드
 
     /**
-     * @param member:  채팅 작성자
+     * @param user:  채팅 작성자
      * @param chat:    채팅방
      * @param message: 메시지
      */
-    public void createMessage(Member member, Chat chat, String message) {
-        this.member = member;
+    public void createMessage(User user, Chat chat, String message) {
+        this.user = user;
         this.chat = chat;
         this.message = message;
         this.send_time = LocalDateTime.now();
-        member.getMessages().add(this);
+        user.getMessages().add(this);
         chat.getMessages().add(this);
     }
 

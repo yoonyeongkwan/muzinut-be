@@ -3,7 +3,7 @@ package nuts.muzinut.domain.board;
 import jakarta.persistence.*;
 import lombok.Getter;
 import nuts.muzinut.domain.baseEntity.BaseTimeEntity;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter
@@ -19,7 +19,7 @@ public class Reply extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private User user;
 
     private String content;
 

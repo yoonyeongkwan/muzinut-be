@@ -18,7 +18,7 @@ import nuts.muzinut.domain.nuts.SupportMsg;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+//@Entity
 @Getter @Setter
 @NoArgsConstructor
 public class Member extends BaseTimeEntity {
@@ -53,55 +53,55 @@ public class Member extends BaseTimeEntity {
     //관계 매핑
 
     //회원 관련
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Mailbox> mailboxes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Follow> followings = new ArrayList<>();
-
-    //음악 관련
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Song> songList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<PlayNut> playNutList = new ArrayList<>();
-
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
-    private Playlist playlist;
-
-    //게시판 관련
-    @OneToMany(mappedBy = "member")
-    private List<RecruitBoard> recruitBoards = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<FreeBoard> freeBoards = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Lounge> lounges = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Bookmark> bookmarks = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Like> likeList = new ArrayList<>();
-
-    //후원 관련
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<PaymentHistory> paymentHistories = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<SupportMsg> supportMsgs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<NutsUsageHistory> nutsUsageHistories = new ArrayList<>();
-
-    //채팅 관련
-    @OneToMany(mappedBy = "member")
-    private List<ChatMember> chatMembers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member")
-    private List<Message> messages = new ArrayList<>();
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<Mailbox> mailboxes = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<Follow> followings = new ArrayList<>();
+//
+//    //음악 관련
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<Song> songList = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<PlayNut> playNutList = new ArrayList<>();
+//
+//    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
+//    private Playlist playlist;
+//
+//    //게시판 관련
+//    @OneToMany(mappedBy = "member")
+//    private List<RecruitBoard> recruitBoards = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<FreeBoard> freeBoards = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Lounge> lounges = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Comment> comments = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<Bookmark> bookmarks = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Like> likeList = new ArrayList<>();
+//
+//    //후원 관련
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<PaymentHistory> paymentHistories = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<SupportMsg> supportMsgs = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+//    private List<NutsUsageHistory> nutsUsageHistories = new ArrayList<>();
+//
+//    //채팅 관련
+//    @OneToMany(mappedBy = "member")
+//    private List<ChatMember> chatMembers = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "member")
+//    private List<Message> messages = new ArrayList<>();
 }

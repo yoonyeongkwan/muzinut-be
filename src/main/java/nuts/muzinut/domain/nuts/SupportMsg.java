@@ -2,7 +2,7 @@ package nuts.muzinut.domain.nuts;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter
@@ -14,8 +14,8 @@ public class SupportMsg {
     private Long id;
 
     @ManyToOne(fetch =  FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "sponsor_id")
     private Long sponsorId; //후원한 팬 pk
@@ -24,15 +24,15 @@ public class SupportMsg {
 
     /**
      * 연관관계 편의 메서드
-     * @param member:  후원 받는 회원
+     * @param user:  후원 받는 회원
      * @param sponsor: 후원하는 팬
      * @param message: 후원 메시지
      * @param nuts:    후원 nuts
      */
-    public void addSupportMsg(Member member, Member sponsor, String message, int nuts) {
-        this.member = member;
+    public void addSupportMsg(User user, User sponsor, String message, int nuts) {
+        this.user = user;
         this.sponsorId = sponsor.getId();
         this.message = message;
-        member.getSupportMsgs().add(this);
+        user.getSupportMsgs().add(this);
     }
 }

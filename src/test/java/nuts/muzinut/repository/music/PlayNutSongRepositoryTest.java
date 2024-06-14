@@ -1,10 +1,10 @@
 package nuts.muzinut.repository.music;
 
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.music.PlayNutMusic;
-import nuts.muzinut.repository.member.MemberRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,20 +19,20 @@ import static org.assertj.core.api.Assertions.*;
 class PlayNutSongRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
-    PleNutRepository pleNutRepository;
+    PlayNutRepository playNutRepository;
     @Autowired
     MusicRepository musicRepository;
     @Autowired
-    PleNutMusicRepository pleNutMusicRepository;
+    PlayNutMusicRepository playNutMusicRepository;
 
     @Test
     void save() {
 
         //given
         PlayNut playNut = new PlayNut();
-        pleNutRepository.save(playNut);
+        playNutRepository.save(playNut);
 
         Song song = new Song();
         musicRepository.save(song);
@@ -41,10 +41,10 @@ class PlayNutSongRepositoryTest {
         playNutMusic.addPlaylistMusic(playNut, song);
 
         //when
-        pleNutMusicRepository.save(playNutMusic);
+        playNutMusicRepository.save(playNutMusic);
 
         //then
-        Optional<PlayNutMusic> findPleNutMusic = pleNutMusicRepository.findById(playNutMusic.getId());
+        Optional<PlayNutMusic> findPleNutMusic = playNutMusicRepository.findById(playNutMusic.getId());
         assertThat(findPleNutMusic.get()).isEqualTo(playNutMusic);
         assertThat(findPleNutMusic.get().getPlayNut()).isEqualTo(playNut);
     }
@@ -54,13 +54,13 @@ class PlayNutSongRepositoryTest {
 
         //given
         PlayNutMusic playNutMusic = new PlayNutMusic();
-        pleNutMusicRepository.save(playNutMusic);
+        playNutMusicRepository.save(playNutMusic);
 
         //when
-        pleNutMusicRepository.delete(playNutMusic);
+        playNutMusicRepository.delete(playNutMusic);
 
         //then
-        Optional<PlayNutMusic> findPleNutMusic = pleNutMusicRepository.findById(playNutMusic.getId());
+        Optional<PlayNutMusic> findPleNutMusic = playNutMusicRepository.findById(playNutMusic.getId());
         assertThat(findPleNutMusic.isEmpty()).isTrue();
     }
 
@@ -70,20 +70,20 @@ class PlayNutSongRepositoryTest {
 
         //given
         PlayNut playNut = new PlayNut();
-        pleNutRepository.save(playNut);
+        playNutRepository.save(playNut);
 
         Song song = new Song();
         musicRepository.save(song);
 
         PlayNutMusic playNutMusic = new PlayNutMusic();
         playNutMusic.addPlaylistMusic(playNut, song);
-        pleNutMusicRepository.save(playNutMusic);
+        playNutMusicRepository.save(playNutMusic);
 
         //when
-        pleNutRepository.delete(playNut);
+        playNutRepository.delete(playNut);
 
         //then
-        Optional<PlayNutMusic> findPleNutMusic = pleNutMusicRepository.findById(playNutMusic.getId());
+        Optional<PlayNutMusic> findPleNutMusic = playNutMusicRepository.findById(playNutMusic.getId());
         assertThat(findPleNutMusic.isEmpty()).isTrue();
     }
 
@@ -92,28 +92,28 @@ class PlayNutSongRepositoryTest {
     void deleteMember() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         PlayNut playNut = new PlayNut();
-        playNut.createPleNut(member);
-        pleNutRepository.save(playNut);
+        playNut.createPleNut(user);
+        playNutRepository.save(playNut);
 
         Song song = new Song();
         musicRepository.save(song);
 
         PlayNutMusic playNutMusic = new PlayNutMusic();
         playNutMusic.addPlaylistMusic(playNut, song);
-        pleNutMusicRepository.save(playNutMusic);
+        playNutMusicRepository.save(playNutMusic);
 
         //when
-        memberRepository.delete(member);
+        userRepository.delete(user);
 
         //then
-        Optional<PlayNutMusic> findPleNutMusic = pleNutMusicRepository.findById(playNutMusic.getId());
+        Optional<PlayNutMusic> findPleNutMusic = playNutMusicRepository.findById(playNutMusic.getId());
         assertThat(findPleNutMusic.isEmpty()).isTrue();
 
-        Optional<PlayNut> findPleNut = pleNutRepository.findById(playNut.getId());
+        Optional<PlayNut> findPleNut = playNutRepository.findById(playNut.getId());
         assertThat(findPleNut.isEmpty()).isTrue();
     }
 }

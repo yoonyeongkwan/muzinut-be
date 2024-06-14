@@ -1,9 +1,9 @@
 package nuts.muzinut.repository.music;
 
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.domain.music.SongCorpArtist;
-import nuts.muzinut.repository.member.MemberRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +21,7 @@ class SongCorpArtistRepositoryTest {
     @Autowired
     MusicRepository musicRepository;
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     MusicCorpArtistRepository musicCorpArtistRepository;
 
@@ -29,17 +29,17 @@ class SongCorpArtistRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         //음악 만드는데 협조한 아티스트
-        Member corpArtist1 = new Member();
-        Member corpArtist2 = new Member();
-        memberRepository.save(corpArtist1);
-        memberRepository.save(corpArtist2);
+        User corpArtist1 = new User();
+        User corpArtist2 = new User();
+        userRepository.save(corpArtist1);
+        userRepository.save(corpArtist2);
 
         Song song = new Song();
-        song.createMusic(member);
+        song.createMusic(user);
         musicRepository.save(song);
 
         SongCorpArtist corp1 = new SongCorpArtist();
@@ -85,17 +85,17 @@ class SongCorpArtistRepositoryTest {
     void deleteMusic() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         //음악 만드는데 협조한 아티스트
-        Member corpArtist1 = new Member();
-        Member corpArtist2 = new Member();
-        memberRepository.save(corpArtist1);
-        memberRepository.save(corpArtist2);
+        User corpArtist1 = new User();
+        User corpArtist2 = new User();
+        userRepository.save(corpArtist1);
+        userRepository.save(corpArtist2);
 
         Song song = new Song();
-        song.createMusic(member);
+        song.createMusic(user);
         musicRepository.save(song);
 
         SongCorpArtist corp1 = new SongCorpArtist();

@@ -1,4 +1,4 @@
-package nuts.muzinut.dto.security;
+package nuts.muzinut.dto;
 
 import java.util.ArrayList;
 import java.util.List;

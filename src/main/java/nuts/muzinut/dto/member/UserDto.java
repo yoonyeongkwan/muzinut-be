@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Size;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.security.AuthorityDto;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,13 @@ public class UserDto {
     @Size(min = 3, max = 50)
     private String nickname;
 
-    private Set<AuthorityDto> authorityDtoSet;
+    private Set<AuthorityDto> authorityDtoSet = new HashSet<>();
+
+    public UserDto(String username, String password, String nickname) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+    }
 
     public static UserDto from(User user) {
         if(user == null) return null;

@@ -9,7 +9,7 @@ import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class DataInit {
 
@@ -22,5 +22,7 @@ public class DataInit {
         AuthorityDto authorityDto = new AuthorityDto("admin");
         UserDto userDto = new UserDto("admin", "admin", "add");
         userService.signup(userDto);
+        UserDto userDto2 = new UserDto("admin1", "admin1", "add");
+        userService.signup(userDto2);
     }
 }

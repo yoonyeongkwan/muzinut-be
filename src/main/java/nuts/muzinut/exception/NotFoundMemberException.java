@@ -1,5 +1,6 @@
 package nuts.muzinut.exception;
 
+//로그인 시도 했는데 없는 회원인 경우
 public class NotFoundMemberException extends RuntimeException{
     public NotFoundMemberException() {
         super();

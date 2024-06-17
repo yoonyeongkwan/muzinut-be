@@ -1,10 +1,10 @@
 package nuts.muzinut.repository.music;
 
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.domain.music.Playlist;
 import nuts.muzinut.domain.music.PlaylistMusic;
-import nuts.muzinut.repository.member.MemberRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +23,7 @@ class PlaylistSongRepositoryTest {
     @Autowired
     PlaylistMusicRepository playlistMusicRepository;
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     MusicRepository musicRepository;
 
@@ -93,11 +93,11 @@ class PlaylistSongRepositoryTest {
     void deleteMember() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Playlist playlist = new Playlist();
-        playlist.createPlaylist(member);
+        playlist.createPlaylist(user);
         playlistRepository.save(playlist);
 
         Song song = new Song();
@@ -108,7 +108,7 @@ class PlaylistSongRepositoryTest {
         playlistMusicRepository.save(playlistMusic);
 
         //when
-        memberRepository.delete(member);
+        userRepository.delete(user);
 
         //then
         Optional<PlaylistMusic> findPlaylistMusic = playlistMusicRepository.findById(playlistMusic.getId());

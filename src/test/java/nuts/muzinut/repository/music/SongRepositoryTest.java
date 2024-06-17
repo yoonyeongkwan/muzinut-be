@@ -1,8 +1,8 @@
 package nuts.muzinut.repository.music;
 
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
-import nuts.muzinut.repository.member.MemberRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 class SongRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     MusicRepository musicRepository;
 
@@ -25,10 +25,10 @@ class SongRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
         Song song = new Song();
-        song.createMusic(member);
+        song.createMusic(user);
 
         //when
         musicRepository.save(song);
@@ -36,7 +36,7 @@ class SongRepositoryTest {
         //then
         Optional<Song> findMusic = musicRepository.findById(song.getId());
         assertThat(findMusic.get()).isEqualTo(song);
-        assertThat(findMusic.get()).isEqualTo(member.getSongList().getFirst());
+        assertThat(findMusic.get()).isEqualTo(user.getSongList().getFirst());
     }
 
     @Test

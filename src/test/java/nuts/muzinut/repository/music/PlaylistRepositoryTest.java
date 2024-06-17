@@ -1,8 +1,8 @@
 package nuts.muzinut.repository.music;
 
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Playlist;
-import nuts.muzinut.repository.member.MemberRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 class PlaylistRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     PlaylistRepository playlistRepository;
 
@@ -25,29 +25,29 @@ class PlaylistRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
         Playlist playlist = new Playlist();
 
         //when
-        playlist.createPlaylist(member);
+        playlist.createPlaylist(user);
         playlistRepository.save(playlist);
 
         //then
         Optional<Playlist> findPlaylist = playlistRepository.findById(playlist.getId());
         assertThat(findPlaylist.get()).isEqualTo(playlist);
-        assertThat(findPlaylist.get().getMember()).isEqualTo(member);
+        assertThat(findPlaylist.get().getUser()).isEqualTo(user);
     }
 
     @Test
     void delete() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Playlist playlist = new Playlist();
-        playlist.createPlaylist(member);
+        playlist.createPlaylist(user);
         playlistRepository.save(playlist);
 
         //when
@@ -63,15 +63,15 @@ class PlaylistRepositoryTest {
     void deleteMember() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Playlist playlist = new Playlist();
-        playlist.createPlaylist(member);
+        playlist.createPlaylist(user);
         playlistRepository.save(playlist);
 
         //when
-        memberRepository.delete(member);
+        userRepository.delete(user);
 
         //then
         Optional<Playlist> findPlaylist = playlistRepository.findById(playlist.getId());

@@ -2,9 +2,8 @@ package nuts.muzinut.repository.chat;
 
 import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.Message;
-import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,14 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class MessageRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     ChatRepository chatRepository;
     @Autowired
@@ -31,8 +29,8 @@ class MessageRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Chat chat = new Chat();
         chatRepository.save(chat);
@@ -41,8 +39,8 @@ class MessageRepositoryTest {
         Message msg2 = new Message();
 
         //when
-        msg1.createMessage(member, chat, "msg1");
-        msg2.createMessage(member, chat, "msg2");
+        msg1.createMessage(user, chat, "msg1");
+        msg2.createMessage(user, chat, "msg2");
         messageRepository.save(msg1);
         messageRepository.save(msg2);
 
@@ -61,22 +59,22 @@ class MessageRepositoryTest {
 
         //채팅을 작성한 인원은 1명
         assertThat(result)
-                .extracting("member")
-                .containsOnly(member);
+                .extracting("user")
+                .containsOnly(user);
     }
 
     @Test
     void delete() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Chat chat = new Chat();
         chatRepository.save(chat);
 
         Message msg1 = new Message();
-        msg1.createMessage(member, chat, "msg1");
+        msg1.createMessage(user, chat, "msg1");
         messageRepository.save(msg1);
 
         //when

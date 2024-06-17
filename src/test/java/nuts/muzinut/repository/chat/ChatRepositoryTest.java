@@ -3,9 +3,8 @@ package nuts.muzinut.repository.chat;
 import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.chat.RoomType;
-import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,14 +14,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class ChatRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     ChatRepository chatRepository;
     @Autowired
@@ -64,11 +62,11 @@ class ChatRepositoryTest {
     void deleteWithMessage() {
 
         //given
-        Member member1 = new Member();
-        memberRepository.save(member1);
+        User user1 = new User();
+        userRepository.save(user1);
 
-        Member member2 = new Member();
-        memberRepository.save(member2);
+        User user2 = new User();
+        userRepository.save(user2);
 
         Chat chat = new Chat();
         chatRepository.save(chat);
@@ -77,8 +75,8 @@ class ChatRepositoryTest {
         Message msg2 = new Message();
 
         //하나의 채팅방에 2개의 메시지가 있는 상황
-        msg1.createMessage(member1, chat, "msg1");
-        msg2.createMessage(member2, chat, "msg2");
+        msg1.createMessage(user1, chat, "msg1");
+        msg2.createMessage(user2, chat, "msg2");
         messageRepository.save(msg1);
         messageRepository.save(msg2);
 

@@ -1,4 +1,4 @@
-package nuts.muzinut.dto;
+package nuts.muzinut.dto.email;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;

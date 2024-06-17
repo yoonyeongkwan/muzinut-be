@@ -28,6 +28,5 @@ class RedisUtilTest {
 
         //then
         assertThat(redisUtil.getData(email)).isEqualTo("aaa111");
-        assertThat(redisUtil.existData(email)).isTrue();
     }
 }

@@ -1,9 +1,9 @@
 package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.*;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
-import nuts.muzinut.repository.member.MemberRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.MusicRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 class CommentRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
+    @Autowired UserRepository userRepository;
     @Autowired FreeBoardRepository freeBoardRepository;
     @Autowired LoungeRepository loungeRepository;
     @Autowired RecruitBoardRepository recruitBoardRepository;
@@ -29,14 +29,14 @@ class CommentRepositoryTest {
     void musicComment() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Song song = new Song();
         musicRepository.save(song);
 
         Comment comment = new Comment();
-        comment.addComment(member, song.getId(), BoardType.MUSIC, "content");
+        comment.addComment(user, song.getId(), BoardType.MUSIC, "content");
 
         //when
         commentRepository.save(comment);
@@ -44,7 +44,7 @@ class CommentRepositoryTest {
         //then
         Optional<Comment> findComment = commentRepository.findById(comment.getId());
         assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getMember()).isEqualTo(member);
+        assertThat(findComment.get().getUser()).isEqualTo(user);
         assertThat(findComment.get().getBoardId()).isEqualTo(song.getId());
     }
 
@@ -52,14 +52,14 @@ class CommentRepositoryTest {
     void freeBoardComment() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         FreeBoard freeBoard = new FreeBoard();
         freeBoardRepository.save(freeBoard);
 
         Comment comment = new Comment();
-        comment.addComment(member, freeBoard.getId(), BoardType.FREE, "content");
+        comment.addComment(user, freeBoard.getId(), BoardType.FREE, "content");
 
         //when
         commentRepository.save(comment);
@@ -67,7 +67,7 @@ class CommentRepositoryTest {
         //then
         Optional<Comment> findComment = commentRepository.findById(comment.getId());
         assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getMember()).isEqualTo(member);
+        assertThat(findComment.get().getUser()).isEqualTo(user);
         assertThat(findComment.get().getBoardId()).isEqualTo(freeBoard.getId());
     }
 
@@ -75,14 +75,14 @@ class CommentRepositoryTest {
     void LoungeComment() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Lounge lounge = new Lounge();
         loungeRepository.save(lounge);
 
         Comment comment = new Comment();
-        comment.addComment(member, lounge.getId(), BoardType.LOUNGE, "content");
+        comment.addComment(user, lounge.getId(), BoardType.LOUNGE, "content");
 
         //when
         commentRepository.save(comment);
@@ -90,7 +90,7 @@ class CommentRepositoryTest {
         //then
         Optional<Comment> findComment = commentRepository.findById(comment.getId());
         assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getMember()).isEqualTo(member);
+        assertThat(findComment.get().getUser()).isEqualTo(user);
         assertThat(findComment.get().getBoardId()).isEqualTo(lounge.getId());
     }
 
@@ -98,14 +98,14 @@ class CommentRepositoryTest {
     void RecruitBoardComment() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         RecruitBoard recruitBoard = new RecruitBoard();
         recruitBoardRepository.save(recruitBoard);
 
         Comment comment = new Comment();
-        comment.addComment(member, recruitBoard.getId(), BoardType.LOUNGE, "content");
+        comment.addComment(user, recruitBoard.getId(), BoardType.LOUNGE, "content");
 
         //when
         commentRepository.save(comment);
@@ -113,7 +113,7 @@ class CommentRepositoryTest {
         //then
         Optional<Comment> findComment = commentRepository.findById(comment.getId());
         assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getMember()).isEqualTo(member);
+        assertThat(findComment.get().getUser()).isEqualTo(user);
         assertThat(findComment.get().getBoardId()).isEqualTo(recruitBoard.getId());
     }
 

@@ -1,9 +1,8 @@
 package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.*;
-import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 class BookmarkRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
+    @Autowired UserRepository userRepository;
     @Autowired FreeBoardRepository freeBoardRepository;
     @Autowired LoungeRepository loungeRepository;
     @Autowired RecruitBoardRepository recruitBoardRepository;
@@ -27,14 +26,14 @@ class BookmarkRepositoryTest {
     void bookmarkFreeBoard() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         FreeBoard freeBoard = new FreeBoard();
         freeBoardRepository.save(freeBoard);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(member, freeBoard.getId(), BoardType.FREE);
+        bookmark.addBookmark(user, freeBoard.getId(), BoardType.FREE);
 
         //when
         bookmarkRepository.save(bookmark);
@@ -42,7 +41,7 @@ class BookmarkRepositoryTest {
         //then
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());
         assertThat(findBookmark.get()).isEqualTo(bookmark);
-        assertThat(findBookmark.get().getMember()).isEqualTo(member);
+        assertThat(findBookmark.get().getUser()).isEqualTo(user);
         assertThat(findBookmark.get().getBoardId()).isEqualTo(freeBoard.getId());
         assertThat(findBookmark.get().getBoardType()).isEqualTo(BoardType.FREE);
     }
@@ -51,14 +50,14 @@ class BookmarkRepositoryTest {
     void bookmarkRecruitBoard() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         RecruitBoard recruitBoard = new RecruitBoard();
         recruitBoardRepository.save(recruitBoard);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(member, recruitBoard.getId(), BoardType.RECRUIT);
+        bookmark.addBookmark(user, recruitBoard.getId(), BoardType.RECRUIT);
 
         //when
         bookmarkRepository.save(bookmark);
@@ -66,7 +65,7 @@ class BookmarkRepositoryTest {
         //then
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());
         assertThat(findBookmark.get()).isEqualTo(bookmark);
-        assertThat(findBookmark.get().getMember()).isEqualTo(member);
+        assertThat(findBookmark.get().getUser()).isEqualTo(user);
         assertThat(findBookmark.get().getBoardId()).isEqualTo(recruitBoard.getId());
         assertThat(findBookmark.get().getBoardType()).isEqualTo(BoardType.RECRUIT);
     }
@@ -75,14 +74,14 @@ class BookmarkRepositoryTest {
     void bookmarkLounge() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Lounge lounge = new Lounge();
         loungeRepository.save(lounge);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(member, lounge.getId(), BoardType.LOUNGE);
+        bookmark.addBookmark(user, lounge.getId(), BoardType.LOUNGE);
 
         //when
         bookmarkRepository.save(bookmark);
@@ -90,7 +89,7 @@ class BookmarkRepositoryTest {
         //then
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());
         assertThat(findBookmark.get()).isEqualTo(bookmark);
-        assertThat(findBookmark.get().getMember()).isEqualTo(member);
+        assertThat(findBookmark.get().getUser()).isEqualTo(user);
         assertThat(findBookmark.get().getBoardId()).isEqualTo(lounge.getId());
         assertThat(findBookmark.get().getBoardType()).isEqualTo(BoardType.LOUNGE);
     }
@@ -115,18 +114,18 @@ class BookmarkRepositoryTest {
     void deleteMember() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         Lounge lounge = new Lounge();
         loungeRepository.save(lounge);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(member, lounge.getId(), BoardType.LOUNGE);
+        bookmark.addBookmark(user, lounge.getId(), BoardType.LOUNGE);
         bookmarkRepository.save(bookmark);
 
         //when
-        memberRepository.delete(member);
+        userRepository.delete(user);
 
         //then
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());

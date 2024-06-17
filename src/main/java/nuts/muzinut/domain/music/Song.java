@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nuts.muzinut.domain.baseEntity.BaseBoardEntity;
-import nuts.muzinut.domain.member.Member;
+import nuts.muzinut.domain.member.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +20,8 @@ public class Song extends BaseBoardEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String intro;
     private String article;
@@ -43,8 +43,8 @@ public class Song extends BaseBoardEntity {
     private Album album;
 
     //연관 관계 편의 메서드
-    public void createMusic(Member member) {
-        this.member = member;
-        member.getSongList().add(this);
+    public void createMusic(User user) {
+        this.user = user;
+        user.getSongList().add(this);
     }
 }

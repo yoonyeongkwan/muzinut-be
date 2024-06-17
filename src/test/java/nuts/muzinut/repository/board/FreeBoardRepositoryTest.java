@@ -2,11 +2,9 @@ package nuts.muzinut.repository.board;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.FreeBoard;
-import nuts.muzinut.domain.member.Member;
-import nuts.muzinut.repository.member.MemberRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,14 +17,13 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class FreeBoardRepositoryTest {
 
     @Autowired
-    MemberRepository memberRepository;
+    UserRepository userRepository;
     @Autowired
     FreeBoardRepository freeBoardRepository;
     @PersistenceContext
@@ -36,11 +33,11 @@ class FreeBoardRepositoryTest {
     void save() {
 
         //given
-        Member member = new Member();
-        memberRepository.save(member);
+        User user = new User();
+        userRepository.save(user);
 
         FreeBoard freeBoard = new FreeBoard();
-        freeBoard.createFreeBoard(member);
+        freeBoard.createFreeBoard(user);
 
         //when
         freeBoardRepository.save(freeBoard);
@@ -48,7 +45,7 @@ class FreeBoardRepositoryTest {
         //then
         Optional<FreeBoard> findFreeBoard = freeBoardRepository.findById(freeBoard.getId());
         assertThat(findFreeBoard.get()).isEqualTo(freeBoard);
-        assertThat(findFreeBoard.get().getMember()).isEqualTo(member);
+        assertThat(findFreeBoard.get().getUser()).isEqualTo(user);
     }
 
     @Test

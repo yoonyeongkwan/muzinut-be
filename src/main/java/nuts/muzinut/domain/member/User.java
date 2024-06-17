@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "`user`")
+//@Table(name = "`user`")
+@Table(name = "users")
 @Getter
 @Setter
 @Builder
@@ -44,6 +45,12 @@ public class User {
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @Column(name = "profile_img_filename")
+    private String profileImgFilename;
+
+    @Column(name = "account_number")
+    private int accountNumber; //계좌 번호
 
     private String intro; //자기 소개
     private int nuts; //보유 너츠

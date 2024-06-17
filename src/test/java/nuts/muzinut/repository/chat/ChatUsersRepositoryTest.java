@@ -114,7 +114,7 @@ class ChatUsersRepositoryTest {
 
         //회원은 1명
         assertThat(result)
-                .extracting("member")
+                .extracting("user")
                 .containsOnly(user);
     }
 

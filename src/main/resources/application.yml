@@ -1,25 +1,24 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/db/muzinut
+    url: jdbc:h2:tcp://localhost/~/muzinut
     username: sa
     password: 12
     driver-class-name: org.h2.Driver
+
+  h2:
+    console:
+      enabled: true
+
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: wontube100@gmail.com
-    password: vcrrzrvvplnzpmxx
+    host: smtp.naver.com
+    port: 465
+    username: muzinut@naver.com
+    password: 3whabwlsjt!@
     properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-            required: true
-          connectiontimeout: 5000 #클라이언트가 SMTP 서버와의 연결을 설정하는 시간
-          timeout: 5000 #클라이언트가 SMTP 서버로부터 응답을 대기하는 시간
-          writetimeout: 5000
-    auth-code-expiration-millis: 1800000  # 이메일 인증 코드의 만료 시간 (30 * 60 * 1000 == 30분)
+      mail.smtp.auth: true
+      mail.smtp.ssl.enable: true
+      mail.smtp.ssl.trust: smtp.naver.com
+
   redis:
     host: localhost
     port: 6379
@@ -31,6 +30,13 @@ spring:
       hibernate:
         #        show_sql: true
         format_sql: true
+
+jwt:
+  header: Authorization
+  #HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
+  #echo 'silvernine-tech-spring-boot-jwt-tutorial-secret-silvernine-tech-spring-boot-jwt-tutorial-secret'|base64
+  secret: c2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQtc2lsdmVybmluZS10ZWNoLXNwcmluZy1ib290LWp3dC10dXRvcmlhbC1zZWNyZXQK
+  token-validity-in-seconds: 86400
 
 logging.level:
   org.hibernate.SQL: debug

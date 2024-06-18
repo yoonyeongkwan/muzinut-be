@@ -76,6 +76,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Friend> friends = new ArrayList<>();
+
     //음악 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Song> songList = new ArrayList<>();

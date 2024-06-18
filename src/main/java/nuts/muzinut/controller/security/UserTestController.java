@@ -13,11 +13,11 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/api")
-public class UserController {
+public class UserTestController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public UserTestController(UserService userService) {
         this.userService = userService;
     }
 

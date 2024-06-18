@@ -40,6 +40,11 @@ public class UserDto {
         this.nickname = nickname;
     }
 
+    public UserDto(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+
     public static UserDto from(User user) {
         if(user == null) return null;
 

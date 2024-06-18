@@ -56,5 +56,4 @@ public interface MailboxRepository extends JpaRepository<Mailbox, Long> {
     )
     void sendArtistMusicUploaded(String message, Long followingMemberId);
 
-
 }

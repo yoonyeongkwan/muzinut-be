@@ -17,6 +17,7 @@ public class AdminBoard extends BaseBoardEntity {
     @Column(name = "admin_board_id")
     private Long id;
 
+    private String title;
     private String content;
 
     @Column(name = "admin_id")

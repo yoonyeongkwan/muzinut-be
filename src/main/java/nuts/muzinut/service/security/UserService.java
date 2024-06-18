@@ -63,4 +63,9 @@ public class UserService {
                         .orElseThrow(() -> new NotFoundMemberException("Member not found"))
         );
     }
+
+    @Transactional(readOnly = true)
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
 }

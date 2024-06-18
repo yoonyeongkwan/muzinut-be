@@ -1,6 +1,6 @@
 package nuts.muzinut.exception;
 
-//이메일 인증 실패 예외
+//이메일 인증 실패한 경우 ex) 인증번호를 잘못 입력했을 때
 public class EmailVertFailException extends RuntimeException{
 
     public EmailVertFailException() {

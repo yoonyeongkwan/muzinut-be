@@ -20,7 +20,9 @@ public class DataInit {
     @PostConstruct
     public void init() {
         AuthorityDto authorityDto = new AuthorityDto("admin");
-        UserDto userDto = new UserDto("admin", "admin", "add");
+        UserDto userDto = new UserDto("admin@naver.com", "admin", "add");
         userService.signup(userDto);
+        UserDto userDto2 = new UserDto("admin1", "admin1", "add");
+        userService.signup(userDto2);
     }
 }

@@ -3,6 +3,8 @@ package nuts.muzinut.handler;
 import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
 import nuts.muzinut.exception.DuplicateMemberException;
+import nuts.muzinut.exception.EmailVertFailException;
+import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -34,9 +36,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ResponseStatus(BAD_REQUEST)
-    @ExceptionHandler(NullPointerException.class)
+    @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class })
     @ResponseBody
-    private ErrorDto BAD_REQUEST(NullPointerException ex, WebRequest request){
+    private ErrorDto BAD_REQUEST(EmailVertFailException ex, WebRequest request){
         return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
     }
 }

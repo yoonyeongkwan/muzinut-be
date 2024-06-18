@@ -25,19 +25,12 @@
         <div class="input-group mb-3">
             <input
                     type="email"
-                    id="email"
+                    id="username"
                     class="form-control"
                     placeholder="이메일 입력하세요"
                     aria-label="email"
                     aria-describedby="basic-addon1"
             />
-            <button
-                    type="button"
-                    class="btn btn-primary"
-                    onclick="emailVertificate()"
-            >
-                이메일 인증
-            </button>
         </div>
     </div>
     <div class="input-group mb-3">
@@ -50,21 +43,44 @@
                 aria-describedby="basic-addon1"
         />
     </div>
-    <button type="button" class="btn btn-primary">회원 가입</button>
+    <!-- 로그인 버튼 -->
+    <button type="button" id="loginBtn" class="btn btn-primary">
+        로그인 하기
+    </button>
 </div>
+
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script>
-    document.querySelector(".btn1").addEventListener(
-      "click",
-      () => {
-        const data = { mid: "apiuser10", mpw: "1111" };
-        axios.post("http://localhost:8080/generateToken", data);
-      },
-      false
-    );
-    function emailVertificate() {
-      alert("인증 메일");
-    }
+    // 로그인 버튼
+    const loginBtn = document.getElementById("loginBtn");
+
+    //회원가입 전송
+    loginBtn.addEventListener("click", () => {
+      alert("로그인 진행중입니다.");
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const data = {
+        username,
+        password,
+      };
+      axios
+        .post("http://localhost:8080/users/authenticate", data)
+        .then((response) => {
+          // 응답 객체에서 status 코드를 얻습니다.
+          const statusCode = response.status;
+          console.log("Status Code:", statusCode);
+          // 로그인 성공시
+          if (statusCode === 200) {
+            console.log("로그인을 성공적으로 완료되었습니다.");
+            alert(`로그인 성공해서 받은 데이터 ${response.data.token}`);
+            localStorage.setItem("token", response.data.token);
+            location.href = "/";
+          } else {
+            console.log("예상치 못한 상태 코드:", statusCode);
+          }
+        });
+    });
 </script>
 </body>
 </html>

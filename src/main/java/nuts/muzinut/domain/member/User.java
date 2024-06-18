@@ -17,7 +17,8 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "`user`")
+//@Table(name = "`user`")
+@Table(name = "users")
 @Getter
 @Setter
 @Builder
@@ -45,6 +46,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(name = "profile_img_filename")
+    private String profileImgFilename;
+
+    @Column(name = "account_number")
+    private int accountNumber; //계좌 번호
+
     private String intro; //자기 소개
     private int nuts; //보유 너츠
     private int vote; //투표권
@@ -68,6 +75,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Friend> friends = new ArrayList<>();
 
     //음악 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

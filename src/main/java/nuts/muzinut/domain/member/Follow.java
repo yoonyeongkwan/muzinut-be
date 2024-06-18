@@ -30,4 +30,13 @@ public class Follow {
         this.notification = true; //처음 팔로우 했을 때 알림 설정은 기본적으로 켜져있음
         user.getFollowings().add(this);
     }
+
+    //비지니스 로직
+    public void turnOffNotification() {
+        this.notification = false;
+    }
+
+    public void turnOnNotification() {
+        this.notification = true;
+    }
 }

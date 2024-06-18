@@ -59,7 +59,7 @@ class MessageRepositoryTest {
 
         //채팅을 작성한 인원은 1명
         assertThat(result)
-                .extracting("member")
+                .extracting("user")
                 .containsOnly(user);
     }
 

@@ -101,7 +101,7 @@ class MailboxRepositoryTest {
         assertThat(notReadMailCount).isEqualTo(2); //읽지 않은 메일은 총 2개
     }
 
-    //유저가 메일을 읽으면 모든 읽지 않은 메일들을 읽음 표시로 설정한다
+    //유저가 메일을 읽으면 모든 읽지 않은 메일들을 읽음 표시로 바뀐다
     @Test
     void readMails() {
 
@@ -133,7 +133,7 @@ class MailboxRepositoryTest {
         //then
         assertThat(findMails.size()).isEqualTo(2); //user 가 받은 메시지는 2개
         assertThat(findMails)
-                .contains("message1", "message2"); //user 의 메시지 내용
+                .containsExactly("message1", "message2"); //user 의 메시지 내용
     }
 
     //모든 회원들에게 공지사항을 전송

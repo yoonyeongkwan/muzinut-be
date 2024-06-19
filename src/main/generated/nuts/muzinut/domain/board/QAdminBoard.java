@@ -22,8 +22,6 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
 
     public final nuts.muzinut.domain.baseEntity.QBaseBoardEntity _super = new nuts.muzinut.domain.baseEntity.QBaseBoardEntity(this);
 
-    public final NumberPath<Long> adminId = createNumber("adminId", Long.class);
-
     public final ListPath<AdminUploadFile, QAdminUploadFile> adminUploadFiles = this.<AdminUploadFile, QAdminUploadFile>createList("adminUploadFiles", AdminUploadFile.class, QAdminUploadFile.class, PathInits.DIRECT2);
 
     public final StringPath content = createString("content");
@@ -38,8 +36,7 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
 
     public final StringPath title = createString("title");
 
-    //inherited
-    public final NumberPath<Integer> view = _super.view;
+    public final NumberPath<Integer> view = createNumber("view", Integer.class);
 
     public QAdminBoard(String variable) {
         super(AdminBoard.class, forVariable(variable));

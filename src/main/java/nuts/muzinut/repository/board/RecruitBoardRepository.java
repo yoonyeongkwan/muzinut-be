@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 public interface RecruitBoardRepository extends JpaRepository<RecruitBoard, Long> {
 
     // 특정 제목에 부합하는 모집 게시판 검색
-    @Query("SELECT rb FROM RecruitBoard rb WHERE rb.title LIKE %:title%")
+    @Query("SELECT rb FROM RecruitBoard rb LEFT JOIN FETCH rb.recruitBoardGenres WHERE rb.title LIKE %:title%")
     Page<RecruitBoard> findByTitleContaining(@Param("title") String title, Pageable pageable);
 
     // 최신 순서대로 모집 게시판 조회

@@ -8,6 +8,7 @@ import nuts.muzinut.domain.member.User;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "recruit_board")
@@ -56,7 +57,7 @@ public class RecruitBoard extends BaseBoardEntity {
     }
 
     // 새로운 생성자
-    public RecruitBoard(User user, String content, int recruitMember, LocalDateTime startDuration, LocalDateTime endDuration, LocalDateTime startWorkDuration, LocalDateTime endWorkDuration) {
+    public RecruitBoard(User user, String content, int recruitMember, LocalDateTime startDuration, LocalDateTime endDuration, LocalDateTime startWorkDuration, LocalDateTime endWorkDuration, String title) {
         this.user = user;
         this.content = content;
         this.recruitMember = recruitMember;
@@ -64,6 +65,7 @@ public class RecruitBoard extends BaseBoardEntity {
         this.endDuration = endDuration;
         this.startWorkDuration = startWorkDuration;
         this.endWorkDuration = endWorkDuration;
+        super.title = title;
         user.getRecruitBoards().add(this);
     }
 
@@ -73,5 +75,12 @@ public class RecruitBoard extends BaseBoardEntity {
         recruitBoardGenre.setGenre(genre);
         recruitBoardGenre.addRecruitGenre(this);
         this.recruitBoardGenres.add(recruitBoardGenre);
+    }
+
+    // 장르 리스트를 문자열 리스트로 변환하는 메서드
+    public List<String> getGenres() {
+        return recruitBoardGenres.stream()
+                .map(RecruitBoardGenre::getGenre)
+                .collect(Collectors.toList());
     }
 }

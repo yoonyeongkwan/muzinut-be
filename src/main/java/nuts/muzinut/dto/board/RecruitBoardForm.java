@@ -16,5 +16,4 @@ public class RecruitBoardForm {
     private LocalDateTime startWorkDuration;
     private LocalDateTime endWorkDuration;
     private List<String> genres;
-    private Long userId;
 }

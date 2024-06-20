@@ -5,6 +5,7 @@ import lombok.Getter;
 import nuts.muzinut.domain.baseEntity.BaseBoardEntity;
 import nuts.muzinut.domain.member.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -77,10 +78,33 @@ public class RecruitBoard extends BaseBoardEntity {
         this.recruitBoardGenres.add(recruitBoardGenre);
     }
 
+    // 장르 삭제 메서드
+    public void clearGenres() {
+        this.recruitBoardGenres.clear();
+    }
+
     // 장르 리스트를 문자열 리스트로 변환하는 메서드
     public List<String> getGenres() {
         return recruitBoardGenres.stream()
                 .map(RecruitBoardGenre::getGenre)
                 .collect(Collectors.toList());
+    }
+
+    // 조회수 증가 메서드
+    public void incrementView() {
+        this.view++;
+    }
+
+    // 수정 메서드
+    public void update(User user, String content, int recruitMember, LocalDateTime startDuration,
+                   LocalDateTime endDuration, LocalDateTime startWorkDuration, LocalDateTime endWorkDuration, String title) {
+        this.user = user;
+        this.content = content;
+        this.recruitMember = recruitMember;
+        this.startDuration = startDuration;
+        this.endDuration = endDuration;
+        this.startWorkDuration = startWorkDuration;
+        this.endWorkDuration = endWorkDuration;
+        this.title = title;
     }
 }

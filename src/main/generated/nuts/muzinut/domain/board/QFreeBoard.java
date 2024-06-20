@@ -22,14 +22,21 @@ public class QFreeBoard extends EntityPathBase<FreeBoard> {
 
     public static final QFreeBoard freeBoard = new QFreeBoard("freeBoard");
 
-    public final nuts.muzinut.domain.baseEntity.QBaseBoardEntity _super = new nuts.muzinut.domain.baseEntity.QBaseBoardEntity(this);
+    public final QBoard _super = new QBoard(this);
+
+    //inherited
+    public final ListPath<Comment, QComment> comments = _super.comments;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
 
     public final StringPath filename = createString("filename");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final NumberPath<Long> id = _super.id;
+
+    //inherited
+    public final ListPath<Like, QLike> likes = _super.likes;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;

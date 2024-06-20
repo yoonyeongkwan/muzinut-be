@@ -22,9 +22,7 @@ public class QLike extends EntityPathBase<Like> {
 
     public static final QLike like = new QLike("like1");
 
-    public final NumberPath<Long> boardId = createNumber("boardId", Long.class);
-
-    public final EnumPath<BoardType> boardType = createEnum("boardType", BoardType.class);
+    public final QBoard board;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -48,6 +46,7 @@ public class QLike extends EntityPathBase<Like> {
 
     public QLike(Class<? extends Like> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.board = inits.isInitialized("board") ? new QBoard(forProperty("board")) : null;
         this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
     }
 

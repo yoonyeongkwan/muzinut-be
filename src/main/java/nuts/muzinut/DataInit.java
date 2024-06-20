@@ -116,4 +116,26 @@ public class DataInit {
         em.flush();
         em.clear();
     }
+
+    @PostConstruct
+    public void recruitBoardBoardScenario() {
+        User user1 = new User();
+        user1.setNickname("tom");
+        User user2 = new User();
+        user2.setNickname("nick");
+
+        Board recruitBoard = new RecruitBoard();
+
+        Comment comment1 = new Comment();
+        comment1.addComment(user1, recruitBoard, "sample");
+        Reply reply1 = new Reply();
+        reply1.addReply(comment1, "댓글1", user1);
+//        replyRepository.save(reply1);
+
+        Comment comment2 = new Comment();
+        comment2.addComment(user1, recruitBoard, "sample");
+        Reply reply2 = new Reply();
+        reply2.addReply(comment1, "댓글2", user1);
+        replyRepository.save(reply2);
+    }
 }

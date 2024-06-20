@@ -26,6 +26,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final BooleanPath activated = createBoolean("activated");
 
+    public final ListPath<nuts.muzinut.domain.board.AdminBoard, nuts.muzinut.domain.board.QAdminBoard> adminBoards = this.<nuts.muzinut.domain.board.AdminBoard, nuts.muzinut.domain.board.QAdminBoard>createList("adminBoards", nuts.muzinut.domain.board.AdminBoard.class, nuts.muzinut.domain.board.QAdminBoard.class, PathInits.DIRECT2);
+
     public final SetPath<Authority, QAuthority> authorities = this.<Authority, QAuthority>createSet("authorities", Authority.class, QAuthority.class, PathInits.DIRECT2);
 
     public final ListPath<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark> bookmarks = this.<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark>createList("bookmarks", nuts.muzinut.domain.board.Bookmark.class, nuts.muzinut.domain.board.QBookmark.class, PathInits.DIRECT2);
@@ -71,6 +73,8 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath profileImgFilename = createString("profileImgFilename");
 
     public final ListPath<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard> recruitBoards = this.<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard>createList("recruitBoards", nuts.muzinut.domain.board.RecruitBoard.class, nuts.muzinut.domain.board.QRecruitBoard.class, PathInits.DIRECT2);
+
+    public final ListPath<nuts.muzinut.domain.board.Reply, nuts.muzinut.domain.board.QReply> replies = this.<nuts.muzinut.domain.board.Reply, nuts.muzinut.domain.board.QReply>createList("replies", nuts.muzinut.domain.board.Reply.class, nuts.muzinut.domain.board.QReply.class, PathInits.DIRECT2);
 
     public final EnumPath<Role> role = createEnum("role", Role.class);
 

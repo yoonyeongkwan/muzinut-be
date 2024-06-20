@@ -22,7 +22,10 @@ public class QRecruitBoard extends EntityPathBase<RecruitBoard> {
 
     public static final QRecruitBoard recruitBoard = new QRecruitBoard("recruitBoard");
 
-    public final nuts.muzinut.domain.baseEntity.QBaseBoardEntity _super = new nuts.muzinut.domain.baseEntity.QBaseBoardEntity(this);
+    public final QBoard _super = new QBoard(this);
+
+    //inherited
+    public final ListPath<Comment, QComment> comments = _super.comments;
 
     public final StringPath content = createString("content");
 
@@ -33,7 +36,11 @@ public class QRecruitBoard extends EntityPathBase<RecruitBoard> {
 
     public final DateTimePath<java.time.LocalDateTime> endWorkDuration = createDateTime("endWorkDuration", java.time.LocalDateTime.class);
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final NumberPath<Long> id = _super.id;
+
+    //inherited
+    public final ListPath<Like, QLike> likes = _super.likes;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;

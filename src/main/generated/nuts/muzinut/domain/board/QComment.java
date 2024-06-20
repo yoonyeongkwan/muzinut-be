@@ -24,9 +24,7 @@ public class QComment extends EntityPathBase<Comment> {
 
     public final nuts.muzinut.domain.baseEntity.QBaseTimeEntity _super = new nuts.muzinut.domain.baseEntity.QBaseTimeEntity(this);
 
-    public final NumberPath<Long> boardId = createNumber("boardId", Long.class);
-
-    public final EnumPath<BoardType> boardType = createEnum("boardType", BoardType.class);
+    public final QBoard board;
 
     public final StringPath content = createString("content");
 
@@ -60,6 +58,7 @@ public class QComment extends EntityPathBase<Comment> {
 
     public QComment(Class<? extends Comment> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.board = inits.isInitialized("board") ? new QBoard(forProperty("board")) : null;
         this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
     }
 

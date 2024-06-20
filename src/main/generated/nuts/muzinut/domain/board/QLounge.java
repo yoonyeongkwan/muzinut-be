@@ -22,7 +22,10 @@ public class QLounge extends EntityPathBase<Lounge> {
 
     public static final QLounge lounge = new QLounge("lounge");
 
-    public final nuts.muzinut.domain.baseEntity.QBaseBoardEntity _super = new nuts.muzinut.domain.baseEntity.QBaseBoardEntity(this);
+    public final QBoard _super = new QBoard(this);
+
+    //inherited
+    public final ListPath<Comment, QComment> comments = _super.comments;
 
     public final StringPath content = createString("content");
 
@@ -30,6 +33,9 @@ public class QLounge extends EntityPathBase<Lounge> {
     public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    //inherited
+    public final ListPath<Like, QLike> likes = _super.likes;
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;

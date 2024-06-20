@@ -92,14 +92,8 @@ public class AdminBoardController {
         AdminBoard board = adminBoard.orElseThrow(() -> new NotFoundEntityException("어드민 게시판이 존재하지 않습니다."));
 
         List<AdminUploadFile> adminUploadFiles = board.getAdminUploadFiles();
-        List<AdminFilename> adminFilenames = new ArrayList<>();
 
-        for (AdminUploadFile adminUploadFile : adminUploadFiles) {
-            adminFilenames.add(new AdminFilename(adminUploadFile.getStoreFilename(),
-                    adminUploadFile.getOriginFilename(),adminUploadFile.getId()));
-        }
-
-        return new DetailAdminBoardDto(board.getTitle(), board.getContent(), board.getView(), adminFilenames);
+        return new DetailAdminBoardDto(board.getTitle(), board.getContent(), board.getView(), adminUploadFiles);
     }
 
     @ResponseBody

@@ -12,15 +12,12 @@ import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.CommentRepository;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.ReplyRepository;
-import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
+import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.security.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import static nuts.muzinut.domain.board.BoardType.*;
 
 @Component
 @RequiredArgsConstructor
@@ -30,7 +27,7 @@ public class DataInit {
     private final AuthorityRepository authorityRepository;
     private final UserService userService;
     private final AdminBoardRepository adminBoardRepository;
-    private final AdminBoardQueryRepository repository;
+    private final BoardQueryRepository repository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final AdminBoardService adminBoardService;

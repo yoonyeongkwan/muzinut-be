@@ -8,26 +8,19 @@ import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsForm;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.comment.QCommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
+import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
-import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
+import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
-import static nuts.muzinut.domain.board.QAdminBoard.*;
 import static nuts.muzinut.domain.board.QBoard.*;
-import static nuts.muzinut.domain.board.QComment.*;
-import static nuts.muzinut.domain.board.QLike.*;
-import static nuts.muzinut.domain.board.QReply.*;
 
 @Slf4j
 @Service
@@ -35,7 +28,7 @@ import static nuts.muzinut.domain.board.QReply.*;
 public class AdminBoardService {
 
     private final AdminBoardRepository adminBoardRepository;
-    private final AdminBoardQueryRepository adminBoardQueryRepository;
+    private final BoardQueryRepository boardQueryRepository;
     private final AdminUploadFileRepository uploadFileRepository;
 
     public AdminBoard saveWithFile(AdminUploadFile adminUploadFile) {
@@ -66,21 +59,29 @@ public class AdminBoardService {
      * @return: dto
      */
     public DetailAdminBoardDto getDetailAdminBoard(Long boardId) {
-        List<Tuple> result = adminBoardQueryRepository.getDetailAdminBoard(boardId);
+        List<Tuple> result = boardQueryRepository.getDetailBoard(boardId);
 
         if (result.isEmpty()) {
             return null;
         }
 
-        DetailAdminBoardDto detailAdminBoardDto = new DetailAdminBoardDto();
 
         Tuple first = result.getFirst();
-        Long likeCount = first.get(3, Long.class);
-        detailAdminBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
         Board findBoard = first.get(board);
+        AdminBoard findAdminBoard = adminBoardRepository.findById(findBoard.getId())
+                .orElseThrow(() -> new NotFoundEntityException("adminBoard Not exist"));
+
         if (findBoard == null) {
             return null;
         }
+
+        List<AdminUploadFile> files = uploadFileRepository.getAdminUploadFile(findAdminBoard.getId());
+        DetailAdminBoardDto detailAdminBoardDto =
+                new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getContent(),
+                        findAdminBoard.getView(), files); //어드민 게시판 관련 파일 셋팅
+
+        Long likeCount = first.get(3, Long.class);
+        detailAdminBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
 
         Set<CommentDto> commentDtoSet = new HashSet<>();
         Set<ReplyDto> replyDtoSet = new HashSet<>();

@@ -1,39 +1,28 @@
 package nuts.muzinut.repository.board.query;
 
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.Expression;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.comment.QCommentDto;
-import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.CommentRepository;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.ReplyRepository;
 import nuts.muzinut.repository.member.UserRepository;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static nuts.muzinut.domain.board.QBoard.*;
-import static nuts.muzinut.domain.board.QComment.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
 @Transactional
-class AdminBoardQueryRepositoryTest {
+class BoardQueryRepositoryTest {
 
-    @Autowired AdminBoardQueryRepository repository;
+    @Autowired
+    BoardQueryRepository repository;
     @Autowired AdminBoardRepository adminBoardRepository;
     @Autowired UserRepository userRepository;
     @Autowired CommentRepository commentRepository;
@@ -54,7 +43,7 @@ class AdminBoardQueryRepositoryTest {
         Like like = createLike(user, board);
 
         //when
-        List<Tuple> result = repository.getDetailAdminBoard(board.getId());
+        List<Tuple> result = repository.getDetailBoard(board.getId());
 
         //then
         Tuple tuple = result.getFirst();

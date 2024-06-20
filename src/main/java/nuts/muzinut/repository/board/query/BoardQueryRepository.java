@@ -6,15 +6,12 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.domain.board.*;
-import nuts.muzinut.domain.member.QUser;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static nuts.muzinut.domain.board.QAdminBoard.*;
 import static nuts.muzinut.domain.board.QBoard.*;
 import static nuts.muzinut.domain.board.QComment.*;
 import static nuts.muzinut.domain.board.QLike.*;
@@ -24,11 +21,11 @@ import static nuts.muzinut.domain.member.QUser.*;
 @Slf4j
 @RequiredArgsConstructor
 @Repository
-public class AdminBoardQueryRepository {
+public class BoardQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Tuple> getDetailAdminBoard(Long boardId) {
+    public List<Tuple> getDetailBoard(Long boardId) {
 
         return queryFactory
                 .select(board,

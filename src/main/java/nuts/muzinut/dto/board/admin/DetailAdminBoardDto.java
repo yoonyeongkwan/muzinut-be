@@ -25,11 +25,13 @@ public class DetailAdminBoardDto {
     private int view;
     private List<AdminFilename> adminFilenames = new ArrayList<>();
 
-    public DetailAdminBoardDto(String title, String content, int view, List<AdminFilename> adminFilenames) {
+    public DetailAdminBoardDto(String title, String content, int view, List<AdminUploadFile> files) {
         this.title = title;
         this.content = content;
         this.view = view;
-        this.adminFilenames = adminFilenames;
+        for (AdminUploadFile file : files) {
+            this.adminFilenames.add(new AdminFilename(file.getStoreFilename(), file.getOriginFilename(), file.getId()));
+        }
     }
 
     public void setAdminBoard(AdminBoard adminBoard) {
@@ -44,6 +46,5 @@ public class DetailAdminBoardDto {
             adminFilenames.add(new AdminFilename(adminUploadFile.getStoreFilename(),
                     adminUploadFile.getOriginFilename(),adminUploadFile.getId()));
         }
-
     }
 }

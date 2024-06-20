@@ -5,6 +5,7 @@ import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.exception.*;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
+@Order(1)
 @RestControllerAdvice
 public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -34,10 +36,11 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ResponseStatus(BAD_REQUEST)
-    @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class })
+    @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class, BoardNotFoundException.class })
     @ResponseBody
     private ErrorDto BAD_REQUEST(EmailVertFailException ex, WebRequest request){
-        return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
+        log.info("BoardNotFoundException 호출");
+        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

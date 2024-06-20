@@ -8,11 +8,7 @@ import nuts.muzinut.domain.member.User;
 @Entity
 @Getter
 @Table(name = "free_board")
-public class FreeBoard extends BaseBoardEntity {
-
-    @Id @GeneratedValue
-    @Column(name = "free_board_id")
-    private Long id;
+public class FreeBoard extends Board {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

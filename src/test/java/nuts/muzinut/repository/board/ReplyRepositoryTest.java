@@ -2,6 +2,7 @@ package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.Comment;
 import nuts.muzinut.domain.board.Reply;
+import nuts.muzinut.domain.member.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +25,13 @@ class ReplyRepositoryTest {
     void save() {
 
         //given
+        User user = new User();
+
         Comment comment = new Comment();
         commentRepository.save(comment);
 
         Reply reply = new Reply();
-        reply.addReply(comment, "대댓글 내용");
+        reply.addReply(comment, "reply content", user);
 
         //when
         replyRepository.save(reply);

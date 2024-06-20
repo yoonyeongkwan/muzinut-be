@@ -69,6 +69,11 @@ public class User {
         this.password = password;
     }
 
+    public String setNickname(String nickname) {
+        this.nickname = nickname;
+        return nickname;
+    }
+
     //회원 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Mailbox> mailboxes = new ArrayList<>();
@@ -99,14 +104,20 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Lounge> lounges = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Reply> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<Like> likeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<AdminBoard> adminBoards = new ArrayList<>();
 
     //후원 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

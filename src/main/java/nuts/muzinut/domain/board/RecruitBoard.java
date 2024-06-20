@@ -14,11 +14,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "recruit_board")
 @Getter
-public class RecruitBoard extends BaseBoardEntity {
-
-    @Id @GeneratedValue
-    @Column(name = "recruit_board_id")
-    private Long id;
+public class RecruitBoard extends Board {
 
     /**
      * 탈퇴한 회원이 작성한 게시판 정보는 모두 사라지는가?

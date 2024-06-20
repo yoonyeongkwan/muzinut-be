@@ -22,30 +22,7 @@ class LikeRepositoryTest {
     @Autowired FreeBoardRepository freeBoardRepository;
     @Autowired LoungeRepository loungeRepository;
     @Autowired RecruitBoardRepository recruitBoardRepository;
-    @Autowired MusicRepository musicRepository;
     @Autowired LikeRepository likeRepository;
-
-    @Test
-    void musicLike() {
-
-        //given
-        User user = new User();
-        userRepository.save(user);
-
-        Song song = new Song();
-        musicRepository.save(song);
-
-        Like like = new Like(song.getId(), BoardType.MUSIC, user);
-
-        //when
-        likeRepository.save(like);
-
-        //then
-        Optional<Like> findLike = likeRepository.findById(like.getId());
-        assertThat(findLike.get()).isEqualTo(like);
-        assertThat(findLike.get().getUser()).isEqualTo(user);
-        assertThat(findLike.get().getBoardId()).isEqualTo(song.getId());
-    }
 
     @Test
     void loungeLike() {
@@ -57,7 +34,8 @@ class LikeRepositoryTest {
         Lounge lounge = new Lounge();
         loungeRepository.save(lounge);
 
-        Like like = new Like(lounge.getId(), BoardType.LOUNGE, user);
+        Like like = new Like();
+        like.addLike(user, lounge);
 
         //when
         likeRepository.save(like);
@@ -66,7 +44,7 @@ class LikeRepositoryTest {
         Optional<Like> findLike = likeRepository.findById(like.getId());
         assertThat(findLike.get()).isEqualTo(like);
         assertThat(findLike.get().getUser()).isEqualTo(user);
-        assertThat(findLike.get().getBoardId()).isEqualTo(lounge.getId());
+        assertThat(findLike.get().getBoard()).isEqualTo(lounge);
     }
 
     @Test
@@ -79,7 +57,9 @@ class LikeRepositoryTest {
         FreeBoard freeBoard = new FreeBoard();
         freeBoardRepository.save(freeBoard);
 
-        Like like = new Like(freeBoard.getId(), BoardType.LOUNGE, user);
+        Like like = new Like();
+        like.addLike(user, freeBoard);
+
 
         //when
         likeRepository.save(like);
@@ -88,7 +68,7 @@ class LikeRepositoryTest {
         Optional<Like> findLike = likeRepository.findById(like.getId());
         assertThat(findLike.get()).isEqualTo(like);
         assertThat(findLike.get().getUser()).isEqualTo(user);
-        assertThat(findLike.get().getBoardId()).isEqualTo(freeBoard.getId());
+        assertThat(findLike.get().getBoard()).isEqualTo(freeBoard);
     }
 
     @Test
@@ -101,7 +81,8 @@ class LikeRepositoryTest {
         RecruitBoard recruitBoard = new RecruitBoard();
         recruitBoardRepository.save(recruitBoard);
 
-        Like like = new Like(recruitBoard.getId(), BoardType.LOUNGE, user);
+        Like like = new Like();
+        like.addLike(user, recruitBoard);
 
         //when
         likeRepository.save(like);
@@ -110,7 +91,7 @@ class LikeRepositoryTest {
         Optional<Like> findLike = likeRepository.findById(like.getId());
         assertThat(findLike.get()).isEqualTo(like);
         assertThat(findLike.get().getUser()).isEqualTo(user);
-        assertThat(findLike.get().getBoardId()).isEqualTo(recruitBoard.getId());
+        assertThat(findLike.get().getBoard()).isEqualTo(recruitBoard);
     }
 
     @Test

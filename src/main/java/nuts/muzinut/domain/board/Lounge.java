@@ -7,7 +7,7 @@ import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter
-public class Lounge extends BaseBoardEntity {
+public class Lounge extends Board {
 
     @Id @GeneratedValue
     @Column(name = "lounge_id")

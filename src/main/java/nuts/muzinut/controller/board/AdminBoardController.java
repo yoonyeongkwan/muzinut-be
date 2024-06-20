@@ -5,12 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
 import nuts.muzinut.dto.MessageDto;
-import nuts.muzinut.dto.board.AdminBoardsDto;
-import nuts.muzinut.dto.board.SaveAdminBoardDto;
-import nuts.muzinut.dto.board.AdminBoardForm;
-import nuts.muzinut.dto.board.StoreFilename;
+import nuts.muzinut.dto.board.admin.AdminBoardsDto;
+import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
+import nuts.muzinut.dto.board.admin.AdminBoardForm;
+import nuts.muzinut.dto.board.admin.AdminFilename;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
@@ -21,8 +22,6 @@ import nuts.muzinut.service.security.UserService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -88,18 +87,29 @@ public class AdminBoardController {
      */
     @ResponseBody
     @GetMapping("/admin-boards/{id}")
-    public SaveAdminBoardDto adminBoards(@PathVariable Long id, Model model) {
+    public DetailAdminBoardDto adminBoards(@PathVariable Long id, Model model) {
         Optional<AdminBoard> adminBoard = adminBoardRepository.findById(id);
         AdminBoard board = adminBoard.orElseThrow(() -> new NotFoundEntityException("어드민 게시판이 존재하지 않습니다."));
 
         List<AdminUploadFile> adminUploadFiles = board.getAdminUploadFiles();
-        List<StoreFilename> storeFilenames = new ArrayList<>();
+        List<AdminFilename> adminFilenames = new ArrayList<>();
 
         for (AdminUploadFile adminUploadFile : adminUploadFiles) {
-            storeFilenames.add(new StoreFilename(adminUploadFile.getStoreFilename(), adminUploadFile.getId()));
+            adminFilenames.add(new AdminFilename(adminUploadFile.getStoreFilename(),
+                    adminUploadFile.getOriginFilename(),adminUploadFile.getId()));
         }
 
-        return new SaveAdminBoardDto(board.getTitle(), board.getContent(), board.getView(), storeFilenames);
+        return new DetailAdminBoardDto(board.getTitle(), board.getContent(), board.getView(), adminFilenames);
+    }
+
+    @ResponseBody
+    @GetMapping("/admin-boards/test/{id}")
+    public DetailAdminBoardDto adminBoardss(@PathVariable Long id) {
+        DetailAdminBoardDto detailAdminBoard = adminBoardService.getDetailAdminBoard(id);
+        if (detailAdminBoard == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+        return detailAdminBoard;
     }
 
     @GetMapping("/images/{filename}")

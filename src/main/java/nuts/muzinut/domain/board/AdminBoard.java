@@ -14,22 +14,29 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Table(name = "admin_board")
-public class AdminBoard extends BaseBoardEntity {
+public class AdminBoard extends Board {
 
-    @Id @GeneratedValue
-    @Column(name = "admin_board_id")
-    private Long id;
-
-    private String title;
     private String content;
-    private int view;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public AdminBoard(String title, String content) {
-        this.title = title;
+        super.title = title;
         this.content = content;
+    }
+
+    public Long getId() {
+        return super.getId();
     }
 
     @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
     private List<AdminUploadFile> adminUploadFiles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
 }

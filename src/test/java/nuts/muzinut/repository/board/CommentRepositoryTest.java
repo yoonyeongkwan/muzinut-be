@@ -1,5 +1,6 @@
 package nuts.muzinut.repository.board;
 
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
@@ -8,44 +9,39 @@ import nuts.muzinut.repository.music.MusicRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Slf4j
 @SpringBootTest
 @Transactional
 class CommentRepositoryTest {
 
     @Autowired UserRepository userRepository;
     @Autowired FreeBoardRepository freeBoardRepository;
+    @Autowired AdminBoardRepository adminBoardRepository;
     @Autowired LoungeRepository loungeRepository;
     @Autowired RecruitBoardRepository recruitBoardRepository;
-    @Autowired MusicRepository musicRepository;
     @Autowired CommentRepository commentRepository;
+    @Autowired ReplyRepository replyRepository;
 
     @Test
-    void musicComment() {
+    void save() {
 
         //given
-        User user = new User();
-        userRepository.save(user);
-
-        Song song = new Song();
-        musicRepository.save(song);
-
         Comment comment = new Comment();
-        comment.addComment(user, song.getId(), BoardType.MUSIC, "content");
 
         //when
         commentRepository.save(comment);
 
         //then
-        Optional<Comment> findComment = commentRepository.findById(comment.getId());
-        assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getUser()).isEqualTo(user);
-        assertThat(findComment.get().getBoardId()).isEqualTo(song.getId());
+        Optional<Comment> result = commentRepository.findById(comment.getId());
+        assertThat(result.get()).isEqualTo(comment);
     }
 
     @Test
@@ -53,84 +49,97 @@ class CommentRepositoryTest {
 
         //given
         User user = new User();
-        userRepository.save(user);
-
         FreeBoard freeBoard = new FreeBoard();
-        freeBoardRepository.save(freeBoard);
-
         Comment comment = new Comment();
-        comment.addComment(user, freeBoard.getId(), BoardType.FREE, "content");
+        comment.addComment(user, freeBoard, "h");
 
         //when
         commentRepository.save(comment);
 
         //then
-        Optional<Comment> findComment = commentRepository.findById(comment.getId());
-        assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getUser()).isEqualTo(user);
-        assertThat(findComment.get().getBoardId()).isEqualTo(freeBoard.getId());
+        Optional<Comment> result = commentRepository.findById(comment.getId());
+        assertThat(result.get().getBoard()).isEqualTo(freeBoard);
+        assertThat(result.get().getUser()).isEqualTo(user);
     }
 
     @Test
-    void LoungeComment() {
+    void adminBoardComment() {
 
         //given
         User user = new User();
-        userRepository.save(user);
+        AdminBoard adminBoard = new AdminBoard();
+        Comment comment = new Comment();
+        comment.addComment(user, adminBoard, "h");
 
+        //when
+        commentRepository.save(comment);
+
+        //then
+        Optional<Comment> result = commentRepository.findById(comment.getId());
+        assertThat(result.get().getBoard()).isEqualTo(adminBoard);
+        assertThat(result.get().getUser()).isEqualTo(user);
+
+    }
+
+    @Test
+    void loungeComment() {
+
+        //given
+        User user = new User();
         Lounge lounge = new Lounge();
-        loungeRepository.save(lounge);
-
         Comment comment = new Comment();
-        comment.addComment(user, lounge.getId(), BoardType.LOUNGE, "content");
+        comment.addComment(user, lounge, "h");
 
         //when
         commentRepository.save(comment);
 
         //then
-        Optional<Comment> findComment = commentRepository.findById(comment.getId());
-        assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getUser()).isEqualTo(user);
-        assertThat(findComment.get().getBoardId()).isEqualTo(lounge.getId());
+        Optional<Comment> result = commentRepository.findById(comment.getId());
+        assertThat(result.get().getBoard()).isEqualTo(lounge);
+        assertThat(result.get().getUser()).isEqualTo(user);
+
     }
 
     @Test
-    void RecruitBoardComment() {
+    void recruitComment() {
 
         //given
         User user = new User();
-        userRepository.save(user);
-
         RecruitBoard recruitBoard = new RecruitBoard();
-        recruitBoardRepository.save(recruitBoard);
-
         Comment comment = new Comment();
-        comment.addComment(user, recruitBoard.getId(), BoardType.LOUNGE, "content");
+        comment.addComment(user, recruitBoard, "h");
 
         //when
         commentRepository.save(comment);
 
         //then
-        Optional<Comment> findComment = commentRepository.findById(comment.getId());
-        assertThat(findComment.get()).isEqualTo(comment);
-        assertThat(findComment.get().getUser()).isEqualTo(user);
-        assertThat(findComment.get().getBoardId()).isEqualTo(recruitBoard.getId());
+        Optional<Comment> result = commentRepository.findById(comment.getId());
+        assertThat(result.get().getBoard()).isEqualTo(recruitBoard);
+        assertThat(result.get().getUser()).isEqualTo(user);
+
     }
 
     @Test
-    void delete() {
+    void boardComments() {
 
         //given
-        Comment comment = new Comment();
-        commentRepository.save(comment);
+        User user = new User();
+        AdminBoard adminBoard = new AdminBoard();
+        Comment comment1 = createComment(user, adminBoard);
+        Comment comment2 = createComment(user, adminBoard);
+        commentRepository.save(comment1);
+        commentRepository.save(comment2);
 
         //when
-        commentRepository.delete(comment);
+        List<Comment> findComments = commentRepository.findBoardComments(adminBoard);
 
         //then
-        Optional<Comment> findComment = commentRepository.findById(comment.getId());
-        assertThat(findComment.isEmpty()).isTrue();
+        assertThat(findComments.size()).isEqualTo(2);
     }
 
-    //게시판이 삭제 될때 해당 게시판의 댓글이 삭제되는 로직은 cascade 로 구현하지 않았기에 따로 쿼리를 작성해야함.
+    private Comment createComment(User user, Board board) {
+        Comment comment = new Comment();
+        comment.addComment(user, board, "h");
+        return comment;
+    }
 }

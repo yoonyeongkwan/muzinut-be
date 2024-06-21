@@ -4,7 +4,7 @@ import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.repository.member.UserRepository;
-import nuts.muzinut.repository.music.MusicRepository;
+import nuts.muzinut.repository.music.SongRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +22,8 @@ class CommentRepositoryTest {
     @Autowired FreeBoardRepository freeBoardRepository;
     @Autowired LoungeRepository loungeRepository;
     @Autowired RecruitBoardRepository recruitBoardRepository;
-    @Autowired MusicRepository musicRepository;
+    @Autowired
+    SongRepository musicRepository;
     @Autowired CommentRepository commentRepository;
 
     @Test

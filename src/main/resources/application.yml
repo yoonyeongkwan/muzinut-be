@@ -9,6 +9,9 @@ spring:
     console:
       enabled: true
 
+  file:
+    dir: F:/final/project/muzinut-be/src/main/java/nuts/muzinut/file/
+
   mail:
     host: smtp.naver.com
     port: 465

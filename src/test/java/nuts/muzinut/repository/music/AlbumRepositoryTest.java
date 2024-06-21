@@ -15,7 +15,8 @@ import static org.assertj.core.api.Assertions.*;
 @Transactional
 class AlbumRepositoryTest {
 
-    @Autowired MusicRepository musicRepository;
+    @Autowired
+    SongRepository musicRepository;
     @Autowired AlbumRepository albumRepository;
 
     @Test

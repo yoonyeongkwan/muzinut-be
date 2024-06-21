@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ReplyRepositoryTest {
+class ReplySongRepositoryTest {
 
     @Autowired CommentRepository commentRepository;
     @Autowired ReplyRepository replyRepository;

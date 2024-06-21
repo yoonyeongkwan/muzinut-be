@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class BookmarkRepositoryTest {
+class BookmarkSongRepositoryTest {
 
     @Autowired UserRepository userRepository;
     @Autowired FreeBoardRepository freeBoardRepository;

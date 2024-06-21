@@ -18,9 +18,9 @@ import static org.assertj.core.api.Assertions.*;
 class SongGenreRepositoryTest {
 
     @Autowired
-    MusicRepository musicRepository;
+    SongRepository musicRepository;
     @Autowired
-    MusicGenreRepository musicGenreRepository;
+    SongGenreRepository songGenreRepository;
 
 
     @Test
@@ -36,11 +36,11 @@ class SongGenreRepositoryTest {
         //when: 하나의 음악에 2가지 장르를 넣을 때
         songGenre1.addMusicGenre(song);
         songGenre2.addMusicGenre(song);
-        musicGenreRepository.save(songGenre1);
-        musicGenreRepository.save(songGenre2);
+        songGenreRepository.save(songGenre1);
+        songGenreRepository.save(songGenre2);
 
         //then
-        List<SongGenre> result = musicGenreRepository.findAll();
+        List<SongGenre> result = songGenreRepository.findAll();
 
         //1개의 음악만 저장되어 있음
         assertThat(result)
@@ -58,13 +58,13 @@ class SongGenreRepositoryTest {
 
         //given
         SongGenre songGenre = new SongGenre(Genre.HIPHOP);
-        musicGenreRepository.save(songGenre);
+        songGenreRepository.save(songGenre);
 
         //when
-        musicGenreRepository.delete(songGenre);
+        songGenreRepository.delete(songGenre);
 
         //then
-        Optional<SongGenre> result = musicGenreRepository.findById(songGenre.getId());
+        Optional<SongGenre> result = songGenreRepository.findById(songGenre.getId());
         assertThat(result.isEmpty()).isTrue();
     }
 
@@ -81,14 +81,14 @@ class SongGenreRepositoryTest {
 
         songGenre1.addMusicGenre(song);
         songGenre2.addMusicGenre(song);
-        musicGenreRepository.save(songGenre1);
-        musicGenreRepository.save(songGenre2);
+        songGenreRepository.save(songGenre1);
+        songGenreRepository.save(songGenre2);
 
         //when
         musicRepository.delete(song);
 
         //then
-        List<SongGenre> result = musicGenreRepository.findAll();
+        List<SongGenre> result = songGenreRepository.findAll();
         assertThat(result.size()).isEqualTo(0);
     }
 }

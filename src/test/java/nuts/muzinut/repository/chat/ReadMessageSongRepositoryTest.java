@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class ReadMessageRepositoryTest {
+class ReadMessageSongRepositoryTest {
 
     @Autowired
     UserRepository userRepository;

@@ -5,7 +5,7 @@ import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.repository.member.UserRepository;
-import nuts.muzinut.repository.music.MusicRepository;
+import nuts.muzinut.repository.music.SongRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,13 +16,14 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class LikeRepositoryTest {
+class LikeSongRepositoryTest {
 
     @Autowired UserRepository userRepository;
     @Autowired FreeBoardRepository freeBoardRepository;
     @Autowired LoungeRepository loungeRepository;
     @Autowired RecruitBoardRepository recruitBoardRepository;
-    @Autowired MusicRepository musicRepository;
+    @Autowired
+    SongRepository musicRepository;
     @Autowired LikeRepository likeRepository;
 
     @Test

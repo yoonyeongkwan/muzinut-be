@@ -19,6 +19,7 @@ public class MailController {
     private final MailSendService mailService;
     @PostMapping("/send")
     public String mailSend(@RequestBody @Valid EmailRequestDto emailDto){
+        System.out.println("샐행 =======================================");
         System.out.println("이메일 인증 이메일 :" + emailDto.getEmail());
         return mailService.joinEmail(emailDto.getEmail());
     }
@@ -32,6 +33,7 @@ public class MailController {
         else{
             throw new EmailVertFailException("인증 번호가 일치하지 않습니다");
         }
+
     }
 
 }

@@ -9,7 +9,7 @@ import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 public class DataInit {
 

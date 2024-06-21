@@ -14,7 +14,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-class PlayNutRepositoryTest {
+class PlayNutSongRepositoryTest {
 
     @Autowired
     UserRepository userRepository;

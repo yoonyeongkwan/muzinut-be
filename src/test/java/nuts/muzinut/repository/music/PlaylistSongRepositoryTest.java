@@ -25,7 +25,7 @@ class PlaylistSongRepositoryTest {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    MusicRepository musicRepository;
+    SongRepository musicRepository;
 
     @Test
     void save() {

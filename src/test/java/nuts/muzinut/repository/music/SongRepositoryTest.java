@@ -19,7 +19,7 @@ class SongRepositoryTest {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    MusicRepository musicRepository;
+    SongRepository musicRepository;
 
     @Test
     void save() {

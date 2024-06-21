@@ -1,10 +1,7 @@
-package nuts.muzinut.dto.board;
+package nuts.muzinut.dto.board.recruit;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

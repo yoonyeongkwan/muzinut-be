@@ -1,4 +1,4 @@
-package nuts.muzinut.dto.board;
+package nuts.muzinut.dto.board.recruit;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

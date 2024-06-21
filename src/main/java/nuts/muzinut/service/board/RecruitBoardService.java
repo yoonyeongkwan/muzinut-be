@@ -1,16 +1,17 @@
 package nuts.muzinut.service.board;
 
+import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.board.RecruitBoardDto;
-import nuts.muzinut.dto.board.RecruitBoardForm;
-import nuts.muzinut.dto.board.RecruitBoardsForm;
-import nuts.muzinut.dto.board.SaveRecruitBoardDto;
+import nuts.muzinut.dto.board.comment.CommentDto;
+import nuts.muzinut.dto.board.comment.ReplyDto;
+import nuts.muzinut.dto.board.recruit.*;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
 import nuts.muzinut.repository.board.RecruitBoardRepository;
+import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,7 +23,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.AccessDeniedException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +36,7 @@ public class RecruitBoardService {
     private final RecruitBoardRepository recruitBoardRepository;
     private final RecruitBoardGenreRepository recruitBoardGenreRepository;
     private final UserRepository userRepository;
+    private final BoardQueryRepository boardQueryRepository;
 
     // 모집 게시판 생성 요청을 처리하는 메소드
     @Transactional
@@ -71,11 +76,62 @@ public class RecruitBoardService {
 
     // 특정 모집 게시판을 조회하는 서비스 메소드
     @Transactional
-    public RecruitBoard findRecruitBoardById(Long id) {
+    public DetailRecruitBoardDto getDetailBoard(Long id) {
         RecruitBoard recruitBoard = recruitBoardRepository.findById(id)
                 .orElseThrow(() -> new NotFoundEntityException("모집 게시판이 존재하지 않습니다."));
         recruitBoard.incrementView();
-        return recruitBoard;
+
+        // 작성자 정보 가져오기
+        String author = recruitBoard.getUser().getNickname();
+
+        // 댓글과 대댓글 가져오기
+        List<Tuple> result = boardQueryRepository.getDetailBoard(id);
+
+        if (result.isEmpty()) {
+            return null;
+        }
+
+        List<CommentDto> commentDtoList = new ArrayList<>();
+        Set<CommentDto> commentDtoSet = new HashSet<>();
+        Set<ReplyDto> replyDtoSet = new HashSet<>();
+
+        for (Tuple t : result) {
+            ReplyDto findReply = t.get(2, ReplyDto.class);
+            CommentDto findComment = t.get(1, CommentDto.class);
+
+            if (findComment.getId() != null) {
+                commentDtoSet.add(findComment);
+            }
+
+            if (findReply.getId() != null) {
+                replyDtoSet.add(findReply);
+            }
+        }
+
+        List<CommentDto> comments = new ArrayList<>(commentDtoSet);
+        for (ReplyDto replyDto : replyDtoSet) {
+            for (CommentDto comment : comments) {
+                if (comment.getId().equals(replyDto.getCommentId())) {
+                    comment.getReplies().add(replyDto);
+                }
+            }
+        }
+
+        DetailRecruitBoardDto detailRecruitBoardDto = new DetailRecruitBoardDto(
+                recruitBoard.getTitle(),
+                recruitBoard.getContent(),
+                recruitBoard.getView(),
+                recruitBoard.getRecruitMember(),
+                recruitBoard.getStartDuration(),
+                recruitBoard.getEndDuration(),
+                recruitBoard.getStartWorkDuration(),
+                recruitBoard.getEndWorkDuration(),
+                recruitBoard.getGenres(),
+                author,
+                comments
+        );
+
+        return detailRecruitBoardDto;
     }
 
     // 모든 모집 게시판을 최신 순으로 조회하는 메소드 (페이징 처리)
@@ -120,6 +176,15 @@ public class RecruitBoardService {
             throw new BoardNotExistException("모집 게시판이 존재하지 않습니다.");
         }
         return convertToSaveRecruitBoardDtoPage(recruitBoards);
+    }
+
+    // 모집 게시판 수정 폼을 보여주는 메소드
+    @Transactional
+    public RecruitBoard findRecruitBoardById(Long id) {
+        RecruitBoard recruitBoard = recruitBoardRepository.findById(id)
+                .orElseThrow(() -> new NotFoundEntityException("모집 게시판이 존재하지 않습니다."));
+        recruitBoard.incrementView();
+        return recruitBoard;
     }
 
     // 모집 게시판 수정을 처리하는 메소드

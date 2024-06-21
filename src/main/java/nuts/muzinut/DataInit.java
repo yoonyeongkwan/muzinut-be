@@ -18,8 +18,10 @@ import nuts.muzinut.repository.board.ReplyRepository;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
+import nuts.muzinut.service.DataInitService;
 import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.security.UserService;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,16 +36,19 @@ public class DataInit {
     private final UserService userService;
     private final AdminBoardRepository adminBoardRepository;
     private final RecruitBoardRepository recruitBoardRepository;
-    private final BoardQueryRepository repository;git 
+    private final BoardQueryRepository repository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
     private final AdminBoardService adminBoardService;
     private final ReplyRepository replyRepository;
+
+    private final DataInitService dataInitService;
+
     @PersistenceContext
     EntityManager em;
 
 
-//    @PostConstruct
+    @PostConstruct
     public void init() {
         AuthorityDto authorityDto = new AuthorityDto("admin");
         UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
@@ -53,7 +58,7 @@ public class DataInit {
         UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
         userService.signup(userDto3);
 
-//        createAdminBoards();
+        dataInitService.recruitBoardBoardScenario();
     }
 
     @PostConstruct
@@ -114,25 +119,9 @@ public class DataInit {
         em.clear();
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void recruitBoardBoardScenario() {
-        User user1 = new User();
-        user1.setNickname("tom");
-        User user2 = new User();
-        user2.setNickname("nick");
+        dataInitService.recruitBoardBoardScenario();
 
-        Board recruitBoard = new RecruitBoard();
-
-        Comment comment1 = new Comment();
-        comment1.addComment(user1, recruitBoard, "sample");
-        Reply reply1 = new Reply();
-        reply1.addReply(comment1, "댓글1", user1);
-//        replyRepository.save(reply1);
-
-        Comment comment2 = new Comment();
-        comment2.addComment(user1, recruitBoard, "sample");
-        Reply reply2 = new Reply();
-        reply2.addReply(comment1, "댓글2", user1);
-        replyRepository.save(reply2);
     }
 }

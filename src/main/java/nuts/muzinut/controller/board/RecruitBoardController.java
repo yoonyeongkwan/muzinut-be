@@ -4,23 +4,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.dto.MessageDto;
-import nuts.muzinut.dto.board.RecruitBoardDto;
-import nuts.muzinut.dto.board.RecruitBoardForm;
-import nuts.muzinut.dto.board.SaveRecruitBoardDto;
+import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
+import nuts.muzinut.dto.board.recruit.RecruitBoardDto;
+import nuts.muzinut.dto.board.recruit.RecruitBoardForm;
+import nuts.muzinut.dto.board.recruit.SaveRecruitBoardDto;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.service.board.RecruitBoardService;
-import nuts.muzinut.service.security.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -55,22 +51,9 @@ public class RecruitBoardController {
     // 특정 모집 게시판을 조회하는 메소드
     @ResponseBody
     @GetMapping("/recruit-boards/{id}")
-    public SaveRecruitBoardDto getRecruitBoard(@PathVariable("id") Long id, Model model) {
-        RecruitBoard recruitBoard = recruitBoardService.findRecruitBoardById(id);
-
-        return new SaveRecruitBoardDto(
-                recruitBoard.getTitle(),
-                recruitBoard.getContent(),
-                recruitBoard.getView(),
-                recruitBoard.getRecruitMember(),
-                recruitBoard.getStartDuration(),
-                recruitBoard.getEndDuration(),
-                recruitBoard.getStartWorkDuration(),
-                recruitBoard.getEndWorkDuration(),
-                recruitBoard.getGenres()
-        );
+    public DetailRecruitBoardDto getRecruitBoard(@PathVariable("id") Long id, Model model) {
+        return recruitBoardService.getDetailBoard(id);
     }
-
 
     // 모든 모집 게시판을 최신 순으로 조회하는 메소드 (페이징 처리)
     @ResponseBody

@@ -59,9 +59,10 @@ public class DataInit {
         userService.signup(userDto3);
 
         dataInitService.recruitBoardBoardScenario();
+        dataInitService.commentScenario();
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void adminBoardScenario() {
         User user1 = new User();
         user1.setNickname("tom");
@@ -119,9 +120,4 @@ public class DataInit {
         em.clear();
     }
 
-//    @PostConstruct
-    public void recruitBoardBoardScenario() {
-        dataInitService.recruitBoardBoardScenario();
-
-    }
 }

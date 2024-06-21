@@ -1,3 +1,4 @@
+
 package nuts.muzinut.service.board;
 
 import com.querydsl.core.Tuple;
@@ -87,34 +88,33 @@ public class RecruitBoardService {
         // 댓글과 대댓글 가져오기
         List<Tuple> result = boardQueryRepository.getDetailBoard(id);
 
-        if (result.isEmpty()) {
-            return null;
-        }
-
         List<CommentDto> commentDtoList = new ArrayList<>();
         Set<CommentDto> commentDtoSet = new HashSet<>();
         Set<ReplyDto> replyDtoSet = new HashSet<>();
 
-        for (Tuple t : result) {
-            ReplyDto findReply = t.get(2, ReplyDto.class);
-            CommentDto findComment = t.get(1, CommentDto.class);
+        if (!result.isEmpty()) {
+            for (Tuple t : result) {
+                ReplyDto findReply = t.get(2, ReplyDto.class);
+                CommentDto findComment = t.get(1, CommentDto.class);
 
-            if (findComment.getId() != null) {
-                commentDtoSet.add(findComment);
-            }
+                if (findComment.getId() != null) {
+                    commentDtoSet.add(findComment);
+                }
 
-            if (findReply.getId() != null) {
-                replyDtoSet.add(findReply);
-            }
-        }
-
-        List<CommentDto> comments = new ArrayList<>(commentDtoSet);
-        for (ReplyDto replyDto : replyDtoSet) {
-            for (CommentDto comment : comments) {
-                if (comment.getId().equals(replyDto.getCommentId())) {
-                    comment.getReplies().add(replyDto);
+                if (findReply.getId() != null) {
+                    replyDtoSet.add(findReply);
                 }
             }
+
+            List<CommentDto> comments = new ArrayList<>(commentDtoSet);
+            for (ReplyDto replyDto : replyDtoSet) {
+                for (CommentDto comment : comments) {
+                    if (comment.getId().equals(replyDto.getCommentId())) {
+                        comment.getReplies().add(replyDto);
+                    }
+                }
+            }
+            commentDtoList = comments;
         }
 
         DetailRecruitBoardDto detailRecruitBoardDto = new DetailRecruitBoardDto(
@@ -128,11 +128,12 @@ public class RecruitBoardService {
                 recruitBoard.getEndWorkDuration(),
                 recruitBoard.getGenres(),
                 author,
-                comments
+                commentDtoList
         );
 
         return detailRecruitBoardDto;
     }
+
 
     // 모든 모집 게시판을 최신 순으로 조회하는 메소드 (페이징 처리)
     public RecruitBoardDto findAllRecruitBoards(int startPage) {

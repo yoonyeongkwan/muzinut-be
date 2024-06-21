@@ -44,4 +44,9 @@ public class Comment extends BaseTimeEntity {
     //관계 매핑
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<Reply> replies = new ArrayList<>();
+
+    // 댓글 내용 수정 메서드
+    public void modifyContent(String content) {
+        this.content = content;
+    }
 }

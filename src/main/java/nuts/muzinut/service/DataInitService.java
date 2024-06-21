@@ -3,6 +3,7 @@ package nuts.muzinut.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.Comment;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.board.Reply;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class DataInitService {
@@ -62,5 +64,20 @@ public class DataInitService {
         Reply reply2 = new Reply();
         reply2.addReply(comment1, "댓글2", user1);
         replyRepository.save(reply2);
+    }
+
+    @Transactional
+    public void commentScenario() {
+        // 사용자 생성
+        User user = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        log.info("User found: {}", user.getNickname());
+
+        // 게시판 생성
+        RecruitBoard recruitBoard = new RecruitBoard(user, "Sample Content for Comment Test", 5,
+                LocalDateTime.now(), LocalDateTime.now().plusDays(7),
+                LocalDateTime.now().plusDays(8), LocalDateTime.now().plusDays(14),
+                "Sample Title for Comment Test");
+        recruitBoardRepository.save(recruitBoard);
+        log.info("RecruitBoard created: {}", recruitBoard.getTitle());
     }
 }

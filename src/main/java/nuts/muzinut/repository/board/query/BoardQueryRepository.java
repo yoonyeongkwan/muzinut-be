@@ -6,11 +6,13 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.domain.board.Board;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static nuts.muzinut.domain.board.QBoard.*;
 import static nuts.muzinut.domain.board.QComment.*;
@@ -45,4 +47,14 @@ public class BoardQueryRepository {
                 .where(board.id.eq(boardId))
                 .fetch();
     }
+
+    public Optional<Board> findById(Long boardId) {
+        Board boardResult = queryFactory
+                .selectFrom(board)
+                .where(board.id.eq(boardId))
+                .fetchOne();
+
+        return Optional.ofNullable(boardResult);
+    }
+
 }

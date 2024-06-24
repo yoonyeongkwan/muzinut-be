@@ -5,6 +5,7 @@ import nuts.muzinut.domain.member.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -56,4 +57,24 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
      */
     @Query("select f.followingMemberId from Follow f where f.user = :user")
     List<Long> findFollowingMemberIdsByUser(User user);
+
+    /**
+     * 특정 유저가 특정 회원을 팔로우하는 메서드
+     * @param user: 팔로잉 하는 주체
+     * @param followingMemberId: 팔로잉 하는 대상
+     */
+    @Modifying
+    @Transactional
+    @Query("insert into Follow (user, followingMemberId, notification) values (:user, :followingMemberId, true)")
+    void follow(User user, Long followingMemberId);
+
+    /**
+     * 특정 유저가 특정 회원을 팔로우 취소하는 메서드
+     * @param user: 팔로잉 취소하는 주체
+     * @param followingMemberId: 팔로잉 취소하는 대상
+     */
+    @Modifying
+    @Transactional
+    @Query("delete from Follow f where f.user = :user and f.followingMemberId = :followingMemberId")
+    void unfollow(User user, Long followingMemberId);
 }

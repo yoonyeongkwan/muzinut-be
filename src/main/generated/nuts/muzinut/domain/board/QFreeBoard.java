@@ -44,6 +44,7 @@ public class QFreeBoard extends EntityPathBase<FreeBoard> {
     //inherited
     public final StringPath title;
 
+    // inherited
     public final nuts.muzinut.domain.member.QUser user;
 
     //inherited
@@ -74,7 +75,7 @@ public class QFreeBoard extends EntityPathBase<FreeBoard> {
         this.likes = _super.likes;
         this.modifiedDt = _super.modifiedDt;
         this.title = _super.title;
-        this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
+        this.user = _super.user;
         this.view = _super.view;
     }
 

@@ -100,7 +100,7 @@ public class UserService {
     public User findUserById(Long userId) {
         return userRepository.findById(userId).orElse(null);
     }
-    
+
     /**
      * 토큰을 토대로 로그인 한 사용자인지 검증
      * @throws NotFoundMemberException: 스프링 시큐리티가 관리하지 않는 회원일 경우 exception 발생

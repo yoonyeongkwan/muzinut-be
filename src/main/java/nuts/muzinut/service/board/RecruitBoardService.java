@@ -9,7 +9,6 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.recruit.*;
-import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
 import nuts.muzinut.repository.board.RecruitBoardRepository;
@@ -79,8 +78,7 @@ public class RecruitBoardService {
     // 특정 모집 게시판을 조회하는 서비스 메소드
     @Transactional
     public DetailRecruitBoardDto getDetailBoard(Long id) {
-        RecruitBoard recruitBoard = recruitBoardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("모집 게시판이 존재하지 않습니다."));
+        RecruitBoard recruitBoard = checkEntityExists(id);
         recruitBoard.incrementView();
 
         // 작성자 정보 가져오기
@@ -183,8 +181,7 @@ public class RecruitBoardService {
     // 모집 게시판 수정 폼을 보여주는 메소드
     @Transactional
     public RecruitBoard findRecruitBoardById(Long id) {
-        RecruitBoard recruitBoard = recruitBoardRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException("모집 게시판이 존재하지 않습니다."));
+        RecruitBoard recruitBoard = checkEntityExists(id);
         recruitBoard.incrementView();
         return recruitBoard;
     }
@@ -193,13 +190,8 @@ public class RecruitBoardService {
     @Transactional
     public RecruitBoard updateRecruitBoard(Long id, RecruitBoardForm recruitBoardForm) throws AccessDeniedException {
         String username = getCurrentUsername();
-        RecruitBoard recruitBoard = recruitBoardRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException("모집 게시판이 존재하지 않습니다."));
-
-        // 게시글 작성자와 로그인된 사용자가 일치하는지 확인
-        if (!recruitBoard.getUser().getUsername().equals(username)) {
-            throw new AccessDeniedException("해당 게시판을 수정할 권한이 없습니다");
-        }
+        RecruitBoard recruitBoard = checkEntityExists(id);
+        checkUserAuthorization(recruitBoard, username);
 
         // RecruitBoard 엔티티 업데이트
         recruitBoard.update(
@@ -227,12 +219,8 @@ public class RecruitBoardService {
     @Transactional
     public void deleteRecruitBoard(Long id) throws AccessDeniedException {
         String username = getCurrentUsername();
-        RecruitBoard recruitBoard = recruitBoardRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException("해당 ID의 모집 게시판을 찾을 수 없습니다"));
-
-        if (!recruitBoard.getUser().getUsername().equals(username)) {
-            throw new AccessDeniedException("해당 게시판을 삭제할 권한이 없습니다");
-        }
+        RecruitBoard recruitBoard = checkEntityExists(id);
+        checkUserAuthorization(recruitBoard, username);
         recruitBoardRepository.delete(recruitBoard);
     }
 
@@ -263,5 +251,18 @@ public class RecruitBoardService {
                 board.getEndWorkDuration(),
                 board.getGenres()
         ));
+    }
+
+    // 공통 예외 처리를 위한 메소드
+    private RecruitBoard checkEntityExists(Long id) {
+        return recruitBoardRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 모집 게시판을 찾을 수 없습니다"));
+    }
+
+    // 공통 예외 처리를 위한 메소드
+    private void checkUserAuthorization(RecruitBoard recruitBoard, String username) throws AccessDeniedException {
+        if (!recruitBoard.getUser().getUsername().equals(username)) {
+            throw new AccessDeniedException("해당 게시판에 대한 권한이 없습니다");
+        }
     }
 }

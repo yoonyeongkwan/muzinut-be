@@ -30,6 +30,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final SetPath<Authority, QAuthority> authorities = this.<Authority, QAuthority>createSet("authorities", Authority.class, QAuthority.class, PathInits.DIRECT2);
 
+    public final ListPath<nuts.muzinut.domain.board.Board, nuts.muzinut.domain.board.QBoard> boards = this.<nuts.muzinut.domain.board.Board, nuts.muzinut.domain.board.QBoard>createList("boards", nuts.muzinut.domain.board.Board.class, nuts.muzinut.domain.board.QBoard.class, PathInits.DIRECT2);
+
     public final ListPath<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark> bookmarks = this.<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark>createList("bookmarks", nuts.muzinut.domain.board.Bookmark.class, nuts.muzinut.domain.board.QBookmark.class, PathInits.DIRECT2);
 
     public final ListPath<nuts.muzinut.domain.chat.ChatMember, nuts.muzinut.domain.chat.QChatMember> chatMembers = this.<nuts.muzinut.domain.chat.ChatMember, nuts.muzinut.domain.chat.QChatMember>createList("chatMembers", nuts.muzinut.domain.chat.ChatMember.class, nuts.muzinut.domain.chat.QChatMember.class, PathInits.DIRECT2);

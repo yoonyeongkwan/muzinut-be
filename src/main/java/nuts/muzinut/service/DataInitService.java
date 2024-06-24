@@ -56,7 +56,7 @@ public class DataInitService {
 
     @Transactional
     public void recruitBoardBoardScenario() {
-        User user = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
 //        Hibernate.initialize(user.getRecruitBoards()); // 지연 로딩 초기화
 //        System.out.println("user = "+user);
         log.info("User found: {}", user);

@@ -2,6 +2,7 @@ package nuts.muzinut.repository.board;
 
 import nuts.muzinut.domain.board.AdminUploadFile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -13,4 +14,7 @@ public interface AdminUploadFileRepository extends JpaRepository<AdminUploadFile
             "where a.adminBoard.id = :boardId")
     List<AdminUploadFile> getAdminUploadFile(@Param("boardId") Long boardId);
 
+    @Modifying
+    @Query(value = "delete from AdminUploadFile a where a.adminBoard.id = :adminBoardId")
+    void deleteByAdminBoardId(@Param("adminBoardId") Long id);
 }

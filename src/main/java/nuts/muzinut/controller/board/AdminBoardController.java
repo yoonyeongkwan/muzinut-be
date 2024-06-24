@@ -8,11 +8,10 @@ import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.admin.AdminBoardForm;
-import nuts.muzinut.dto.board.admin.AdminFilename;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
-import nuts.muzinut.exception.NotFoundEntityException;
+import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.member.UserRepository;
@@ -28,7 +27,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +36,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Slf4j
@@ -82,28 +78,60 @@ public class AdminBoardController {
     }
 
     /**
+     * 특정 어드민 게시판을 조회
      * @param id: admin board pk
      * @throws: db로 부터 검색되는 엔티티가 없을 경우 NotFoundEntityException 예외 발생 (404 Not found)
      */
     @ResponseBody
     @GetMapping("/admin-boards/{id}")
-    public DetailAdminBoardDto adminBoards(@PathVariable Long id, Model model) {
-        Optional<AdminBoard> adminBoard = adminBoardRepository.findById(id);
-        AdminBoard board = adminBoard.orElseThrow(() -> new NotFoundEntityException("어드민 게시판이 존재하지 않습니다."));
-
-        List<AdminUploadFile> adminUploadFiles = board.getAdminUploadFiles();
-
-        return new DetailAdminBoardDto(board.getTitle(), board.getContent(), board.getView(), adminUploadFiles);
-    }
-
-    @ResponseBody
-    @GetMapping("/admin-boards/test/{id}")
-    public DetailAdminBoardDto adminBoardss(@PathVariable Long id) {
+    public DetailAdminBoardDto getAdminBoard(@PathVariable Long id) {
         DetailAdminBoardDto detailAdminBoard = adminBoardService.getDetailAdminBoard(id);
         if (detailAdminBoard == null) {
             throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
         }
         return detailAdminBoard;
+    }
+
+    //특정 어드민 게시판 수정
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin-boards/{id}")
+    public ResponseEntity<MessageDto> updateAdminBoard(@ModelAttribute AdminBoardForm form,
+                                                       @PathVariable Long id) throws IOException {
+
+        try {
+            AdminBoard adminBoard = adminBoardService.getAdminBoard(id);
+            fileStore.updateAdminAttachedFile(id); //기존에 저장해놓았던 첨부파일 업데이트
+            List<AdminUploadFile> adminUploadFiles = fileStore.storeFiles(form.getAttachFiles(), adminBoard); //첨부 파일들을 저장
+
+            HttpHeaders header = new HttpHeaders();
+            header.setLocation(URI.create("/admin-boards/" + adminBoard.getId())); //수정한 게시판으로 리다이렉트
+
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .headers(header)
+                    .body(new MessageDto("어드민 게시판이 수정되었습니다"));
+
+        } catch (BoardNotExistException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new MessageDto("서버 오류로 어드민 게시판이 수정되질 않았습니다."));
+        }
+    }
+
+
+    //어드민 게시판 삭제
+    @ResponseBody
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/admin-boards/{id}")
+    public ResponseEntity<MessageDto> deleteAdminBoard(@PathVariable Long id) {
+
+        fileStore.deleteAdminAttachedFile(id);
+        adminBoardService.deleteAdminBoard(id);
+        HttpHeaders header = new HttpHeaders();
+        header.setLocation(URI.create("/admin-boards?page=0")); //어드민 게시판으로 리다이렉트
+
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                .headers(header)
+                .body(new MessageDto("어드민 게시판이 삭제되었습니다"));
+
     }
 
     @GetMapping("/images/{filename}")
@@ -116,19 +144,24 @@ public class AdminBoardController {
     @GetMapping("/attach/{id}")
     public ResponseEntity<Resource> downloadAttach(@PathVariable Long id) throws MalformedURLException {
 
-        Optional<AdminUploadFile> file = uploadFileRepository.findById(id);
-        AdminUploadFile uploadFile = file.orElseThrow(() -> new NotFoundEntityException("다운로드를 받고자 하는 파일이 없습니다"));
-        String storeFilename = uploadFile.getStoreFilename();
-        String originFilename = uploadFile.getOriginFilename();
+        try {
+            AdminUploadFile uploadFile = adminBoardService.getAttachFile(id);
+            String storeFilename = uploadFile.getStoreFilename();
+            String originFilename = uploadFile.getOriginFilename();
 
-        UrlResource resource = new UrlResource("file:" + fileStore.getFullPath(storeFilename));
-        log.info("originFilename={}", originFilename);
+            UrlResource resource = new UrlResource("file:" + fileStore.getFullPath(storeFilename));
+            log.info("originFilename={}", originFilename);
 
-        String encodedOriginFilename = UriUtils.encode(originFilename, StandardCharsets.UTF_8);
-        String contentDisposition = "attachment; filename=\"" + encodedOriginFilename + "\"";
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
-                .body(resource);
+            String encodedOriginFilename = UriUtils.encode(originFilename, StandardCharsets.UTF_8);
+            String contentDisposition = "attachment; filename=\"" + encodedOriginFilename + "\"";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                    .body(resource);
+
+        } catch (NotFoundFileException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
     }
 
     /**
@@ -138,13 +171,16 @@ public class AdminBoardController {
      */
     @ResponseBody
     @GetMapping("/admin-boards")
-    public AdminBoardsDto getAdminBoards(@RequestParam("page") int page) {
-        AdminBoardsDto adminBoards = adminBoardService.getAdminBoards(page);
-        if (adminBoards == null) {
-            throw new BoardNotExistException("어드민 게시판이 존재하지 않습니다.");
-        }
+    public ResponseEntity<AdminBoardsDto> getAdminBoards(@RequestParam("page") int page) {
 
-        return adminBoards;
+        try {
+            AdminBoardsDto adminBoards = adminBoardService.getAdminBoards(page);
+            return ResponseEntity.ok()
+                    .body(adminBoards);
+        } catch (BoardNotExistException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT)
+                    .body(null);
+        }
     }
 
     //for test

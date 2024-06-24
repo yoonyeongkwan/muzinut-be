@@ -18,9 +18,9 @@ public class AdminBoard extends Board {
 
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JoinColumn(name = "user_id")
+//    private User user;
 
     public AdminBoard(String title, String content) {
         super.title = title;
@@ -33,10 +33,10 @@ public class AdminBoard extends Board {
 
     @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
     private List<AdminUploadFile> adminUploadFiles = new ArrayList<>();
-
-    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
-    private List<Like> likes = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
+//    private List<Comment> comments = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
+//    private List<Like> likes = new ArrayList<>();
 }

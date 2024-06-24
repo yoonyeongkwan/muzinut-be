@@ -32,11 +32,9 @@ public class DataInit {
     private final LikeRepository likeRepository;
     private final AdminBoardService adminBoardService;
     private final ReplyRepository replyRepository;
-    @PersistenceContext
-    EntityManager em;
+    @PersistenceContext EntityManager em;
 
-
-//    @PostConstruct
+    @PostConstruct
     public void init() {
         AuthorityDto authorityDto = new AuthorityDto("admin");
         UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");

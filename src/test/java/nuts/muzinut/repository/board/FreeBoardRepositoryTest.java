@@ -37,7 +37,6 @@ class FreeBoardRepositoryTest {
         userRepository.save(user);
 
         FreeBoard freeBoard = new FreeBoard();
-        freeBoard.createFreeBoard(user);
 
         //when
         freeBoardRepository.save(freeBoard);

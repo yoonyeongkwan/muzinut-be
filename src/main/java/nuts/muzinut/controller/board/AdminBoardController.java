@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
@@ -12,6 +13,7 @@ import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundFileException;
+import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.member.UserRepository;
@@ -37,6 +39,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -57,6 +60,7 @@ public class AdminBoardController {
         return "/board/admin-board-form";
     }
 
+/*
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/admin-boards/new")
     public ResponseEntity<MessageDto> saveAdminBoard(@ModelAttribute AdminBoardForm form) throws IOException {
@@ -75,6 +79,35 @@ public class AdminBoardController {
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .headers(header)
                 .body(new MessageDto("어드민 게시판이 생성되었습니다"));
+    }
+*/
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/admin-boards/new")
+    public ResponseEntity<MessageDto> saveAdminBoard(@ModelAttribute AdminBoardForm form) throws IOException {
+
+        try {
+            Optional<User> findUser = userService.getUserWithUsername(); //NotFoundMemberException 발생할 수 있음
+            User user = findUser.get();
+            String nickname = user.getNickname();
+//            log.info("user: {}", user.getNickname());
+
+            AdminBoard adminBoard = adminBoardService.createAdminBoard(
+                    new AdminBoard(form.getTitle(), form.getContent()), nickname);
+
+            List<AdminUploadFile> adminUploadFiles = fileStore.storeFiles(form.getAttachFiles(), adminBoard); //첨부 파일들을 저장
+
+            HttpHeaders header = new HttpHeaders();
+            header.setLocation(URI.create("/admin-boards/" + adminBoard.getId())); //생성한 게시판으로 리다이렉트
+
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .headers(header)
+                    .body(new MessageDto("어드민 게시판이 생성되었습니다"));
+
+        } catch (NotFoundMemberException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageDto("게시판에 접근할 수 없습니다."));
+        }
     }
 
     /**

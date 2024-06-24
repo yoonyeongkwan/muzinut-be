@@ -1,6 +1,7 @@
 package nuts.muzinut.service.security;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -93,5 +94,17 @@ public class UserService {
                         .flatMap(userRepository::findOneWithAuthoritiesByUsername)
                         .orElseThrow(() -> new NotFoundMemberException("Member not found"))
         );
+    }
+
+    /**
+     * 토큰을 토대로 로그인 한 사용자인지 검증
+     * @throws NotFoundMemberException: 스프링 시큐리티가 관리하지 않는 회원일 경우 exception 발생
+     */
+    @Transactional(readOnly = true)
+    public Optional<User> getUserWithUsername() {
+
+        return userRepository.findByUsername(
+                SecurityUtil.getCurrentUsername()
+                        .orElseThrow(() -> new NotFoundMemberException("로그인 하지 않았거나 없는 회원입니다")));
     }
 }

@@ -4,6 +4,7 @@ import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsForm;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
@@ -16,7 +17,9 @@ import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.BoardRepository;
+import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static nuts.muzinut.domain.board.QAdminBoard.*;
 import static nuts.muzinut.domain.board.QBoard.*;
 
 @Slf4j
@@ -34,12 +38,16 @@ public class AdminBoardService {
     private final AdminBoardRepository adminBoardRepository;
     private final BoardRepository boardRepository;
     private final BoardQueryRepository boardQueryRepository;
+    private final AdminBoardQueryRepository queryRepository;
     private final AdminUploadFileRepository uploadFileRepository;
+    private final UserRepository userRepository;
 
-    public AdminBoard saveWithFile(AdminUploadFile adminUploadFile) {
-        AdminBoard adminBoard = new AdminBoard();
-        adminUploadFile.addFiles(adminBoard);
-        return adminBoardRepository.save(adminBoard);
+    public AdminBoard createAdminBoard(AdminBoard adminBoard, String nickname) {
+        User user = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new NotFoundEntityException("사용자가 없음"));
+
+        adminBoard.addBoard(user);
+        return boardRepository.save(adminBoard);
     }
 
     public AdminBoard getAdminBoard(Long id) throws BoardNotExistException {
@@ -101,7 +109,7 @@ public class AdminBoardService {
 
         Tuple first = result.getFirst();
         Board findBoard = first.get(board);
-        AdminBoard findAdminBoard = adminBoardRepository.findById(findBoard.getId())
+        AdminBoard findAdminBoard = adminBoardRepository.findAdminBoardWithUser(findBoard.getId()) //Todo 고칠꺼
                 .orElseThrow(() -> new NotFoundEntityException("adminBoard Not exist"));
 
         if (findBoard == null) {
@@ -150,4 +158,5 @@ public class AdminBoardService {
 
         return detailAdminBoardDto;
     }
+
 }

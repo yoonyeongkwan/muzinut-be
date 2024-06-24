@@ -6,23 +6,24 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.domain.board.Board;
+import nuts.muzinut.domain.board.QAdminBoard;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static nuts.muzinut.domain.board.QBoard.*;
-import static nuts.muzinut.domain.board.QComment.*;
-import static nuts.muzinut.domain.board.QLike.*;
-import static nuts.muzinut.domain.board.QReply.*;
-import static nuts.muzinut.domain.member.QUser.*;
+import static nuts.muzinut.domain.board.QAdminBoard.*;
+import static nuts.muzinut.domain.board.QBoard.board;
+import static nuts.muzinut.domain.board.QComment.comment;
+import static nuts.muzinut.domain.board.QLike.like;
+import static nuts.muzinut.domain.board.QReply.reply;
+import static nuts.muzinut.domain.member.QUser.user;
 
 @Slf4j
 @RequiredArgsConstructor
 @Repository
-public class BoardQueryRepository {
+public class AdminBoardQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
@@ -37,9 +38,10 @@ public class BoardQueryRepository {
                         JPAExpressions
                                 .select(like.count())
                                 .from(like)
-                                .where(like.board.id.eq(boardId)))
+                                .where(like.board.id.eq(boardId)),
+                        adminBoard)
                 .from(board)
-                .leftJoin(board.comments, comment).fetchJoin()
+                .leftJoin(board.comments, comment)
                 .leftJoin(comment.replies, reply)
                 .leftJoin(reply.user, user)
                 .where(board.id.eq(boardId))
@@ -56,9 +58,11 @@ public class BoardQueryRepository {
                         JPAExpressions
                                 .select(like.count())
                                 .from(like)
-                                .where(like.board.id.eq(boardId)))
+                                .where(like.board.id.eq(boardId)), adminBoard)
                 .from(board)
-                .leftJoin(board.comments, comment).fetchJoin()
+//                .leftJoin(adminBoard)
+//                .on(board.id.eq(adminBoard.id))
+                .leftJoin(board.comments, comment)
                 .leftJoin(comment.replies, reply)
                 .leftJoin(reply.user, user)
                 .where(board.id.eq(boardId))

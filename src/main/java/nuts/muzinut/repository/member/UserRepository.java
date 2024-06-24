@@ -13,5 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByNickname(String nickname); //nickname 으로 한명의 회원 조회
 
+    Optional<User> findByUsername(String username); //username(email) 으로 회원 조회
+
     List<User> findAllByNickname(String nickname); //nickname 으로 검색 (아티스트 명을 검색할 때 활용)
 }

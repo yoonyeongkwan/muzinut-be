@@ -11,6 +11,7 @@ import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.domain.nuts.NutsUsageHistory;
 import nuts.muzinut.domain.nuts.PaymentHistory;
 import nuts.muzinut.domain.nuts.SupportMsg;
+import org.springframework.security.core.parameters.P;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +65,20 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Set<Authority> authorities;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "playlist_id")
+    private Playlist playlist = new Playlist();
+
+    public User(String username, String password, String nickname) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+    }
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.nickname = nickname;
     }
 
     public String setNickname(String nickname) {
@@ -91,11 +103,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PlayNut> playNutList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Playlist playlist;
 
     //게시판 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Board> boards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
     private List<RecruitBoard> recruitBoards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")

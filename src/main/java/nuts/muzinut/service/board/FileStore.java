@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
+import nuts.muzinut.domain.board.FreeBoard;
+import nuts.muzinut.exception.NoUploadFileException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
+import nuts.muzinut.repository.board.FreeBoardRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,7 @@ public class FileStore {
 
     private final AdminBoardRepository adminBoardRepository;
     private final AdminUploadFileRepository uploadFileRepository;
+    private final FreeBoardRepository freeBoardRepository;
 
     @Value("${spring.file.dir}")
     private String fileDir;
@@ -57,6 +61,27 @@ public class FileStore {
         uploadFileRepository.save(adminUploadFile);
 
         return adminUploadFile;
+    }
+
+    /**
+     * 자유 게시판의 파일 및 엔티티 저장
+     * @param multipartFile: react quill
+     * @param freeBoard: 자유 게시판 엔티티
+     * @return: freeBoard
+     * @throws IOException: 파일 업로드 실패시 발생
+     * @throws NoUploadFileException: 업로드할 파일이 없을 시 발생
+     */
+    public FreeBoard storeFile(MultipartFile multipartFile, FreeBoard freeBoard) throws IOException, NoUploadFileException {
+        if (multipartFile.isEmpty()) {
+            throw new NoUploadFileException("자유게시판의 업로드 파일이 존재하지 않음");
+        }
+
+        String originalFilename = multipartFile.getOriginalFilename();
+        String storeFilename = createStoreFileName(originalFilename);
+        multipartFile.transferTo(new File(getFullPath(storeFilename))); //파일 저장
+
+        freeBoard.setFilename(storeFilename);
+        return freeBoardRepository.save(freeBoard);
     }
 
     //id는 adminBoard pk

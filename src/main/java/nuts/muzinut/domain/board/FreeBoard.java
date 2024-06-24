@@ -2,6 +2,7 @@ package nuts.muzinut.domain.board;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 import nuts.muzinut.domain.baseEntity.BaseBoardEntity;
 import nuts.muzinut.domain.member.User;
 
@@ -10,15 +11,13 @@ import nuts.muzinut.domain.member.User;
 @Table(name = "free_board")
 public class FreeBoard extends Board {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
+//    private User user;
 
     private String filename; //본문 내용이 담긴 html 파일 (react.quails)
 
-    //연관 관계 메서드
-    public void createFreeBoard(User user) {
-        this.user = user;
-        user.getFreeBoards().add(this);
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }

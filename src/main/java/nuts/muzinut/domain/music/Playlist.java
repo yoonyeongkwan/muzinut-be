@@ -15,8 +15,7 @@ public class Playlist {
     @Column(name = "playlist_record")
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
+    @OneToOne(mappedBy = "playlist",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private User user;
 
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)

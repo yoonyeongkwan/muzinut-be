@@ -22,11 +22,22 @@ public class DetailAdminBoardDto {
 
     private String title;
     private String content;
+    private String writer = "muzi";
     private int view;
     private List<AdminFilename> adminFilenames = new ArrayList<>();
 
     public DetailAdminBoardDto(String title, String content, int view, List<AdminUploadFile> files) {
         this.title = title;
+        this.content = content;
+        this.view = view;
+        for (AdminUploadFile file : files) {
+            this.adminFilenames.add(new AdminFilename(file.getStoreFilename(), file.getOriginFilename(), file.getId()));
+        }
+    }
+
+    public DetailAdminBoardDto(String title, String writer, String content, int view, List<AdminUploadFile> files) {
+        this.title = title;
+        this.writer = writer;
         this.content = content;
         this.view = view;
         for (AdminUploadFile file : files) {

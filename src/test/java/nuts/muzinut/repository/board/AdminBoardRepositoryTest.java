@@ -107,6 +107,24 @@ class AdminBoardRepositoryTest {
         assertThat(page.getNumber()).isEqualTo(0);
     }
 
+    @Test
+    void findBoardWithUser() {
+
+        //given
+        User user = new User();
+        AdminBoard adminBoard = new AdminBoard();
+        adminBoard.addBoard(user);
+        adminBoardRepository.save(adminBoard);
+
+        //when
+        AdminBoard findAdminBoard = adminBoardRepository.findAdminBoardWithUser(adminBoard.getId()).get();
+
+        //then
+        assertThat(findAdminBoard).isEqualTo(adminBoard);
+        assertThat(findAdminBoard.getUser()).isEqualTo(user);
+
+    }
+
 
     private void createAdminBoards() {
         for (int i = 0; i < 30; i++) {

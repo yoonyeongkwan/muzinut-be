@@ -46,7 +46,7 @@ public class QLike extends EntityPathBase<Like> {
 
     public QLike(Class<? extends Like> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.board = inits.isInitialized("board") ? new QBoard(forProperty("board")) : null;
+        this.board = inits.isInitialized("board") ? new QBoard(forProperty("board"), inits.get("board")) : null;
         this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
     }
 

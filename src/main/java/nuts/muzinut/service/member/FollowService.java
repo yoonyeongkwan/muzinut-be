@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.Follow;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.repository.member.FollowRepository;
+import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.util.List;
 public class FollowService {
 
     private final FollowRepository followRepository;
+    private final UserService userService;
 
     // 특정 유저의 `팔로잉` 수를 반환하는 메소드
     public Long countFollowing(User user) {
@@ -24,25 +26,25 @@ public class FollowService {
     }
 
     // 특정 유저의 `팔로워` 수를 반환하는 메소드
-    public Long countFollowers(Long followingMemberId) {
-        validateUserId(followingMemberId);
-        return followRepository.countFollowerByFollowingMemberId(followingMemberId);
+    public Long countFollowers(Long userId) {
+        validateUserId(userId);
+        return followRepository.countFollowerByFollowingMemberId(userId);
     }
 
     // 팔로우 알림을 끄는 메소드
     @Transactional
-    public void turnOffNotification(User user, Long followingMemberId) {
+    public void turnOffNotification(User user, Long userId) {
         validateUser(user);
-        validateUserId(followingMemberId);
-        followRepository.turnOffNotification(false, user, followingMemberId);
+        validateUserId(userId);
+        followRepository.updateNotificationStatus(false, user, userId);
     }
 
     // 팔로우 알림을 키는 메소드
     @Transactional
-    public void turnOnNotification(User user, Long followingMemberId) {
+    public void turnOnNotification(User user, Long userId) {
         validateUser(user);
-        validateUserId(followingMemberId);
-        followRepository.turnOnNotification(true, user, followingMemberId);
+        validateUserId(userId);
+        followRepository.updateNotificationStatus(true, user, userId);
     }
 
     // 특정 유저가 팔로우한 모든 팔로우 정보를 반환하는 메소드
@@ -52,16 +54,16 @@ public class FollowService {
     }
 
     // 특정 유저가 특정 회원을 팔로우하고 있는지 확인하는 메소드
-    public boolean isFollowing(User user, Long followingMemberId) {
+    public boolean isFollowing(User user, Long userId) {
         validateUser(user);
-        validateUserId(followingMemberId);
-        return followRepository.existsByUserAndFollowingMemberId(user, followingMemberId);
+        validateUserId(userId);
+        return followRepository.existsByUserAndFollowingMemberId(user, userId);
     }
 
     // 특정 유저의 팔로워 리스트를 반환하는 메소드
-    public List<Follow> getFollowers(Long followingMemberId) {
-        validateUserId(followingMemberId);
-        return followRepository.findByFollowingMemberId(followingMemberId);
+    public List<Follow> getFollowerList(Long userId) {
+        validateUserId(userId);
+        return followRepository.findFollowersByUserId(userId);
     }
 
     // 특정 유저가 팔로우한 회원의 리스트를 반환하는 메소드
@@ -72,11 +74,15 @@ public class FollowService {
 
     // 유저 팔로우 메서드
     @Transactional
-    public void follow(User user, Long followingMemberId) {
+    public void followUser(User user, Long followingUserId) {
         validateUser(user);
-        validateUserId(followingMemberId);
-        if (!isFollowing(user, followingMemberId)) {
-            followRepository.follow(user, followingMemberId);
+        validateUserId(followingUserId);
+        User followingUser = userService.findUserById(followingUserId);
+        validateUser(followingUser);
+        if (!isFollowing(user, followingUser.getId())) {
+            Follow follow = new Follow();
+            follow.createFollowing(user, followingUser);
+            followRepository.save(follow);
         } else {
             throw new IllegalStateException("이미 팔로우 중입니다.");
         }
@@ -84,11 +90,11 @@ public class FollowService {
 
     // 유저 팔로우 취소 메서드
     @Transactional
-    public void unfollow(User user, Long followingMemberId) {
+    public void unfollowUser(User user, Long userId) {
         validateUser(user);
-        validateUserId(followingMemberId);
-        if (isFollowing(user, followingMemberId)) {
-            followRepository.unfollow(user, followingMemberId);
+        validateUserId(userId);
+        if (isFollowing(user, userId)) {
+            followRepository.unfollow(user, userId);
         } else {
             throw new IllegalStateException("팔로우 중이 아닙니다.");
         }
@@ -96,13 +102,13 @@ public class FollowService {
 
     private void validateUser(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("유저 정보가 유효하지 않습니다.");
+            throw new IllegalArgumentException("유효하지 않은 유저 정보입니다.");
         }
     }
 
     private void validateUserId(Long userId) {
         if (userId == null || userId <= 0) {
-            throw new IllegalArgumentException("유저 ID가 유효하지 않습니다.");
+            throw new IllegalArgumentException("유효하지 않은 유저 ID입니다.");
         }
     }
 }

@@ -41,11 +41,6 @@ public class FollowController {
     @GetMapping("/followers-count")
     public ResponseEntity<Long> getFollowersCount(@RequestParam Long userId) {
         log.info("Getting followers count for user with ID: {}", userId);
-        User user = userService.findUserById(userId);
-        if (user == null) {
-            log.error("User not found with ID: {}", userId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
         Long count = followService.countFollowers(userId);
         return ResponseEntity.ok(count);
     }
@@ -93,12 +88,33 @@ public class FollowController {
     @GetMapping("/followers-list")
     public ResponseEntity<List<Follow>> getFollowersList(@RequestParam Long userId) {
         log.info("Getting followers list for user with ID: {}", userId);
-        User user = userService.findUserById(userId);
-        if (user == null) {
-            log.error("User not found with ID: {}", userId);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-        List<Follow> followersList = followService.getFollowers(userId);
+        List<Follow> followersList = followService.getFollowerList(userId);
         return ResponseEntity.ok(followersList);
+    }
+
+    // 유저 팔로우 메서드
+    @PostMapping("/follow")
+    public ResponseEntity<String> followUser(@RequestBody @Valid FollowDto followDto) {
+        log.info("Following user ID: {} by user ID: {}", followDto.getFollowingMemberId(), followDto.getUserId());
+        User user = userService.findUserById(followDto.getUserId());
+        if (user == null) {
+            log.error("User not found with ID: {}", followDto.getUserId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        followService.followUser(user, followDto.getFollowingMemberId());
+        return ResponseEntity.ok("Followed successfully");
+    }
+
+    // 유저 팔로우 취소 메서드
+    @PostMapping("/unfollow")
+    public ResponseEntity<String> unfollowUser(@RequestBody @Valid FollowDto followDto) {
+        log.info("Unfollowing user ID: {} by user ID: {}", followDto.getFollowingMemberId(), followDto.getUserId());
+        User user = userService.findUserById(followDto.getUserId());
+        if (user == null) {
+            log.error("User not found with ID: {}", followDto.getUserId());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+        }
+        followService.unfollowUser(user, followDto.getFollowingMemberId());
+        return ResponseEntity.ok("Unfollowed successfully");
     }
 }

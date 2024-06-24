@@ -7,12 +7,14 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.Comment;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.board.Reply;
+import nuts.muzinut.domain.member.Follow;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.dto.security.AuthorityDto;
 import nuts.muzinut.repository.board.*;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.AuthorityRepository;
+import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.security.UserService;
@@ -27,15 +29,10 @@ import java.time.LocalDateTime;
 public class DataInitService {
 
     private final UserRepository userRepository;
-    private final AuthorityRepository authorityRepository;
     private final UserService userService;
-    private final AdminBoardRepository adminBoardRepository;
     private final RecruitBoardRepository recruitBoardRepository;
-    private final BoardQueryRepository repository;
-    private final CommentRepository commentRepository;
-    private final LikeRepository likeRepository;
-    private final AdminBoardService adminBoardService;
     private final ReplyRepository replyRepository;
+    private final FollowRepository followRepository;
 
     @PersistenceContext
     EntityManager em;
@@ -52,11 +49,37 @@ public class DataInitService {
 
         recruitBoardBoardScenario();
         commentScenario();
+//        followScenario();
+    }
+
+    private void followScenario() {
+        // 사용자 불러오기
+        User user1 = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user2 = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User admin = userRepository.findByNickname("add!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        // 팔로우 관계 설정
+        Follow follow1 = new Follow();
+        follow1.createFollowing(user1, admin);
+        followRepository.save(follow1);
+        log.info("{}가 {}를 팔로우", user1.getNickname(), admin.getNickname());
+
+        Follow follow2 = new Follow();
+        follow2.createFollowing(user2, admin);
+        followRepository.save(follow2);
+        log.info("{}가 {}를 팔로우", user2.getNickname(), admin.getNickname());
+
+        // 알림 기능 테스트
+        followRepository.updateNotificationStatus(false, user1, admin.getId());
+        log.info("{}의 {} 팔로우 알림을 끕니다.", user1.getNickname(), admin.getNickname());
+
+        followRepository.updateNotificationStatus(true, user1, admin.getId());
+        log.info("{}의 {} 팔로우 알림을 켭니다.", user1.getNickname(), admin.getNickname());
     }
 
     @Transactional
     public void recruitBoardBoardScenario() {
-        User user = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
 //        Hibernate.initialize(user.getRecruitBoards()); // 지연 로딩 초기화
 //        System.out.println("user = "+user);
         log.info("User found: {}", user);

@@ -34,4 +34,10 @@ public class AdminUploadFile {
         this.adminBoard = adminBoard;
         adminBoard.getAdminUploadFiles().add(this);
     }
+
+    //비지니스 메서드
+    public void changeFilename(String storeFilename, String originFilename) {
+        this.storeFilename = storeFilename;
+        this.originFilename = originFilename;
+    }
 }

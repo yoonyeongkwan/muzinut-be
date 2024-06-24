@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
-import nuts.muzinut.domain.member.User;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -19,6 +19,7 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@Transactional
 @RequiredArgsConstructor
 public class FileStore {
 
@@ -58,6 +59,29 @@ public class FileStore {
         return adminUploadFile;
     }
 
+    //id는 adminBoard pk
+    public void deleteAdminAttachedFile(Long id) {
+        List<AdminUploadFile> files = uploadFileRepository.getAdminUploadFile(id);
+        if (files.isEmpty()) {
+            return;
+        }
+        deleteFiles(files);
+    }
+
+    //첨부파일 업데이트
+    public void updateAdminAttachedFile(Long id) {
+        deleteAdminAttachedFile(id);
+        uploadFileRepository.deleteByAdminBoardId(id);
+    }
+
+    //어드민 첨부파일을 삭제하는 메서드
+    private void deleteFiles(List<AdminUploadFile> files) {
+        for (AdminUploadFile f : files) {
+            File file = new File(fileDir + f.getStoreFilename());
+            file.delete();
+        }
+    }
+
     //파일 이름을 랜덤으로 생성하는 메서드 (저장하는 파일 명이 겹치면 안되기 때문)
     private String createStoreFileName(String originalFilename) {
         String ext = extractExt(originalFilename);
@@ -70,4 +94,6 @@ public class FileStore {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
     }
+
+
 }

@@ -9,12 +9,15 @@ import nuts.muzinut.repository.board.CommentRepository;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.ReplyRepository;
 import nuts.muzinut.repository.member.UserRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
@@ -36,23 +39,32 @@ class BoardQueryRepositoryTest {
         //given
         User user = createUser();
         AdminBoard board = createBoard();
-        Comment comment = createComment(user, board);
-        Comment comment2 = createComment(user, board);
-        Reply reply1 = createReply(user, comment);
-        Reply reply2 = createReply(user, comment);
-        Like like = createLike(user, board);
+//        Comment comment = createComment(user, board);
+//        Comment comment2 = createComment(user, board);
+//        Reply reply1 = createReply(user, comment);
+//        Reply reply2 = createReply(user, comment);
+//        Like like = createLike(user, board);
 
         //when
-        List<Tuple> result = repository.getDetailBoard(board.getId());
+/*        List<Board> result = repository.getDetailBoardTest(board.getId());
+        Board findBoard = result.getFirst();
+        assertThat(findBoard).isEqualTo(board);
 
-        //then
-        Tuple tuple = result.getFirst();
-//        assertThat(tuple.get(QBoard.board)).isEqualTo(board);
+        List<Comment> comments = findBoard.getComments();
+        for (Comment c : comments) {
+            c.getUser().getNickname();
+
+            List<Reply> replies = c.getReplies();
+            for (Reply reply : replies) {
+                reply.getUser();
+            }
+        }*/
+
+        List<Tuple> result = repository.getDetailBoardTest(board.getId());
+
         for (Tuple t : result) {
-            log.info("tuple: {}",t );
-//            log.info("dto tuple: {}", t.get(3, ReplyDto.class));
+            log.info("tuple: {}", t);
         }
-
     }
 
     private AdminBoard createBoard() {

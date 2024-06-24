@@ -27,7 +27,7 @@ public class BoardQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<Tuple> getDetailBoard(Long boardId) {
+    public List<Tuple> getDetailBoardTest(Long boardId) {
 
         return queryFactory
                 .select(board,
@@ -41,7 +41,27 @@ public class BoardQueryRepository {
                                 .where(like.board.id.eq(boardId))
                 )
                 .from(comment)
-                .join(comment.board, board)
+//                .join(comment.board, board)
+                .rightJoin(comment.board, board)
+                .leftJoin(comment.replies, reply)
+                .leftJoin(reply.user, user)
+                .where(board.id.eq(boardId))
+                .fetch();
+    }
+    public List<Tuple> getDetailBoard(Long boardId) {
+
+        return queryFactory
+                .select(board,
+                        Projections.fields(CommentDto.class, comment.id, comment.content,
+                                comment.user.nickname.as("commentWriter"), comment.createdDt),
+                        Projections.fields(ReplyDto.class, reply.id, reply.content, reply.comment.id.as("commentId"),
+                                reply.user.nickname.as("replyWriter"), reply.createdDt),
+                        JPAExpressions
+                                .select(like.count())
+                                .from(like)
+                                .where(like.board.id.eq(boardId)))
+                .from(board)
+                .leftJoin(board.comments, comment).fetchJoin()
                 .leftJoin(comment.replies, reply)
                 .leftJoin(reply.user, user)
                 .where(board.id.eq(boardId))

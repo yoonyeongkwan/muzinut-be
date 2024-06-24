@@ -84,7 +84,7 @@ public class AdminBoardController {
      */
     @ResponseBody
     @GetMapping("/admin-boards/{id}")
-    public DetailAdminBoardDto getAdminBoard(@PathVariable Long id) {
+    public DetailAdminBoardDto getAdminBoard(@PathVariable("id") Long id) {
         DetailAdminBoardDto detailAdminBoard = adminBoardService.getDetailAdminBoard(id);
         if (detailAdminBoard == null) {
             throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");

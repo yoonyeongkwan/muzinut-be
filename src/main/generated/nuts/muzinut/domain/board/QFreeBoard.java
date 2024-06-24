@@ -22,32 +22,32 @@ public class QFreeBoard extends EntityPathBase<FreeBoard> {
 
     public static final QFreeBoard freeBoard = new QFreeBoard("freeBoard");
 
-    public final QBoard _super = new QBoard(this);
+    public final QBoard _super;
 
     //inherited
-    public final ListPath<Comment, QComment> comments = _super.comments;
+    public final ListPath<Comment, QComment> comments;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
+    public final DateTimePath<java.time.LocalDateTime> createdDt;
 
     public final StringPath filename = createString("filename");
 
     //inherited
-    public final NumberPath<Long> id = _super.id;
+    public final NumberPath<Long> id;
 
     //inherited
-    public final ListPath<Like, QLike> likes = _super.likes;
+    public final ListPath<Like, QLike> likes;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;
+    public final DateTimePath<java.time.LocalDateTime> modifiedDt;
 
     //inherited
-    public final StringPath title = _super.title;
+    public final StringPath title;
 
     public final nuts.muzinut.domain.member.QUser user;
 
     //inherited
-    public final NumberPath<Integer> view = _super.view;
+    public final NumberPath<Integer> view;
 
     public QFreeBoard(String variable) {
         this(FreeBoard.class, forVariable(variable), INITS);
@@ -67,7 +67,15 @@ public class QFreeBoard extends EntityPathBase<FreeBoard> {
 
     public QFreeBoard(Class<? extends FreeBoard> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this._super = new QBoard(type, metadata, inits);
+        this.comments = _super.comments;
+        this.createdDt = _super.createdDt;
+        this.id = _super.id;
+        this.likes = _super.likes;
+        this.modifiedDt = _super.modifiedDt;
+        this.title = _super.title;
         this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
+        this.view = _super.view;
     }
 
 }

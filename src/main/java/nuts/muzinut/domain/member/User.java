@@ -95,7 +95,7 @@ public class User {
     private Playlist playlist;
 
     //게시판 관련
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<RecruitBoard> recruitBoards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")

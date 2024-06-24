@@ -22,32 +22,35 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
 
     public static final QAdminBoard adminBoard = new QAdminBoard("adminBoard");
 
-    public final QBoard _super = new QBoard(this);
+    public final QBoard _super;
 
     public final ListPath<AdminUploadFile, QAdminUploadFile> adminUploadFiles = this.<AdminUploadFile, QAdminUploadFile>createList("adminUploadFiles", AdminUploadFile.class, QAdminUploadFile.class, PathInits.DIRECT2);
 
-    public final ListPath<Comment, QComment> comments = this.<Comment, QComment>createList("comments", Comment.class, QComment.class, PathInits.DIRECT2);
+    //inherited
+    public final ListPath<Comment, QComment> comments;
 
     public final StringPath content = createString("content");
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
+    public final DateTimePath<java.time.LocalDateTime> createdDt;
 
     //inherited
-    public final NumberPath<Long> id = _super.id;
-
-    public final ListPath<Like, QLike> likes = this.<Like, QLike>createList("likes", Like.class, QLike.class, PathInits.DIRECT2);
+    public final NumberPath<Long> id;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;
+    public final ListPath<Like, QLike> likes;
 
     //inherited
-    public final StringPath title = _super.title;
+    public final DateTimePath<java.time.LocalDateTime> modifiedDt;
 
+    //inherited
+    public final StringPath title;
+
+    // inherited
     public final nuts.muzinut.domain.member.QUser user;
 
     //inherited
-    public final NumberPath<Integer> view = _super.view;
+    public final NumberPath<Integer> view;
 
     public QAdminBoard(String variable) {
         this(AdminBoard.class, forVariable(variable), INITS);
@@ -67,7 +70,15 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
 
     public QAdminBoard(Class<? extends AdminBoard> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
+        this._super = new QBoard(type, metadata, inits);
+        this.comments = _super.comments;
+        this.createdDt = _super.createdDt;
+        this.id = _super.id;
+        this.likes = _super.likes;
+        this.modifiedDt = _super.modifiedDt;
+        this.title = _super.title;
+        this.user = _super.user;
+        this.view = _super.view;
     }
 
 }

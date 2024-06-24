@@ -22,31 +22,31 @@ public class QLounge extends EntityPathBase<Lounge> {
 
     public static final QLounge lounge = new QLounge("lounge");
 
-    public final QBoard _super = new QBoard(this);
+    public final QBoard _super;
 
     //inherited
-    public final ListPath<Comment, QComment> comments = _super.comments;
+    public final ListPath<Comment, QComment> comments;
 
     public final StringPath content = createString("content");
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
+    public final DateTimePath<java.time.LocalDateTime> createdDt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     //inherited
-    public final ListPath<Like, QLike> likes = _super.likes;
+    public final ListPath<Like, QLike> likes;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;
+    public final DateTimePath<java.time.LocalDateTime> modifiedDt;
 
     //inherited
-    public final StringPath title = _super.title;
+    public final StringPath title;
 
     public final nuts.muzinut.domain.member.QUser user;
 
     //inherited
-    public final NumberPath<Integer> view = _super.view;
+    public final NumberPath<Integer> view;
 
     public QLounge(String variable) {
         this(Lounge.class, forVariable(variable), INITS);
@@ -66,7 +66,14 @@ public class QLounge extends EntityPathBase<Lounge> {
 
     public QLounge(Class<? extends Lounge> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this._super = new QBoard(type, metadata, inits);
+        this.comments = _super.comments;
+        this.createdDt = _super.createdDt;
+        this.likes = _super.likes;
+        this.modifiedDt = _super.modifiedDt;
+        this.title = _super.title;
         this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
+        this.view = _super.view;
     }
 
 }

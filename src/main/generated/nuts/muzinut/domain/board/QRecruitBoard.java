@@ -22,28 +22,28 @@ public class QRecruitBoard extends EntityPathBase<RecruitBoard> {
 
     public static final QRecruitBoard recruitBoard = new QRecruitBoard("recruitBoard");
 
-    public final QBoard _super = new QBoard(this);
+    public final QBoard _super;
 
     //inherited
-    public final ListPath<Comment, QComment> comments = _super.comments;
+    public final ListPath<Comment, QComment> comments;
 
     public final StringPath content = createString("content");
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
+    public final DateTimePath<java.time.LocalDateTime> createdDt;
 
     public final DateTimePath<java.time.LocalDateTime> endDuration = createDateTime("endDuration", java.time.LocalDateTime.class);
 
     public final DateTimePath<java.time.LocalDateTime> endWorkDuration = createDateTime("endWorkDuration", java.time.LocalDateTime.class);
 
     //inherited
-    public final NumberPath<Long> id = _super.id;
+    public final NumberPath<Long> id;
 
     //inherited
-    public final ListPath<Like, QLike> likes = _super.likes;
+    public final ListPath<Like, QLike> likes;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;
+    public final DateTimePath<java.time.LocalDateTime> modifiedDt;
 
     public final ListPath<RecruitBoardGenre, QRecruitBoardGenre> recruitBoardGenres = this.<RecruitBoardGenre, QRecruitBoardGenre>createList("recruitBoardGenres", RecruitBoardGenre.class, QRecruitBoardGenre.class, PathInits.DIRECT2);
 
@@ -54,12 +54,13 @@ public class QRecruitBoard extends EntityPathBase<RecruitBoard> {
     public final DateTimePath<java.time.LocalDateTime> startWorkDuration = createDateTime("startWorkDuration", java.time.LocalDateTime.class);
 
     //inherited
-    public final StringPath title = _super.title;
+    public final StringPath title;
 
+    // inherited
     public final nuts.muzinut.domain.member.QUser user;
 
     //inherited
-    public final NumberPath<Integer> view = _super.view;
+    public final NumberPath<Integer> view;
 
     public QRecruitBoard(String variable) {
         this(RecruitBoard.class, forVariable(variable), INITS);
@@ -79,7 +80,15 @@ public class QRecruitBoard extends EntityPathBase<RecruitBoard> {
 
     public QRecruitBoard(Class<? extends RecruitBoard> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
+        this._super = new QBoard(type, metadata, inits);
+        this.comments = _super.comments;
+        this.createdDt = _super.createdDt;
+        this.id = _super.id;
+        this.likes = _super.likes;
+        this.modifiedDt = _super.modifiedDt;
+        this.title = _super.title;
+        this.user = _super.user;
+        this.view = _super.view;
     }
 
 }

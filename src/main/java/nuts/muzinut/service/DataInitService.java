@@ -9,6 +9,7 @@ import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.board.Reply;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.UserDto;
+import nuts.muzinut.dto.security.AuthorityDto;
 import nuts.muzinut.repository.board.*;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.AuthorityRepository;
@@ -40,9 +41,25 @@ public class DataInitService {
     EntityManager em;
 
     @Transactional
+    public void initializeData() {
+        AuthorityDto authorityDto = new AuthorityDto("admin");
+        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
+        userService.adminSignup(userDto);
+        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
+        userService.signup(userDto2);
+        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
+        userService.signup(userDto3);
+
+        recruitBoardBoardScenario();
+        commentScenario();
+    }
+
+    @Transactional
     public void recruitBoardBoardScenario() {
         User user = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
 //        Hibernate.initialize(user.getRecruitBoards()); // 지연 로딩 초기화
+//        System.out.println("user = "+user);
+        log.info("User found: {}", user);
 
         User user1 = new User();
         user1.setNickname("tom");
@@ -53,6 +70,8 @@ public class DataInitService {
                 LocalDateTime.now(), LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(8), LocalDateTime.now().plusDays(14),
                 "Sample Title");
+
+        recruitBoardRepository.save(recruitBoard);
 
         Comment comment1 = new Comment();
         comment1.addComment(user1, recruitBoard, "sample");

@@ -16,12 +16,9 @@ import java.util.stream.Collectors;
 @Getter
 public class RecruitBoard extends Board {
 
-    /**
-     * 탈퇴한 회원이 작성한 게시판 정보는 모두 사라지는가?
-     */
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JoinColumn(name = "user_id")
+//    private User user;
 
     private String content;
 
@@ -47,15 +44,8 @@ public class RecruitBoard extends Board {
     public RecruitBoard() {
     }
 
-    //연관 관계 메서드
-    public void createRecruitBoard(User user) {
-        this.user = user;
-        user.getRecruitBoards().add(this);
-    }
-
     // 새로운 생성자
     public RecruitBoard(User user, String content, int recruitMember, LocalDateTime startDuration, LocalDateTime endDuration, LocalDateTime startWorkDuration, LocalDateTime endWorkDuration, String title) {
-        this.user = user;
         this.content = content;
         this.recruitMember = recruitMember;
         this.startDuration = startDuration;
@@ -63,7 +53,12 @@ public class RecruitBoard extends Board {
         this.startWorkDuration = startWorkDuration;
         this.endWorkDuration = endWorkDuration;
         super.title = title;
-        user.getRecruitBoards().add(this);
+//        user.getRecruitBoards().add(this);
+        super.user = user; // Board 클래스의 user 필드를 설정
+        List<RecruitBoard> recruitBoards = user.getRecruitBoards();
+        if (recruitBoards != null) {
+            recruitBoards.add(this);
+        }
     }
 
     // 장르 추가 메서드
@@ -94,7 +89,6 @@ public class RecruitBoard extends Board {
     // 수정 메서드
     public void update(User user, String content, int recruitMember, LocalDateTime startDuration,
                    LocalDateTime endDuration, LocalDateTime startWorkDuration, LocalDateTime endWorkDuration, String title) {
-        this.user = user;
         this.content = content;
         this.recruitMember = recruitMember;
         this.startDuration = startDuration;
@@ -102,5 +96,6 @@ public class RecruitBoard extends Board {
         this.startWorkDuration = startWorkDuration;
         this.endWorkDuration = endWorkDuration;
         this.title = title;
+        super.user = user; // Board 클래스의 user 필드를 설정
     }
 }

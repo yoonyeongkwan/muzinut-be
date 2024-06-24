@@ -2,6 +2,7 @@
 package nuts.muzinut.service.board;
 
 import com.querydsl.core.Tuple;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
@@ -45,7 +46,7 @@ public class RecruitBoardService {
         // 인증된 사용자 정보 가져오기
         String username = getCurrentUsername();
         User user = userRepository.findOneWithAuthoritiesByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+                .orElseThrow(() -> new EntityNotFoundException("Invalid user"));
 
         RecruitBoard recruitBoard = new RecruitBoard(
                 user,
@@ -79,7 +80,7 @@ public class RecruitBoardService {
     @Transactional
     public DetailRecruitBoardDto getDetailBoard(Long id) {
         RecruitBoard recruitBoard = recruitBoardRepository.findById(id)
-                .orElseThrow(() -> new NotFoundEntityException("모집 게시판이 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("모집 게시판이 존재하지 않습니다."));
         recruitBoard.incrementView();
 
         // 작성자 정보 가져오기
@@ -140,7 +141,7 @@ public class RecruitBoardService {
         PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt"));
         Page<RecruitBoard> page = recruitBoardRepository.findAll(pageRequest);
         if (page.isEmpty()) {
-            throw new BoardNotExistException("모집 게시판이 존재하지 않습니다.");
+            throw new EntityNotFoundException("모집 게시판이 존재하지 않습니다.");
         }
         return convertToRecruitBoardDto(page);
     }
@@ -150,7 +151,7 @@ public class RecruitBoardService {
         Pageable pageable = PageRequest.of(page, size);
         Page<RecruitBoard> recruitBoards = recruitBoardRepository.findByTitleContaining(title, pageable);
         if (recruitBoards.isEmpty()) {
-            throw new BoardNotExistException("해당 제목의 모집 게시판이 존재하지 않습니다.");
+            throw new EntityNotFoundException("해당 제목의 모집 게시판이 존재하지 않습니다.");
         }
         return convertToSaveRecruitBoardDtoPage(recruitBoards);
     }
@@ -160,7 +161,7 @@ public class RecruitBoardService {
         PageRequest pageRequest = PageRequest.of(startPage, size, Sort.by(Sort.Direction.DESC, "view"));
         Page<RecruitBoard> recruitBoards = recruitBoardRepository.findAllByOrderByViewDesc(pageRequest);
         if (recruitBoards.isEmpty()) {
-            throw new BoardNotExistException("모집 게시판이 존재하지 않습니다.");
+            throw new EntityNotFoundException("모집 게시판이 존재하지 않습니다.");
         }
         return convertToSaveRecruitBoardDtoPage(recruitBoards);
     }
@@ -174,7 +175,7 @@ public class RecruitBoardService {
         Page<RecruitBoard> recruitBoards = recruitBoardRepository.findAllByGenre(genre, pageRequest);
 
         if (recruitBoards.isEmpty()) {
-            throw new BoardNotExistException("모집 게시판이 존재하지 않습니다.");
+            throw new EntityNotFoundException("모집 게시판이 존재하지 않습니다.");
         }
         return convertToSaveRecruitBoardDtoPage(recruitBoards);
     }

@@ -33,4 +33,27 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     void turnOnNotification(Boolean notification, User user, Long followingMemberId);
 
     List<Follow> findByUser(User user);
+
+    /**
+     * 특정 유저가 특정 회원을 팔로우하고 있는지 확인하는 메서드
+     * @param user: 팔로잉 하는 주체
+     * @param followingMemberId: 팔로잉 하는 대상
+     * @return 팔로우 여부
+     */
+    boolean existsByUserAndFollowingMemberId(User user, Long followingMemberId);
+
+    /**
+     * 특정 유저의 팔로워 리스트를 가져오는 메서드
+     * @param followingMemberId: 팔로잉 하는 대상의 ID
+     * @return 팔로워 리스트
+     */
+    List<Follow> findByFollowingMemberId(Long followingMemberId);
+
+    /**
+     * 특정 유저가 팔로우한 회원의 리스트를 가져오는 메서드
+     * @param user: 팔로잉 하는 주체
+     * @return 팔로잉 리스트
+     */
+    @Query("select f.followingMemberId from Follow f where f.user = :user")
+    List<Long> findFollowingMemberIdsByUser(User user);
 }

@@ -17,6 +17,7 @@ import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.board.AdminBoardService;
+import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,7 @@ public class DataInitService {
     private final RecruitBoardRepository recruitBoardRepository;
     private final ReplyRepository replyRepository;
     private final FollowRepository followRepository;
+    private final FollowService followService;
 
     @PersistenceContext
     EntityManager em;
@@ -46,35 +48,33 @@ public class DataInitService {
         userService.signup(userDto2);
         UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
         userService.signup(userDto3);
+        UserDto userDto4 = new UserDto("user3@naver.com", "user3", "user3!");
+        userService.signup(userDto4);
 
         recruitBoardBoardScenario();
         commentScenario();
-//        followScenario();
+        followScenario();
     }
 
     private void followScenario() {
         // 사용자 불러오기
         User user1 = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
         User user2 = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
-        User admin = userRepository.findByNickname("add!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user3 = userRepository.findByNickname("user3!").orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        // 팔로우 관계 설정
-        Follow follow1 = new Follow();
-        follow1.createFollowing(user1, admin);
-        followRepository.save(follow1);
-        log.info("{}가 {}를 팔로우", user1.getNickname(), admin.getNickname());
+        // FollowService를 사용하여 팔로우 관계 설정
+        followService.followUser(user1, user3.getId());
+        log.info("{}가 {}를 팔로우", user1.getNickname(), user3.getNickname());
 
-        Follow follow2 = new Follow();
-        follow2.createFollowing(user2, admin);
-        followRepository.save(follow2);
-        log.info("{}가 {}를 팔로우", user2.getNickname(), admin.getNickname());
+        followService.followUser(user2, user3.getId());
+        log.info("{}가 {}를 팔로우", user2.getNickname(), user3.getNickname());
 
         // 알림 기능 테스트
-        followRepository.updateNotificationStatus(false, user1, admin.getId());
-        log.info("{}의 {} 팔로우 알림을 끕니다.", user1.getNickname(), admin.getNickname());
+        followRepository.updateNotificationStatus(false, user1, user3.getId());
+        log.info("{}의 {} 팔로우 알림을 끕니다.", user1.getNickname(), user3.getNickname());
 
-        followRepository.updateNotificationStatus(true, user1, admin.getId());
-        log.info("{}의 {} 팔로우 알림을 켭니다.", user1.getNickname(), admin.getNickname());
+        followRepository.updateNotificationStatus(true, user1, user3.getId());
+        log.info("{}의 {} 팔로우 알림을 켭니다.", user1.getNickname(), user3.getNickname());
     }
 
     @Transactional

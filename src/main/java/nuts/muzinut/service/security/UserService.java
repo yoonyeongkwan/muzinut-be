@@ -111,4 +111,12 @@ public class UserService {
                 SecurityUtil.getCurrentUsername()
                         .orElseThrow(() -> new NotFoundMemberException("로그인 하지 않았거나 없는 회원입니다")));
     }
+
+    // 토큰의 사용자 이름 반환
+    @Transactional(readOnly = true)
+    public User findUserByUsername(String username) {
+        return userRepository.findOneWithAuthoritiesByUsername(username)
+                .orElseThrow(() -> new NotFoundMemberException("Member not found"));
+    }
+
 }

@@ -10,6 +10,7 @@ import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.FreeBoardRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -79,9 +80,9 @@ public class FileStore {
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFilename = createStoreFileName(originalFilename);
         multipartFile.transferTo(new File(getFullPath(storeFilename))); //파일 저장
-
         freeBoard.setFilename(storeFilename);
-        return freeBoardRepository.save(freeBoard);
+
+        return freeBoard;
     }
 
     //id는 adminBoard pk

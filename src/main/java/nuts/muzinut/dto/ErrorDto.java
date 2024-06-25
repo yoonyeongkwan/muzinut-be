@@ -2,8 +2,11 @@ package nuts.muzinut.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lombok.Data;
 import org.springframework.validation.FieldError;
 
+@Data
 public class ErrorDto {
     private final int status;
     private final String message;

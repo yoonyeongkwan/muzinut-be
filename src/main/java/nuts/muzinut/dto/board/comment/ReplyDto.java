@@ -23,4 +23,11 @@ public class ReplyDto {
         this.commentId = commentId;
         this.createdDt = createdDt;
     }
+
+    public ReplyDto(Long id, String content, String replyWriter, LocalDateTime createdDt) {
+        this.id = id;
+        this.content = content;
+        this.replyWriter = replyWriter;
+        this.createdDt = createdDt;
+    }
 }

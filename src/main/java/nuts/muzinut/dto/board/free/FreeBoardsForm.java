@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 public class FreeBoardsForm {
+    private Long id;
     private String title;
     private String writer;
     private LocalDateTime createdDt;

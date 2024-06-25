@@ -204,7 +204,7 @@ public class AdminBoardController {
      */
     @ResponseBody
     @GetMapping("/admin-boards")
-    public ResponseEntity<AdminBoardsDto> getAdminBoards(@RequestParam("page") int page) {
+    public ResponseEntity<AdminBoardsDto> getAdminBoards(@RequestParam(value = "page", defaultValue = "0") int page) {
 
         try {
             AdminBoardsDto adminBoards = adminBoardService.getAdminBoards(page);

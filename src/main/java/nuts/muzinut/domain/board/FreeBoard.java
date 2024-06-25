@@ -1,6 +1,7 @@
 package nuts.muzinut.domain.board;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,5 +30,14 @@ public class FreeBoard extends Board {
 
     public int addView() {
         return ++this.view;
+    }
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
+    public void update(String title, String filename) {
+        this.title = title;
+        this.filename = filename;
     }
 }

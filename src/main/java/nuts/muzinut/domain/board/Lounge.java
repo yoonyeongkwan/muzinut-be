@@ -13,15 +13,5 @@ public class Lounge extends Board {
     @Column(name = "lounge_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    private String content;
-
-    //연관 관계 메서드
-    public void createLounge(User user) {
-        this.user = user;
-        user.getLounges().add(this);
-    }
+    private String filename; //react quill file
 }

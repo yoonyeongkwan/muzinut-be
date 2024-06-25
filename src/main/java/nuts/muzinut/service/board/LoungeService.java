@@ -3,7 +3,10 @@ package nuts.muzinut.service.board;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.domain.board.*;
+import nuts.muzinut.domain.board.Board;
+import nuts.muzinut.domain.board.Comment;
+import nuts.muzinut.domain.board.FreeBoard;
+import nuts.muzinut.domain.board.Reply;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
@@ -12,7 +15,6 @@ import nuts.muzinut.dto.board.free.FreeBoardsDto;
 import nuts.muzinut.dto.board.free.FreeBoardsForm;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
-import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.FreeBoardRepository;
 import nuts.muzinut.repository.board.query.FreeBoardQueryRepository;
@@ -22,16 +24,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static nuts.muzinut.domain.board.QBoard.board;
-import static nuts.muzinut.domain.board.QFreeBoard.*;
+import static nuts.muzinut.domain.board.QFreeBoard.freeBoard;
 
 @Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class FreeBoardService {
+public class LoungeService {
 
     private final FreeBoardRepository freeBoardRepository;
     private final BoardRepository boardRepository;
@@ -85,13 +89,12 @@ public class FreeBoardService {
 
         log.info("tuple: {}", result);
         if (result.isEmpty()) {
-            throw new NotFoundEntityException("찾고자 하는 게시판이 없습니다.");
+            return null;
         }
 
         Tuple first = result.getFirst();
         Board findBoard = first.get(board);
         FreeBoard findFreeBoard = first.get(freeBoard);
-        log.info("comment size: {}", findFreeBoard.getComments().size());
         int view = findFreeBoard.addView();
 
         if (findBoard == null || findFreeBoard == null) {

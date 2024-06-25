@@ -8,6 +8,4 @@ import org.springframework.web.multipart.MultipartFile;
 public class FreeBoardForm {
     @NotNull
     private String title;
-    @NotNull
-    private MultipartFile quillFile;
 }

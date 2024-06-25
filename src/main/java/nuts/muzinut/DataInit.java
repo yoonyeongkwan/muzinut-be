@@ -14,7 +14,7 @@ import nuts.muzinut.repository.board.*;
 import nuts.muzinut.service.DataInitService;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class DataInit {
 
@@ -78,7 +78,7 @@ public class DataInit {
 
         Board freeBoard = new FreeBoard();
         freeBoard.addBoard(user1);
-        createFreeBoards();
+//        createFreeBoards();
 
         Comment comment1 = new Comment();
         comment1.addComment(user1, freeBoard, "sample");

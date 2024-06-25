@@ -46,7 +46,7 @@ public class FollowController {
 
     // 특정 유저의 `팔로잉` 수를 반환하는 메소드
     @GetMapping("/following-count")
-    public ResponseEntity<Long> getFollowingCount(@RequestParam Long userId) {
+    public ResponseEntity<Long> getFollowingCount(@RequestParam(value = "userId") Long userId) {
         log.info("Getting following count for user with ID: {}", userId);
         User user = userService.findUserById(userId);
         if (user == null) {
@@ -59,7 +59,7 @@ public class FollowController {
 
     // 특정 유저의 `팔로워` 수를 반환하는 메소드
     @GetMapping("/followers-count")
-    public ResponseEntity<Long> getFollowersCount(@RequestParam Long userId) {
+    public ResponseEntity<Long> getFollowersCount(@RequestParam(value = "userId") Long userId) {
         log.info("Getting followers count for user with ID: {}", userId);
         Long count = followService.countFollowers(userId);
         return ResponseEntity.ok(count);

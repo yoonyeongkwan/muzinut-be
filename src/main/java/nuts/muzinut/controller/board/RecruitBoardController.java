@@ -135,12 +135,12 @@ public class RecruitBoardController {
     @ResponseBody
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/recruit-boards/{id}")
-    public ResponseEntity<Void> deleteRecruitBoard(@PathVariable("id") Long id) {
+    public ResponseEntity<MessageDto> deleteRecruitBoard(@PathVariable("id") Long id) {
         recruitBoardService.deleteRecruitBoard(id);
         HttpHeaders header = new HttpHeaders();
         header.setLocation(URI.create("/recruit-boards")); // 모든 게시판 조회 페이지로 리다이렉트
-        return ResponseEntity.status(HttpStatus.FOUND)
+        return ResponseEntity.status(HttpStatus.OK)
                 .headers(header)
-                .build();
+                .body(new MessageDto("모집 게시판이 삭제되었습니다"));
     }
 }

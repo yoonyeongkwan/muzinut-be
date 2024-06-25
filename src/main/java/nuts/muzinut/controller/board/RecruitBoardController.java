@@ -135,15 +135,12 @@ public class RecruitBoardController {
     @ResponseBody
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/recruit-boards/{id}")
-    public ResponseEntity<MessageDto> deleteRecruitBoard(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteRecruitBoard(@PathVariable("id") Long id) {
         recruitBoardService.deleteRecruitBoard(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new MessageDto("모집 게시판이 삭제되었습니다"));
+        HttpHeaders header = new HttpHeaders();
+        header.setLocation(URI.create("/recruit-boards")); // 모든 게시판 조회 페이지로 리다이렉트
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .headers(header)
+                .build();
     }
-//
-//    @GetMapping("/ex")
-//    public void ex() {
-//        throw new AccessDeniedException("접근 권한이 없음");
-//    }
-
 }

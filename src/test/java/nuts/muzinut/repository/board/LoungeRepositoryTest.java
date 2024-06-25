@@ -29,8 +29,7 @@ class LoungeRepositoryTest {
         userRepository.save(user);
 
         Lounge lounge = new Lounge();
-        lounge.createLounge(user);
-
+        lounge.addBoard(user);
         //when
         loungeRepository.save(lounge);
 

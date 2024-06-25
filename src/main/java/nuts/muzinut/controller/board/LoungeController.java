@@ -5,18 +5,21 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.FreeBoard;
+import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardForm;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
-import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.NoUploadFileException;
+import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.FreeBoardService;
+import nuts.muzinut.service.board.LoungeService;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
@@ -29,29 +32,30 @@ import java.net.URI;
 
 @Slf4j
 @Controller
-@RequestMapping("/free-boards")
+@RequestMapping("/lounges")
 @RequiredArgsConstructor
-public class FreeBoardController {
+public class LoungeController {
 
     private final UserService userService;
     private final FileStore fileStore;
     private final FreeBoardService freeBoardService;
+    private final LoungeService loungeService;
     private final ObjectMapper objectMapper;
 
     /**
      * 자유 게시판 생성
-     * @param freeBoardForm: react quill file & title
      * @throws NoUploadFileException: 업로드 할 파일이 없는 경우
      * @throws IOException
      */
+/*
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping
     public ResponseEntity<MessageDto> createBoard(
-            @RequestPart MultipartFile quillFile, @RequestPart FreeBoardForm freeBoardForm) throws IOException {
+            @RequestPart MultipartFile quillFile) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
-        FreeBoard freeBoard = new FreeBoard(freeBoardForm.getTitle());
-        freeBoard.addBoard(user);
+        Lounge lounge = new Lounge();
+        lounge.addBoard(user);
 
         try {
             fileStore.storeFile(quillFile, freeBoard); //자유 게시판 파일 저장
@@ -67,9 +71,10 @@ public class FreeBoardController {
                     .body(null);
         }
     }
+*/
 
     //특정 게시판 조회
-    @GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/{id}",produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 

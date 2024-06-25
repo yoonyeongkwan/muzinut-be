@@ -1,6 +1,6 @@
 package nuts.muzinut.exception;
 
-public class NoUploadFileException extends Exception{
+public class NoUploadFileException extends RuntimeException{
 
     public NoUploadFileException() {
     }

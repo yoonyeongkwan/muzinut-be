@@ -18,6 +18,7 @@ import java.util.List;
 @Data
 public class DetailFreeBoardDto {
 
+    private Long id;
     private String title;
     private String writer = "muzi";
     private int view;
@@ -32,7 +33,8 @@ public class DetailFreeBoardDto {
         this.view = view;
     }
 
-    public DetailFreeBoardDto(String title, String writer, int view, String quillFilename) {
+    public DetailFreeBoardDto(Long id ,String title, String writer, int view, String quillFilename) {
+        this.id = id;
         this.title = title;
         this.writer = writer;
         this.view = view;

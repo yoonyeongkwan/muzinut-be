@@ -105,7 +105,7 @@ public class User {
 
 
     //게시판 관련
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Board> boards = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")

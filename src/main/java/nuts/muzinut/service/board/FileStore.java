@@ -85,6 +85,28 @@ public class FileStore {
         return freeBoard;
     }
 
+    /**
+     * 자유 게시판 파일 수정
+     * @param multipartFile: react quill
+     * @param freeBoard: 자유 게시판 엔티티
+     * @throws IOException: 파일 업로드 실패시 발생
+     * @throws NoUploadFileException: 업로드할 파일이 없을 시 발생
+     * @return: 업데이트 한 파일명을 반환
+     */
+    public String updateFreeBoardFile(MultipartFile multipartFile, FreeBoard freeBoard) throws IOException, NoUploadFileException {
+        if (multipartFile.isEmpty()) {
+            throw new NoUploadFileException("자유게시판의 업로드 파일이 존재하지 않음");
+        }
+
+        deleteFile(freeBoard.getFilename()); //기존 파일 삭제
+        String originalFilename = multipartFile.getOriginalFilename();
+        String storeFilename = createStoreFileName(originalFilename);
+        multipartFile.transferTo(new File(getFullPath(storeFilename))); //파일 저장
+        freeBoard.setFilename(storeFilename);
+
+        return storeFilename;
+    }
+
     //id는 adminBoard pk
     public void deleteAdminAttachedFile(Long id) {
         List<AdminUploadFile> files = uploadFileRepository.getAdminUploadFile(id);
@@ -106,6 +128,12 @@ public class FileStore {
             File file = new File(fileDir + f.getStoreFilename());
             file.delete();
         }
+    }
+
+    //자유 게시판 파일을 삭제하는 메서드
+    public void deleteFile(String filename) {
+            File file = new File(fileDir + filename);
+            file.delete();
     }
 
     //파일 이름을 랜덤으로 생성하는 메서드 (저장하는 파일 명이 겹치면 안되기 때문)

@@ -38,7 +38,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class, BoardNotFoundException.class })
     @ResponseBody
-    private ErrorDto BAD_REQUEST(EmailVertFailException ex, WebRequest request){
+    private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
         log.info("BoardNotFoundException 호출");
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }

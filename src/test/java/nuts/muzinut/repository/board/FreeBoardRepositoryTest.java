@@ -83,6 +83,22 @@ class FreeBoardRepositoryTest {
         assertThat(page.getTotalElements()).isEqualTo(10); //전체 데이터 수
 
     }
+    @Test
+    void findFreeBoardWithUser() {
+
+        //given
+        User user = new User();
+        FreeBoard freeBoard = new FreeBoard();
+        freeBoard.addBoard(user);
+        freeBoardRepository.save(freeBoard);
+
+        //when
+        Optional<FreeBoard> board = freeBoardRepository.findFreeBoardWithUser(freeBoard.getId());
+
+        //then
+        assertThat(board.get()).isEqualTo(freeBoard);
+        assertThat(board.get().getUser()).isEqualTo(user);
+    }
 
     private void createFreeBoards() {
         for (int i = 0; i < 10; i++) {

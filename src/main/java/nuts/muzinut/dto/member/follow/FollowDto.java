@@ -1,4 +1,4 @@
-package nuts.muzinut.dto.member;
+package nuts.muzinut.dto.member.follow;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -11,4 +11,8 @@ public class FollowDto {
 
     @NotNull
     private Long followingMemberId;
+//
+//    private String followingMemberUsername;
+//    private String followingMemberNickname;
+//    private String followingMemberProfileImgFilename;
 }

@@ -4,12 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.Follow;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.member.follow.FollowListDto;
 import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -47,12 +49,6 @@ public class FollowService {
         followRepository.updateNotificationStatus(true, user, userId);
     }
 
-    // 특정 유저가 팔로우한 모든 팔로우 정보를 반환하는 메소드
-    public List<Follow> getFollowingList(User user) {
-        validateUser(user);
-        return followRepository.findByUser(user);
-    }
-
     // 특정 유저가 특정 회원을 팔로우하고 있는지 확인하는 메소드
     public boolean isFollowing(User user, Long userId) {
         validateUser(user);
@@ -60,17 +56,36 @@ public class FollowService {
         return followRepository.existsByUserAndFollowingMemberId(user, userId);
     }
 
-    // 특정 유저의 팔로워 리스트를 반환하는 메소드
-    public List<Follow> getFollowerList(Long userId) {
-        validateUserId(userId);
-        return followRepository.findFollowersByUserId(userId);
+    // 팔로잉(특정 유저가 팔로우한 회원의) 리스트를 반환하는 메소드
+    public List<FollowListDto> getFollowingList(User user) {
+        validateUser(user);
+        List<Follow> followings = followRepository.findByUser(user);
+        return followings.stream()
+                .map(follow -> new FollowListDto(follow.getFollowingMemberId()))
+                .collect(Collectors.toList());
     }
 
-    // 특정 유저가 팔로우한 회원의 리스트를 반환하는 메소드
-    public List<Long> getFollowingMemberIds(User user) {
-        validateUser(user);
-        return followRepository.findFollowingMemberIdsByUser(user);
+    // 팔로워(특정 유저를 팔로우한 회원의) 리스트를 반환하는 메소드
+    public List<FollowListDto> getFollowerList(Long userId) {
+        validateUserId(userId);
+        List<Follow> followers = followRepository.findFollowersByUserId(userId);
+        return followers.stream()
+                .map(follow -> new FollowListDto(follow.getUser()))
+                .collect(Collectors.toList());
     }
+
+//
+//    // 팔로잉(특정 유저가 팔로우한 회원의) 리스트를 반환하는 메소드
+//    public List<Follow> getFollowerList(Long userId) {
+//        validateUserId(userId);
+//        return followRepository.findFollowersByUserId(userId);
+//    }
+//
+//    // 팔로워(특정 유저를 팔로우한 회원의) 리스트를 반환하는 메소드
+//    public List<Long> getFollowingMemberIds(User user) {
+//        validateUser(user);
+//        return followRepository.findFollowingMemberIdsByUser(user);
+//    }
 
     // 유저 팔로우 메서드
     @Transactional

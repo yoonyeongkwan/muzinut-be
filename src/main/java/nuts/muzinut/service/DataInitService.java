@@ -51,8 +51,8 @@ public class DataInitService {
         UserDto userDto4 = new UserDto("user3@naver.com", "user3", "user3!");
         userService.signup(userDto4);
 
-        recruitBoardBoardScenario();
-        commentScenario();
+//        recruitBoardBoardScenario();
+//        commentScenario();
         followScenario();
     }
 

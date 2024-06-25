@@ -25,6 +25,7 @@ import java.net.URI;
 
 @Slf4j
 @Controller
+@RequestMapping("/community")
 @RequiredArgsConstructor
 public class RecruitBoardController {
 

@@ -3,19 +3,20 @@ package nuts.muzinut.controller.member;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.domain.member.Follow;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.member.FollowDto;
+import nuts.muzinut.dto.member.follow.FollowDto;
+import nuts.muzinut.dto.member.follow.FollowListDto;
 import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Slf4j
@@ -43,10 +44,9 @@ public class FollowController {
         return userService.findUserByUsername(username);
     }
 
-
     // 특정 유저의 `팔로잉` 수를 반환하는 메소드
     @GetMapping("/following-count")
-    public ResponseEntity<Long> getFollowingCount(@RequestParam(value = "userId") Long userId) {
+    public ResponseEntity<Map<String, Long>> getFollowingCount(@RequestParam(value = "userId") Long userId) {
         log.info("Getting following count for user with ID: {}", userId);
         User user = userService.findUserById(userId);
         if (user == null) {
@@ -54,15 +54,24 @@ public class FollowController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
         Long count = followService.countFollowing(user);
-        return ResponseEntity.ok(count);
+        Map<String, Long> response = new HashMap<>();
+        response.put("followingCount", count);
+        return ResponseEntity.ok(response);
     }
 
     // 특정 유저의 `팔로워` 수를 반환하는 메소드
     @GetMapping("/followers-count")
-    public ResponseEntity<Long> getFollowersCount(@RequestParam(value = "userId") Long userId) {
+    public ResponseEntity<Map<String, Long>> getFollowersCount(@RequestParam(value = "userId") Long userId) {
         log.info("Getting followers count for user with ID: {}", userId);
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            log.error("User not found with ID: {}", userId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         Long count = followService.countFollowers(userId);
-        return ResponseEntity.ok(count);
+        Map<String, Long> response = new HashMap<>();
+        response.put("followersCount", count);
+        return ResponseEntity.ok(response);
     }
 
     // 팔로우 알림을 끄는 메소드
@@ -91,24 +100,35 @@ public class FollowController {
         return ResponseEntity.ok("Notification turned on");
     }
 
-    // 특정 유저의 팔로워 리스트를 반환하는 메소드
+    // 팔로잉(특정 유저가 팔로우한 회원의) 리스트를 반환하는 메소드
     @GetMapping("/following-list")
-    public ResponseEntity<List<Follow>> getFollowingList(@RequestParam Long userId) {
+    public ResponseEntity<List<FollowListDto>> getFollowingList(@RequestParam(value = "userId") Long userId) {
         log.info("Getting following list for user with ID: {}", userId);
         User user = userService.findUserById(userId);
         if (user == null) {
             log.error("User not found with ID: {}", userId);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        List<Follow> followingList = followService.getFollowingList(user);
+        List<FollowListDto> followingList = followService.getFollowingList(user);
+        if (followingList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(followingList);
+        }
         return ResponseEntity.ok(followingList);
     }
 
-    // 특정 유저가 팔로우한 회원의 리스트를 반환하는 메소드
+    // 팔로워(특정 유저를 팔로우한 회원의) 리스트를 반환하는 메소드
     @GetMapping("/followers-list")
-    public ResponseEntity<List<Follow>> getFollowersList(@RequestParam Long userId) {
+    public ResponseEntity<List<FollowListDto>> getFollowersList(@RequestParam(value = "userId") Long userId) {
         log.info("Getting followers list for user with ID: {}", userId);
-        List<Follow> followersList = followService.getFollowerList(userId);
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            log.error("User not found with ID: {}", userId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        List<FollowListDto> followersList = followService.getFollowerList(userId);
+        if (followersList.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(followersList);
+        }
         return ResponseEntity.ok(followersList);
     }
 

@@ -14,7 +14,7 @@ import nuts.muzinut.repository.board.*;
 import nuts.muzinut.service.DataInitService;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 public class DataInit {
 
@@ -47,7 +47,7 @@ public class DataInit {
 //        dataInitService.commentScenario();
 //    }
 
-    @PostConstruct
+//    @PostConstruct
     public void adminBoardScenario() {
         User user1 = new User();
         user1.setNickname("tom");

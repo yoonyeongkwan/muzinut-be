@@ -40,8 +40,9 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     // 특정 유저가 특정 회원을 팔로우하고 있는지 확인하는 메소드
     boolean existsByUserAndFollowingMemberId(User user, Long followingMemberId);
 
-    // 특정 유저의 팔로워 리스트를 가져오는 메서드
-    List<Follow> findFollowersByUserId(Long followingMemberId);
+    // 팔로워(특정 유저를 팔로우한 회원의) 리스트를 반환하는 메소드
+    @Query("select f from Follow f where f.followingMemberId = :userId")
+    List<Follow> findFollowersByUserId(@Param("userId") Long userId);
 
     /**
      * @param user: 팔로잉 하는 주체

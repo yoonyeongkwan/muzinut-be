@@ -27,10 +27,10 @@ public class QLounge extends EntityPathBase<Lounge> {
     //inherited
     public final ListPath<Comment, QComment> comments;
 
-    public final StringPath content = createString("content");
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDt;
+
+    public final StringPath filename = createString("filename");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -43,6 +43,7 @@ public class QLounge extends EntityPathBase<Lounge> {
     //inherited
     public final StringPath title;
 
+    // inherited
     public final nuts.muzinut.domain.member.QUser user;
 
     //inherited
@@ -72,7 +73,7 @@ public class QLounge extends EntityPathBase<Lounge> {
         this.likes = _super.likes;
         this.modifiedDt = _super.modifiedDt;
         this.title = _super.title;
-        this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
+        this.user = _super.user;
         this.view = _super.view;
     }
 

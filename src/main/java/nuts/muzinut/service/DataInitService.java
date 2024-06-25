@@ -7,16 +7,12 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.Comment;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.board.Reply;
-import nuts.muzinut.domain.member.Follow;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.dto.security.AuthorityDto;
 import nuts.muzinut.repository.board.*;
-import nuts.muzinut.repository.board.query.BoardQueryRepository;
-import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
-import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Service;
@@ -51,8 +47,8 @@ public class DataInitService {
         UserDto userDto4 = new UserDto("user3@naver.com", "user3", "user3!");
         userService.signup(userDto4);
 
-//        recruitBoardBoardScenario();
-//        commentScenario();
+        recruitBoardBoardScenario();
+        commentScenario();
         followScenario();
     }
 
@@ -80,14 +76,15 @@ public class DataInitService {
     @Transactional
     public void recruitBoardBoardScenario() {
         User user = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
-//        Hibernate.initialize(user.getRecruitBoards()); // 지연 로딩 초기화
-//        System.out.println("user = "+user);
         log.info("User found: {}", user);
 
         User user1 = new User();
         user1.setNickname("tom");
+        userRepository.save(user1); // User 객체를 먼저 저장
+
         User user2 = new User();
         user2.setNickname("nick");
+        userRepository.save(user2); // User 객체를 먼저 저장
 
         RecruitBoard recruitBoard = new RecruitBoard(user, "Sample Content", 5,
                 LocalDateTime.now(), LocalDateTime.now().plusDays(7),

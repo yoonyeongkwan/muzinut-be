@@ -7,17 +7,11 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.repository.board.RecruitBoardRepository;
 import nuts.muzinut.repository.board.CommentRepository;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.ReplyRepository;
 import nuts.muzinut.repository.board.*;
-import nuts.muzinut.repository.board.query.BoardQueryRepository;
-import nuts.muzinut.repository.member.AuthorityRepository;
-import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.DataInitService;
-import nuts.muzinut.service.board.AdminBoardService;
-import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,13 +21,12 @@ public class DataInit {
     private final AdminBoardRepository adminBoardRepository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
-    private final ReplyRepository replyRepository;git
-
+    private final ReplyRepository replyRepository;
     private final DataInitService dataInitService;
+    private final FreeBoardRepository freeBoardRepository;
 
     @PersistenceContext
     EntityManager em;
-    private final FreeBoardRepository freeBoardRepository;
 
     @PostConstruct
     public void init() {

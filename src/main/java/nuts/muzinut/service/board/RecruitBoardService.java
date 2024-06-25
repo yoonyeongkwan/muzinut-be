@@ -2,7 +2,6 @@
 package nuts.muzinut.service.board;
 
 import com.querydsl.core.Tuple;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
@@ -18,12 +17,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +44,7 @@ public class RecruitBoardService {
         // 인증된 사용자 정보 가져오기
         String username = getCurrentUsername();
         User user = userRepository.findOneWithAuthoritiesByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("Invalid user"));
+                .orElseThrow(() -> new NotFoundEntityException("Invalid user"));
 
         RecruitBoard recruitBoard = new RecruitBoard(
                 user,
@@ -139,7 +138,7 @@ public class RecruitBoardService {
         PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt"));
         Page<RecruitBoard> page = recruitBoardRepository.findAll(pageRequest);
         if (page.isEmpty()) {
-            throw new EntityNotFoundException("모집 게시판이 존재하지 않습니다.");
+            throw new NotFoundEntityException("모집 게시판이 존재하지 않습니다.");
         }
         return convertToRecruitBoardDto(page);
     }
@@ -149,7 +148,7 @@ public class RecruitBoardService {
         Pageable pageable = PageRequest.of(page, size);
         Page<RecruitBoard> recruitBoards = recruitBoardRepository.findByTitleContaining(title, pageable);
         if (recruitBoards.isEmpty()) {
-            throw new EntityNotFoundException("해당 제목의 모집 게시판이 존재하지 않습니다.");
+            throw new NotFoundEntityException("해당 제목의 모집 게시판이 존재하지 않습니다.");
         }
         return convertToSaveRecruitBoardDtoPage(recruitBoards);
     }
@@ -159,7 +158,7 @@ public class RecruitBoardService {
         PageRequest pageRequest = PageRequest.of(startPage, size, Sort.by(Sort.Direction.DESC, "view"));
         Page<RecruitBoard> recruitBoards = recruitBoardRepository.findAllByOrderByViewDesc(pageRequest);
         if (recruitBoards.isEmpty()) {
-            throw new EntityNotFoundException("모집 게시판이 존재하지 않습니다.");
+            throw new NotFoundEntityException("모집 게시판이 존재하지 않습니다.");
         }
         return convertToSaveRecruitBoardDtoPage(recruitBoards);
     }
@@ -173,7 +172,7 @@ public class RecruitBoardService {
         Page<RecruitBoard> recruitBoards = recruitBoardRepository.findAllByGenre(genre, pageRequest);
 
         if (recruitBoards.isEmpty()) {
-            throw new EntityNotFoundException("모집 게시판이 존재하지 않습니다.");
+            throw new NotFoundEntityException("모집 게시판이 존재하지 않습니다.");
         }
         return convertToSaveRecruitBoardDtoPage(recruitBoards);
     }
@@ -182,13 +181,12 @@ public class RecruitBoardService {
     @Transactional
     public RecruitBoard findRecruitBoardById(Long id) {
         RecruitBoard recruitBoard = checkEntityExists(id);
-        recruitBoard.incrementView();
         return recruitBoard;
     }
 
     // 모집 게시판 수정을 처리하는 메소드
     @Transactional
-    public RecruitBoard updateRecruitBoard(Long id, RecruitBoardForm recruitBoardForm) throws AccessDeniedException {
+    public RecruitBoard updateRecruitBoard(Long id, RecruitBoardForm recruitBoardForm) {
         String username = getCurrentUsername();
         RecruitBoard recruitBoard = checkEntityExists(id);
         checkUserAuthorization(recruitBoard, username);
@@ -256,7 +254,7 @@ public class RecruitBoardService {
     // 공통 예외 처리를 위한 메소드
     private RecruitBoard checkEntityExists(Long id) {
         return recruitBoardRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 모집 게시판을 찾을 수 없습니다"));
+                .orElseThrow(() -> new NotFoundEntityException("해당 ID의 모집 게시판을 찾을 수 없습니다"));
     }
 
     // 공통 예외 처리를 위한 메소드

@@ -58,18 +58,21 @@ public class DataInitService {
         User user3 = userRepository.findByNickname("user3!").orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // FollowService를 사용하여 팔로우 관계 설정
-        followService.followUser(user1, user3.getId());
+        followService.toggleFollow(user1, user3.getId());
         log.info("{}가 {}를 팔로우", user1.getNickname(), user3.getNickname());
 
-        followService.followUser(user2, user3.getId());
+        followService.toggleFollow(user2, user3.getId());
         log.info("{}가 {}를 팔로우", user2.getNickname(), user3.getNickname());
 
         // 알림 기능 테스트
-        followRepository.updateNotificationStatus(false, user1, user3.getId());
+        followService.toggleNotification(user1, user3.getId());
         log.info("{}의 {} 팔로우 알림을 끕니다.", user1.getNickname(), user3.getNickname());
 
-        followRepository.updateNotificationStatus(true, user1, user3.getId());
+        followService.toggleNotification(user1, user3.getId());
         log.info("{}의 {} 팔로우 알림을 켭니다.", user1.getNickname(), user3.getNickname());
+
+        // 데이터베이스 커밋 보장
+        em.flush();
     }
 
     @Transactional

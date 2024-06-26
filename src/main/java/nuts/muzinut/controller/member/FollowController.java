@@ -7,6 +7,7 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.follow.FollowDto;
 import nuts.muzinut.dto.member.follow.FollowListDto;
+import nuts.muzinut.dto.member.follow.FollowNotificationDto;
 import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.http.HttpStatus;
@@ -84,30 +85,12 @@ public class FollowController {
         return ResponseEntity.ok(response);
     }
 
-    // 팔로우 알림을 끄는 메소드
-    @PostMapping("/turn-off-notification")
-    public ResponseEntity<String> turnOffNotification(@RequestBody @Valid FollowDto followDto) {
-        log.info("Turning off notification for user ID: {} and following member ID: {}", followDto.getUserId(), followDto.getFollowingMemberId());
-        User user = userService.findUserById(followDto.getUserId());
-        if (user == null) {
-            log.error("User not found with ID: {}", followDto.getUserId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        followService.turnOffNotification(user, followDto.getFollowingMemberId());
-        return ResponseEntity.ok("Notification turned off");
-    }
-
-    // 팔로우 알림을 키는 메소드
-    @PostMapping("/turn-on-notification")
-    public ResponseEntity<String> turnOnNotification(@RequestBody @Valid FollowDto followDto) {
-        log.info("Turning on notification for user ID: {} and following member ID: {}", followDto.getUserId(), followDto.getFollowingMemberId());
-        User user = userService.findUserById(followDto.getUserId());
-        if (user == null) {
-            log.error("User not found with ID: {}", followDto.getUserId());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-        }
-        followService.turnOnNotification(user, followDto.getFollowingMemberId());
-        return ResponseEntity.ok("Notification turned on");
+    // 팔로우 알림 토글 메소드
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("/follow-notification")
+    public ResponseEntity<MessageDto> toggleNotification(@RequestBody @Valid FollowNotificationDto toggleNotificationDto) {
+        User user = getAuthenticatedUser();
+        return followService.toggleNotification(user, toggleNotificationDto.getFollowingMemberId());
     }
 
     // 팔로잉(특정 유저가 팔로우한 회원의) 리스트를 반환하는 메소드

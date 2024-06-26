@@ -44,20 +44,6 @@ public class FollowService {
         }
     }
 
-//    // 팔로우 알림 토글 메소드
-//    @Transactional
-//    public void toggleNotification(User user, Long followingUserId) {
-//        validateUser(user);
-//        validateUserId(followingUserId);
-//
-//        boolean isNotificationOn = followRepository.existsByUserAndFollowingMemberIdAndNotificationStatus(user, followingUserId, true);
-//        if (isNotificationOn) {
-//            turnOffNotification(user, followingUserId);
-//        } else {
-//            turnOnNotification(user, followingUserId);
-//        }
-//    }
-
     // 특정 유저의 `팔로잉` 수를 반환하는 메소드
     public Long countFollowing(User user) {
         validateUser(user);
@@ -70,20 +56,23 @@ public class FollowService {
         return followRepository.countFollowerByFollowingMemberId(userId);
     }
 
-    // 팔로우 알림을 끄는 메소드
+    // 팔로우 알림 토글 메서드
     @Transactional
-    public void turnOffNotification(User user, Long userId) {
+    public ResponseEntity<MessageDto> toggleNotification(User user, Long userId) {
         validateUser(user);
         validateUserId(userId);
-        followRepository.updateNotificationStatus(false, user, userId);
-    }
+        Follow follow = followRepository.findByUserAndFollowingMemberId(user, userId)
+                .orElseThrow(() -> new IllegalArgumentException("팔로우 관계가 존재하지 않습니다."));
 
-    // 팔로우 알림을 키는 메소드
-    @Transactional
-    public void turnOnNotification(User user, Long userId) {
-        validateUser(user);
-        validateUserId(userId);
-        followRepository.updateNotificationStatus(true, user, userId);
+        if (follow.getNotification()) {
+            follow.turnOffNotification();
+            followRepository.save(follow);
+            return ResponseEntity.ok().body(new MessageDto("알림이 꺼졌습니다."));
+        } else {
+            follow.turnOnNotification();
+            followRepository.save(follow);
+            return ResponseEntity.ok().body(new MessageDto("알림이 켜졌습니다."));
+        }
     }
 
     // 특정 유저가 특정 회원을 팔로우하고 있는지 확인하는 메소드
@@ -109,30 +98,6 @@ public class FollowService {
         return followers.stream()
                 .map(follow -> new FollowListDto(follow.getUser()))
                 .collect(Collectors.toList());
-    }
-
-    // 유저 팔로우 메서드
-    @Transactional
-    public void followUser(User user, Long followingUserId) {
-        validateUser(user);
-        validateUserId(followingUserId);
-        User followingUser = userService.findUserById(followingUserId);
-        validateUser(followingUser);
-        Follow follow = new Follow();
-        follow.createFollowing(user, followingUser);
-        followRepository.save(follow);
-    }
-
-    // 유저 팔로우 취소 메서드
-    @Transactional
-    public void unfollowUser(User user, Long userId) {
-        validateUser(user);
-        validateUserId(userId);
-        if (isFollowing(user, userId)) {
-            followRepository.unfollow(user, userId);
-        } else {
-            throw new IllegalStateException("팔로우 중이 아닙니다.");
-        }
     }
 
     private void validateUser(User user) {

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 public interface FollowRepository extends JpaRepository<Follow, Long> {
@@ -28,9 +29,6 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Modifying
     @Query("update Follow f set f.notification = :notification where f.user = :user and f.followingMemberId = :followingMemberId")
     void updateNotificationStatus(@Param("notification") Boolean notification, @Param("user") User user, @Param("followingMemberId") Long followingMemberId);
-
-    // 팔로우 알림 설정 여부를 확인하는 메소드
-//    boolean existsByUserAndFollowingMemberId()
 
     // 특정 유저가 팔로우한 Follow 객체 리스트를 가져오는 메서드
     List<Follow> findByUser(User user);
@@ -63,4 +61,7 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Modifying
     @Query("delete from Follow f where f.user = :user and f.followingMemberId = :followingMemberId")
     void unfollow(@Param("user") User user, @Param("followingMemberId") Long followingMemberId);
+
+    // 팔로우 관계를 확인하는 메서드
+    Optional<Follow> findByUserAndFollowingMemberId(User user, Long followingMemberId);
 }

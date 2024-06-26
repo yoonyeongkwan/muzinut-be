@@ -13,7 +13,7 @@ public class Reply extends BaseTimeEntity {
     @Column(name = "reply_id")
     private Long id;
 
-    @ManyToOne(fetch =  FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
@@ -29,5 +29,10 @@ public class Reply extends BaseTimeEntity {
         this.content = content;
         this.user = user;
         comment.getReplies().add(this);
+    }
+
+    // 대댓글 내용 수정 메서드
+    public void modifyContent(String content) {
+        this.content = content;
     }
 }

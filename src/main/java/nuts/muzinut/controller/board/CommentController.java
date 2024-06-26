@@ -23,7 +23,7 @@ public class CommentController {
     public ResponseEntity<MessageDto> addComment(
             @PathVariable("boardId") Long boardId,
             @RequestBody CommentRequestDto commentRequestDto) {
-        return commentService.addComment(boardId, commentRequestDto.getContent());
+        return commentService.saveComment(boardId, commentRequestDto.getContent());
     }
 
     // 댓글 수정

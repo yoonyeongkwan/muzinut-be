@@ -16,7 +16,7 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
@@ -38,6 +38,9 @@ public class Comment extends BaseTimeEntity {
         this.content = content;
         this.board = board;
         board.getComments().add(this);
+        if (user.getComments() == null){
+            user.setComments(new ArrayList<>());
+        }
         user.getComments().add(this);
     }
 

@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import nuts.muzinut.dto.MessageDto;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -30,7 +28,7 @@ public class CommentService {
 
     // 댓글 작성
     @Transactional
-    public ResponseEntity<MessageDto> addComment(Long boardId, String content) {
+    public ResponseEntity<MessageDto> saveComment(Long boardId, String content) {
         String currentUsername = getCurrentUsername();
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new NotFoundEntityException("사용자를 찾을 수 없습니다"));

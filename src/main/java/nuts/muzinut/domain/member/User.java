@@ -74,6 +74,7 @@ public class User {
         this.password = password;
         this.nickname = nickname;
         this.followings = new ArrayList<>(); // 필드 초기화 추가
+        this.comments = new ArrayList<>(); // 필드 초기화 추가
     }
 
     public User(String username, String password) {
@@ -81,6 +82,7 @@ public class User {
         this.password = password;
         this.nickname = username;
         this.followings = new ArrayList<>(); // 필드 초기화 추가
+        this.comments = new ArrayList<>(); // 필드 초기화 추가
     }
 
     public String setNickname(String nickname) {

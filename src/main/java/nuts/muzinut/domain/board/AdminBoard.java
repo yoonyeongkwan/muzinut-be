@@ -3,9 +3,6 @@ package nuts.muzinut.domain.board;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import nuts.muzinut.domain.baseEntity.BaseBoardEntity;
-import nuts.muzinut.domain.member.User;
-import org.hibernate.validator.constraints.Length;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,27 +13,24 @@ import java.util.List;
 @Table(name = "admin_board")
 public class AdminBoard extends Board {
 
-    private String content;
+    private String filename; //react quill file
 
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    @JoinColumn(name = "user_id")
-//    private User user;
-
-    public AdminBoard(String title, String content) {
+    public AdminBoard(String title) {
         super.title = title;
-        this.content = content;
     }
 
     public Long getId() {
         return super.getId();
     }
 
+    public void changeFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
+
     @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
     private List<AdminUploadFile> adminUploadFiles = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
-//    private List<Comment> comments = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
-//    private List<Like> likes = new ArrayList<>();
 }

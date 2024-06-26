@@ -86,6 +86,10 @@ public class User {
         return nickname;
     }
 
+    public void changeProfileImg(String profileImgFilename) {
+        this.profileImgFilename = profileImgFilename;
+    }
+
     //회원 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Mailbox> mailboxes = new ArrayList<>();
@@ -102,7 +106,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PlayNut> playNutList = new ArrayList<>();
-
 
     //게시판 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

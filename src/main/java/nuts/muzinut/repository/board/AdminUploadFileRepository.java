@@ -1,5 +1,6 @@
 package nuts.muzinut.repository.board;
 
+import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,6 +16,13 @@ public interface AdminUploadFileRepository extends JpaRepository<AdminUploadFile
     List<AdminUploadFile> getAdminUploadFile(@Param("boardId") Long boardId);
 
     @Modifying
-    @Query(value = "delete from AdminUploadFile a where a.adminBoard.id = :adminBoardId")
-    void deleteByAdminBoardId(@Param("adminBoardId") Long id);
+    @Query(value = "delete from AdminUploadFile a where a.adminBoard = :adminBoard")
+    void deleteByAdminBoardId(@Param("adminBoard") AdminBoard adminBoard);
+
+    @Modifying
+    @Query("update AdminUploadFile a set a.storeFilename = :storeFilename, a.originFilename = :originFilename " +
+            "where a.adminBoard = :adminBoard")
+    void updateAttachedFile(@Param("storeFilename") String storeFilename, @Param("originFilename") String originFilename,
+                         @Param("adminBoard") AdminBoard adminBoard);
+
 }

@@ -1,7 +1,7 @@
 package nuts.muzinut.controller.security;
 
 import nuts.muzinut.dto.member.UserDto;
-import nuts.muzinut.service.security.UserService;
+import nuts.muzinut.service.member.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

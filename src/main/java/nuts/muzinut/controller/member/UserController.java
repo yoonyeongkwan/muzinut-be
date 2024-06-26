@@ -1,26 +1,39 @@
 package nuts.muzinut.controller.member;
 
 import lombok.RequiredArgsConstructor;
+import nuts.muzinut.controller.board.FileType;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.JoinDto;
 import nuts.muzinut.dto.member.LoginDto;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.dto.security.TokenDto;
 import nuts.muzinut.exception.EmailVertFailException;
+import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.jwt.JwtFilter;
 import nuts.muzinut.jwt.TokenProvider;
+import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.MailSendService;
-import nuts.muzinut.service.security.UserService;
+import nuts.muzinut.service.member.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.Map;
+
+import static nuts.muzinut.controller.board.FileType.*;
 
 @Controller
 @RequestMapping("/users")
@@ -28,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final FileStore fileStore;
     private final MailSendService mailService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
@@ -81,4 +95,22 @@ public class UserController {
 
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }
+
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping(value = "/set-profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MessageDto> setProfile(MultipartFile profileImg) throws IOException {
+        User user = userService.getUserWithUsername()
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
+
+        if (StringUtils.hasText(user.getProfileImgFilename())) {
+            //프로필 바꾸기
+            String changeImgName = fileStore.updateFile(profileImg, user.getProfileImgFilename());
+        } else {
+            //프로필 처음 설정
+            Map<FileType, String> filenames = fileStore.storeFile(profileImg);
+            user.changeProfileImg(filenames.get(STORE_FILENAME)); //파일명 설정
+        }
+        return null;
+    }
+
 }

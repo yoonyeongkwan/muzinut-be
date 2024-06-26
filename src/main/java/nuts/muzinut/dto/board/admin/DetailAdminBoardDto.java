@@ -21,24 +21,30 @@ public class DetailAdminBoardDto {
     private Long likeCount;
 
     private String title;
-    private String content;
     private String writer = "muzi";
+    private String quillFilename;
     private int view;
     private List<AdminFilename> adminFilenames = new ArrayList<>();
 
-    public DetailAdminBoardDto(String title, String content, int view, List<AdminUploadFile> files) {
+    public DetailAdminBoardDto(String title, int view, List<AdminUploadFile> files, String quillFilename) {
         this.title = title;
-        this.content = content;
         this.view = view;
+        this.quillFilename = quillFilename;
         for (AdminUploadFile file : files) {
             this.adminFilenames.add(new AdminFilename(file.getStoreFilename(), file.getOriginFilename(), file.getId()));
         }
     }
 
-    public DetailAdminBoardDto(String title, String writer, String content, int view, List<AdminUploadFile> files) {
+    public DetailAdminBoardDto(String title, int view, String quillFilename) {
+        this.title = title;
+        this.view = view;
+        this.quillFilename = quillFilename;
+    }
+
+
+    public DetailAdminBoardDto(String title, String writer, int view, List<AdminUploadFile> files) {
         this.title = title;
         this.writer = writer;
-        this.content = content;
         this.view = view;
         for (AdminUploadFile file : files) {
             this.adminFilenames.add(new AdminFilename(file.getStoreFilename(), file.getOriginFilename(), file.getId()));
@@ -47,7 +53,6 @@ public class DetailAdminBoardDto {
 
     public void setAdminBoard(AdminBoard adminBoard) {
         title = adminBoard.getTitle();
-        content = adminBoard.getContent();
         view = adminBoard.getView();
 
         List<AdminUploadFile> adminUploadFiles = adminBoard.getAdminUploadFiles();

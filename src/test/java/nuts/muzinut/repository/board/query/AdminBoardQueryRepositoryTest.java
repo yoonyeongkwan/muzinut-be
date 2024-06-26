@@ -3,6 +3,7 @@ package nuts.muzinut.repository.board.query;
 import com.querydsl.core.Tuple;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
+import nuts.muzinut.domain.member.QUser;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.CommentRepository;
@@ -12,6 +13,7 @@ import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -33,13 +35,16 @@ class AdminBoardQueryRepositoryTest {
     @Autowired ReplyRepository replyRepository;
     @Autowired AdminBoardQueryRepository queryRepository;
 
+    @Rollback(value = false)
     @Test
     void queryTest() {
 
         //given
         User user = new User("username", "pass", "nick");
         User commentUser = new User("u2", "pass2", "nick2");
-        Board board = new Board();
+        userRepository.save(user);
+        userRepository.save(commentUser);
+        AdminBoard board = new AdminBoard();
         board.addBoard(user);
         Comment comment = new Comment();
         comment.addComment(commentUser, board, "c1");
@@ -50,7 +55,7 @@ class AdminBoardQueryRepositoryTest {
         replyRepository.save(reply);
 
         //when
-        List<Tuple> result = queryRepository.getDetailBoard(board.getId());
+        List<Tuple> result = queryRepository.getDetailAdminBoard(board.getId());
 
         //then
         for (Tuple t : result) {
@@ -60,5 +65,13 @@ class AdminBoardQueryRepositoryTest {
         Tuple first = result.getFirst();
         Board findBoard = first.get(QBoard.board);
         log.info("adminBoard writer: {}", findBoard.getUser().getNickname());
+
+        for (Comment c : findBoard.getComments()) {
+            log.info("comments: {}", c.getContent());
+
+            for (Reply r : c.getReplies()) {
+                log.info("replies: {}", r.getContent());
+            }
+        }
     }
 }

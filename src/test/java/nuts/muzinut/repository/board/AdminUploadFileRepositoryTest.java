@@ -127,6 +127,25 @@ class AdminUploadFileRepositoryTest {
         assertThat(result.isEmpty()).isTrue();
     }
 
+    @Test
+    void updateAttachedFile() {
+
+        //given
+        AdminBoard adminBoard = new AdminBoard();
+        AdminUploadFile adminUploadFile = new AdminUploadFile();
+        adminUploadFile.addFiles(adminBoard);
+        uploadFileRepository.save(adminUploadFile);
+
+        //when
+        uploadFileRepository.updateAttachedFile("s", "o", adminBoard);
+        clearContext();
+
+        //then
+        Optional<AdminUploadFile> result = uploadFileRepository.findById(adminUploadFile.getId());
+        assertThat(result.get().getStoreFilename()).isEqualTo("s");
+        assertThat(result.get().getOriginFilename()).isEqualTo("o");
+    }
+
     private void clearContext() {
         em.flush();
         em.clear();

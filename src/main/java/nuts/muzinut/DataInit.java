@@ -13,11 +13,10 @@ import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.board.AdminBoardService;
-import nuts.muzinut.service.board.FreeBoardService;
-import nuts.muzinut.service.security.UserService;
+import nuts.muzinut.service.member.UserService;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 public class DataInit {
 
@@ -50,6 +49,8 @@ public class DataInit {
         user1.setNickname("tom");
         User user2 = new User();
         user2.setNickname("nick");
+        userRepository.save(user1);
+        userRepository.save(user2);
 
         Board adminBoard = new AdminBoard();
 
@@ -64,6 +65,8 @@ public class DataInit {
         Reply reply2 = new Reply();
         reply2.addReply(comment1, "댓글2", user1);
         replyRepository.save(reply2);
+
+        createAdminBoards();
     }
 
 //    @PostConstruct

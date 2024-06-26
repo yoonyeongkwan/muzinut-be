@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.service.board.LikeService;
 import nuts.muzinut.dto.MessageDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -17,19 +18,14 @@ public class LikeController {
 
     private final LikeService likeService;
 
-    // 좋아요 추가
+    // 좋아요 토글
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/likes/{boardId}")
-    public ResponseEntity<MessageDto> saveLike(@PathVariable(value = "boardId") Long boardId) {
-        log.info("Adding like to board with ID: {}", boardId);
-        return likeService.saveLike(boardId);
+    public ResponseEntity<MessageDto> toggleLike(@PathVariable(value = "boardId") Long boardId) {
+        log.info("Toggling like for board with ID: {}", boardId);
+        return likeService.toggleLike(boardId);
     }
 
-    // 좋아요 삭제
-    @DeleteMapping("/likes/{boardId}")
-    public ResponseEntity<MessageDto> deleteLike(@PathVariable("boardId") Long boardId) {
-        log.info("Deleting like from board with ID: {}", boardId);
-        return likeService.deleteLike(boardId);
-    }
 
     // 특정 게시글의 좋아요 수 반환(확인용)
     @GetMapping("/likes/{boardId}/count")

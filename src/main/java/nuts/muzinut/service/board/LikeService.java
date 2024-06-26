@@ -25,9 +25,9 @@ public class LikeService {
     private final BoardQueryRepository boardQueryRepository;
     private final UserRepository userRepository;
 
-    // 좋아요 추가
+    // 좋아요 토글
     @Transactional
-    public ResponseEntity<MessageDto> saveLike(Long boardId) {
+    public ResponseEntity<MessageDto> toggleLike(Long boardId) {
         String currentUsername = getCurrentUsername();
         User user = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new NotFoundEntityException("사용자를 찾을 수 없습니다"));
@@ -36,36 +36,16 @@ public class LikeService {
                 .orElseThrow(() -> new NotFoundEntityException("게시판을 찾을 수 없습니다"));
 
         if (likeRepository.existsByUserAndBoard(user, board)) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new MessageDto("이미 좋아요를 눌렀습니다."));
+            // 좋아요가 이미 눌려 있으면 좋아요 삭제
+            likeRepository.deleteByUserAndBoard(user, board);
+            return ResponseEntity.ok().body(new MessageDto("좋아요가 취소되었습니다."));
+        } else {
+            // 좋아요가 눌려 있지 않으면 좋아요 추가
+            Like like = new Like();
+            like.addLike(user, board);
+            likeRepository.save(like);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageDto("좋아요가 완료되었습니다."));
         }
-
-        Like like = new Like();
-        like.addLike(user, board);
-        likeRepository.save(like);
-
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(new MessageDto("좋아요가 추가되었습니다."));
-    }
-
-    // 좋아요 삭제
-    @Transactional
-    public ResponseEntity<MessageDto> deleteLike(Long boardId) {
-        String currentUsername = getCurrentUsername();
-        User user = userRepository.findByUsername(currentUsername)
-                .orElseThrow(() -> new NotFoundEntityException("사용자를 찾을 수 없습니다"));
-
-        Board board = boardQueryRepository.findById(boardId)
-                .orElseThrow(() -> new NotFoundEntityException("게시판을 찾을 수 없습니다"));
-
-        if (!likeRepository.existsByUserAndBoard(user, board)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new MessageDto("좋아요를 누르지 않았습니다."));
-        }
-
-        likeRepository.deleteByUserAndBoard(user, board);
-
-        return ResponseEntity.ok().body(new MessageDto("좋아요가 삭제되었습니다."));
     }
 
     // 특정 게시글의 좋아요 수 반환

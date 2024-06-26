@@ -108,7 +108,7 @@ public class UserController {
         } else {
             //프로필 처음 설정
             Map<FileType, String> filenames = fileStore.storeFile(profileImg);
-            user.changeProfileImg(filenames.get(STORE_FILENAME)); //파일명 설정
+            user.changeProfileImg(filenames.get(STORE_FILENAME)); //파일명 설정.
         }
         return null;
     }

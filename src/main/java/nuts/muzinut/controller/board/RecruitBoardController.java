@@ -34,7 +34,7 @@ public class RecruitBoardController {
     // 모집 게시판 생성 폼을 보여주는 메소드
     @GetMapping("/recruit-boards/new")
     public String newRecruitBoardForm(@ModelAttribute RecruitBoardForm recruitBoardForm) {
-        return "board/recruit-board-form";
+        return "community/board/recruit-board-form";
     }
 
     // 모집 게시판 생성 요청을 처리하는 메소드
@@ -43,7 +43,7 @@ public class RecruitBoardController {
     public ResponseEntity<MessageDto> saveRecruitBoard(@RequestBody RecruitBoardForm recruitBoardForm) throws Exception {
         RecruitBoard recruitBoard = recruitBoardService.saveRecruitBoard(recruitBoardForm);
         HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/recruit-boards/" + recruitBoard.getId())); // 생성한 게시판으로 리다이렉트
+        header.setLocation(URI.create("/community/recruit-boards/" + recruitBoard.getId())); // 생성한 게시판으로 리다이렉트
         return ResponseEntity.status(HttpStatus.FOUND)
                 .headers(header)
                 .body(new MessageDto("모집 게시판이 생성되었습니다"));
@@ -125,7 +125,7 @@ public class RecruitBoardController {
         RecruitBoard updatedBoard = recruitBoardService.updateRecruitBoard(id, recruitBoardForm);
 
         HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/recruit-boards/" + updatedBoard.getId())); // 수정한 게시판으로 리다이렉트
+        header.setLocation(URI.create("/community/recruit-boards/" + updatedBoard.getId())); // 수정한 게시판으로 리다이렉트
 
         return ResponseEntity.status(HttpStatus.FOUND)
                 .headers(header)
@@ -139,7 +139,7 @@ public class RecruitBoardController {
     public ResponseEntity<MessageDto> deleteRecruitBoard(@PathVariable("id") Long id) {
         recruitBoardService.deleteRecruitBoard(id);
         HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/recruit-boards")); // 모든 게시판 조회 페이지로 리다이렉트
+        header.setLocation(URI.create("/community/recruit-boards")); // 모든 게시판 조회 페이지로 리다이렉트
         return ResponseEntity.status(HttpStatus.OK)
                 .headers(header)
                 .body(new MessageDto("모집 게시판이 삭제되었습니다"));

@@ -17,7 +17,7 @@ public interface AdminUploadFileRepository extends JpaRepository<AdminUploadFile
 
     @Modifying
     @Query(value = "delete from AdminUploadFile a where a.adminBoard = :adminBoard")
-    void deleteByAdminBoardId(@Param("adminBoard") AdminBoard adminBoard);
+    void deleteByAdminBoard(@Param("adminBoard") AdminBoard adminBoard);
 
     @Modifying
     @Query("update AdminUploadFile a set a.storeFilename = :storeFilename, a.originFilename = :originFilename " +

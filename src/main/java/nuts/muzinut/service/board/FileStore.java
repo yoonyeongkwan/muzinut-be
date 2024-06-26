@@ -151,7 +151,7 @@ public class FileStore {
     //첨부파일 업데이트
     public void updateAdminAttachedFile(AdminBoard adminBoard) {
         deleteAdminAttachedFile(adminBoard); //이전에 저장했던 파일들 삭제
-        uploadFileRepository.deleteByAdminBoardId(adminBoard); //기존의 첨부파일을 디비에서 삭제
+        uploadFileRepository.deleteByAdminBoard(adminBoard); //기존의 첨부파일을 디비에서 삭제
     }
 
     //어드민 첨부파일을 삭제하는 메서드

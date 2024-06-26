@@ -9,6 +9,7 @@ import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.recruit.*;
 import nuts.muzinut.exception.NotFoundEntityException;
+import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
 import nuts.muzinut.repository.board.RecruitBoardRepository;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
@@ -37,6 +38,7 @@ public class RecruitBoardService {
     private final RecruitBoardGenreRepository recruitBoardGenreRepository;
     private final UserRepository userRepository;
     private final BoardQueryRepository boardQueryRepository;
+    private final LikeRepository likeRepository;
 
     // 모집 게시판 생성 요청을 처리하는 메소드
     @Transactional
@@ -126,7 +128,8 @@ public class RecruitBoardService {
                 recruitBoard.getEndWorkDuration(),
                 recruitBoard.getGenres(),
                 author,
-                commentDtoList
+                commentDtoList,
+                likeRepository.countByBoard(recruitBoard)   // 좋아요 수 추가
         );
 
         return detailRecruitBoardDto;
@@ -230,7 +233,7 @@ public class RecruitBoardService {
         RecruitBoardDto boardDto = new RecruitBoardDto();
         for (RecruitBoard recruitBoard : recruitBoards) {
             boardDto.getRecruitBoardsForms().add(new RecruitBoardsForm(
-                    recruitBoard.getId(), recruitBoard.getTitle(), recruitBoard.getUser().getId(), recruitBoard.getView(), recruitBoard.getCreatedDt()
+                    recruitBoard.getId(), recruitBoard.getTitle(), recruitBoard.getUser().getId(), recruitBoard.getView(), recruitBoard.getCreatedDt(), recruitBoard.getLikes()
             ));
         }
         return boardDto;

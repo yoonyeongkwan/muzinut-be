@@ -22,4 +22,5 @@ public class DetailRecruitBoardDto {
     private List<String> genres;
     private String author; // 작성자 정보 추가
     private List<CommentDto> comments; // 댓글 리스트 추가
+    private long like;  // 좋아요 수 추가
 }

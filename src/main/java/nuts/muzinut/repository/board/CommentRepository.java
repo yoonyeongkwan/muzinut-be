@@ -14,5 +14,9 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("select c from Comment c where c.board = :board")
     List<Comment> findBoardComments(@Param("board") Board board);
 
-    //Todo 게시판이 삭제 될때 해당 게시판의 댓글이 삭제되는 로직은 cascade 로 구현하지 않았기에 따로 쿼리를 작성해야함.
+    @Query("delete from Comment c where c.board = :board")
+    void deleteCommentsByBoardId(@Param("board") Board board);
+
+    @Query("delete from Comment c where c.id = :commentId")
+    void deleteByCommentId(@Param("commentId") Long commentId);
 }

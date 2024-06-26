@@ -75,7 +75,7 @@ public class DataInitService {
 
     @Transactional
     public void recruitBoardBoardScenario() {
-        User user = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
         log.info("User found: {}", user);
 
         User user1 = new User();

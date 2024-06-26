@@ -2,6 +2,7 @@ package nuts.muzinut.controller.board;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.dto.board.comment.CommentRequestDto;
 import nuts.muzinut.service.board.CommentService;
 import nuts.muzinut.dto.MessageDto;
 import org.springframework.http.ResponseEntity;
@@ -19,21 +20,25 @@ public class CommentController {
     // 댓글 작성
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/comments/{boardId}")
-    public ResponseEntity<MessageDto> addComment(@PathVariable Long boardId, @RequestParam Long userId, @RequestBody String content) {
-        return commentService.addComment(boardId, userId, content);
+    public ResponseEntity<MessageDto> addComment(
+            @PathVariable("boardId") Long boardId,
+            @RequestBody CommentRequestDto commentRequestDto) {
+        return commentService.addComment(boardId, commentRequestDto.getContent());
     }
 
     // 댓글 수정
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/comments/{commentId}")
-    public ResponseEntity<MessageDto> updateComment(@PathVariable Long commentId, @RequestBody String content) {
-        return commentService.updateComment(commentId, content);
+    public ResponseEntity<MessageDto> updateComment(
+            @PathVariable("commentId") Long commentId,
+            @RequestBody CommentRequestDto commentRequestDto) {
+        return commentService.updateComment(commentId, commentRequestDto.getContent());
     }
 
     // 댓글 삭제
     @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/comments/{commentId}")
-    public ResponseEntity<MessageDto> deleteComment(@PathVariable Long commentId) {
+    public ResponseEntity<MessageDto> deleteComment(@PathVariable("commentId") Long commentId) {
         return commentService.deleteComment(commentId);
     }
 }

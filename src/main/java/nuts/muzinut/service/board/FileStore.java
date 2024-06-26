@@ -133,7 +133,7 @@ public class FileStore {
         deleteFile(deleteFilename); //기존 파일 삭제
         String originalFilename = multipartFile.getOriginalFilename();
         String storeFilename = createStoreFileName(originalFilename);
-        multipartFile.transferTo(new File(getFullPath(storeFilename))); //파일 저장
+        multipartFile.transferTo(new File(getFullPath(storeFilename))); //파일 저장.
 
         return storeFilename;
     }

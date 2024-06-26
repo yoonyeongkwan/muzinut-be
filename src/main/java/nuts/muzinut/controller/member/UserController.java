@@ -100,7 +100,7 @@ public class UserController {
     @PostMapping(value = "/set-profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> setProfile(MultipartFile profileImg) throws IOException {
         User user = userService.getUserWithUsername()
-                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다.")); //진짜?
 
         if (StringUtils.hasText(user.getProfileImgFilename())) {
             //프로필 바꾸기

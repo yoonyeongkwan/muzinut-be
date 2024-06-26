@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.Follow;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.follow.FollowListDto;
 import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.service.security.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,40 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserService userService;
+
+    // 팔로우 및 언팔로우 토글 메소드
+    @Transactional
+    public ResponseEntity<MessageDto> toggleFollow(User user, Long followingUserId) {
+        validateUser(user);
+        validateUserId(followingUserId);
+        User followingUser = userService.findUserById(followingUserId);
+        validateUser(followingUser);
+
+        if (!(isFollowing(user, followingUser.getId()))) {
+            // 언팔로잉 상태면(기본) 팔로잉
+            Follow follow = new Follow();
+            follow.createFollowing(user, followingUser);
+            followRepository.save(follow);
+            return ResponseEntity.ok().body(new MessageDto("팔로잉 되었습니다."));
+        } else {
+            followRepository.unfollow(user, followingUserId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageDto("언팔로잉 되었습니다."));
+        }
+    }
+
+//    // 팔로우 알림 토글 메소드
+//    @Transactional
+//    public void toggleNotification(User user, Long followingUserId) {
+//        validateUser(user);
+//        validateUserId(followingUserId);
+//
+//        boolean isNotificationOn = followRepository.existsByUserAndFollowingMemberIdAndNotificationStatus(user, followingUserId, true);
+//        if (isNotificationOn) {
+//            turnOffNotification(user, followingUserId);
+//        } else {
+//            turnOnNotification(user, followingUserId);
+//        }
+//    }
 
     // 특정 유저의 `팔로잉` 수를 반환하는 메소드
     public Long countFollowing(User user) {
@@ -74,19 +111,6 @@ public class FollowService {
                 .collect(Collectors.toList());
     }
 
-//
-//    // 팔로잉(특정 유저가 팔로우한 회원의) 리스트를 반환하는 메소드
-//    public List<Follow> getFollowerList(Long userId) {
-//        validateUserId(userId);
-//        return followRepository.findFollowersByUserId(userId);
-//    }
-//
-//    // 팔로워(특정 유저를 팔로우한 회원의) 리스트를 반환하는 메소드
-//    public List<Long> getFollowingMemberIds(User user) {
-//        validateUser(user);
-//        return followRepository.findFollowingMemberIdsByUser(user);
-//    }
-
     // 유저 팔로우 메서드
     @Transactional
     public void followUser(User user, Long followingUserId) {
@@ -94,13 +118,9 @@ public class FollowService {
         validateUserId(followingUserId);
         User followingUser = userService.findUserById(followingUserId);
         validateUser(followingUser);
-        if (!isFollowing(user, followingUser.getId())) {
-            Follow follow = new Follow();
-            follow.createFollowing(user, followingUser);
-            followRepository.save(follow);
-        } else {
-            throw new IllegalStateException("이미 팔로우 중입니다.");
-        }
+        Follow follow = new Follow();
+        follow.createFollowing(user, followingUser);
+        followRepository.save(follow);
     }
 
     // 유저 팔로우 취소 메서드

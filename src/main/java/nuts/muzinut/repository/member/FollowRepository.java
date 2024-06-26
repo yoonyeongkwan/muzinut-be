@@ -29,6 +29,9 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
     @Query("update Follow f set f.notification = :notification where f.user = :user and f.followingMemberId = :followingMemberId")
     void updateNotificationStatus(@Param("notification") Boolean notification, @Param("user") User user, @Param("followingMemberId") Long followingMemberId);
 
+    // 팔로우 알림 설정 여부를 확인하는 메소드
+//    boolean existsByUserAndFollowingMemberId()
+
     // 특정 유저가 팔로우한 Follow 객체 리스트를 가져오는 메서드
     List<Follow> findByUser(User user);
 

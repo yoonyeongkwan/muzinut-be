@@ -35,17 +35,17 @@ public class LikeService {
         Board board = boardQueryRepository.findById(boardId)
                 .orElseThrow(() -> new NotFoundEntityException("게시판을 찾을 수 없습니다"));
 
-        if (likeRepository.existsByUserAndBoard(user, board)) {
-            // 좋아요가 이미 눌려 있으면 좋아요 삭제
-            likeRepository.deleteByUserAndBoard(user, board);
-            return ResponseEntity.ok().body(new MessageDto("좋아요가 취소되었습니다."));
-        } else {
-            // 좋아요가 눌려 있지 않으면 좋아요 추가
+        if (!(likeRepository.existsByUserAndBoard(user, board))) {
+            // 좋아요가 눌려 있지 않으면(기본) 좋아요 추가
             Like like = new Like();
             like.addLike(user, board);
             likeRepository.save(like);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageDto("좋아요가 완료되었습니다."));
-        }
+            return ResponseEntity.ok().body(new MessageDto("좋아요가 완료되었습니다."));
+        } else {
+            // 좋아요가 이미 눌려 있으면 좋아요 삭제
+            likeRepository.deleteByUserAndBoard(user, board);
+            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageDto("좋아요가 취소되었습니다."));
+            }
     }
 
     // 특정 게시글의 좋아요 수 반환

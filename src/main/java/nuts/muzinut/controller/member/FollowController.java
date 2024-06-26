@@ -4,12 +4,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.follow.FollowDto;
 import nuts.muzinut.dto.member.follow.FollowListDto;
 import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.security.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +29,14 @@ public class FollowController {
 
     private final FollowService followService;
     private final UserService userService;
+
+    // 팔로우 토글
+    @PreAuthorize("hasRole('USER')")
+    @PostMapping("follow")
+    public ResponseEntity<MessageDto> toggleFollow(@RequestBody @Valid FollowDto followDto) {
+        User user = getAuthenticatedUser();
+        return followService.toggleFollow(user, followDto.getFollowingMemberId());
+    }
 
     // 현재 인증된 사용자의 이름을 반환하는 메소드
     private String getCurrentUsername() {
@@ -130,40 +140,5 @@ public class FollowController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(followersList);
         }
         return ResponseEntity.ok(followersList);
-    }
-
-    // 유저 팔로우 메서드
-    @PostMapping("/follow")
-    public ResponseEntity<String> followUser(@RequestBody @Valid FollowDto followDto) {
-        log.info("Following user ID: {} by user ID: {}", followDto.getFollowingMemberId(), followDto.getUserId());
-        User user = getAuthenticatedUser();
-        if (user == null) {
-            log.error("Authenticated user not found");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-        if (user.getId().equals(followDto.getFollowingMemberId())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Users cannot follow themselves");
-        }
-        if (followService.isFollowing(user, followDto.getFollowingMemberId())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Already following this user");
-        }
-        followService.followUser(user, followDto.getFollowingMemberId());
-        return ResponseEntity.ok("Followed successfully");
-    }
-
-    // 유저 팔로우 취소 메서드
-    @PostMapping("/unfollow")
-    public ResponseEntity<String> unfollowUser(@RequestBody @Valid FollowDto followDto) {
-        log.info("Unfollowing user ID: {} by user ID: {}", followDto.getFollowingMemberId(), followDto.getUserId());
-        User user = getAuthenticatedUser();
-        if (user == null) {
-            log.error("Authenticated user not found");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-        if (!followService.isFollowing(user, followDto.getFollowingMemberId())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Not following this user");
-        }
-        followService.unfollowUser(user, followDto.getFollowingMemberId());
-        return ResponseEntity.ok("Unfollowed successfully");
     }
 }

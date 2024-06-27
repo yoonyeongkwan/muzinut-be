@@ -26,7 +26,11 @@ public class QUser extends EntityPathBase<User> {
 
     public final BooleanPath activated = createBoolean("activated");
 
+    public final ListPath<nuts.muzinut.domain.board.AdminBoard, nuts.muzinut.domain.board.QAdminBoard> adminBoards = this.<nuts.muzinut.domain.board.AdminBoard, nuts.muzinut.domain.board.QAdminBoard>createList("adminBoards", nuts.muzinut.domain.board.AdminBoard.class, nuts.muzinut.domain.board.QAdminBoard.class, PathInits.DIRECT2);
+
     public final SetPath<Authority, QAuthority> authorities = this.<Authority, QAuthority>createSet("authorities", Authority.class, QAuthority.class, PathInits.DIRECT2);
+
+    public final ListPath<nuts.muzinut.domain.board.Board, nuts.muzinut.domain.board.QBoard> boards = this.<nuts.muzinut.domain.board.Board, nuts.muzinut.domain.board.QBoard>createList("boards", nuts.muzinut.domain.board.Board.class, nuts.muzinut.domain.board.QBoard.class, PathInits.DIRECT2);
 
     public final ListPath<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark> bookmarks = this.<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark>createList("bookmarks", nuts.muzinut.domain.board.Bookmark.class, nuts.muzinut.domain.board.QBookmark.class, PathInits.DIRECT2);
 
@@ -39,6 +43,8 @@ public class QUser extends EntityPathBase<User> {
     public final ListPath<Follow, QFollow> followings = this.<Follow, QFollow>createList("followings", Follow.class, QFollow.class, PathInits.DIRECT2);
 
     public final ListPath<nuts.muzinut.domain.board.FreeBoard, nuts.muzinut.domain.board.QFreeBoard> freeBoards = this.<nuts.muzinut.domain.board.FreeBoard, nuts.muzinut.domain.board.QFreeBoard>createList("freeBoards", nuts.muzinut.domain.board.FreeBoard.class, nuts.muzinut.domain.board.QFreeBoard.class, PathInits.DIRECT2);
+
+    public final ListPath<Friend, QFriend> friends = this.<Friend, QFriend>createList("friends", Friend.class, QFriend.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -69,6 +75,8 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath profileImgFilename = createString("profileImgFilename");
 
     public final ListPath<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard> recruitBoards = this.<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard>createList("recruitBoards", nuts.muzinut.domain.board.RecruitBoard.class, nuts.muzinut.domain.board.QRecruitBoard.class, PathInits.DIRECT2);
+
+    public final ListPath<nuts.muzinut.domain.board.Reply, nuts.muzinut.domain.board.QReply> replies = this.<nuts.muzinut.domain.board.Reply, nuts.muzinut.domain.board.QReply>createList("replies", nuts.muzinut.domain.board.Reply.class, nuts.muzinut.domain.board.QReply.class, PathInits.DIRECT2);
 
     public final EnumPath<Role> role = createEnum("role", Role.class);
 

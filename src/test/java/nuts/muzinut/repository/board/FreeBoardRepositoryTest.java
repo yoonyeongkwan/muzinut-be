@@ -37,7 +37,6 @@ class FreeBoardRepositoryTest {
         userRepository.save(user);
 
         FreeBoard freeBoard = new FreeBoard();
-        freeBoard.createFreeBoard(user);
 
         //when
         freeBoardRepository.save(freeBoard);
@@ -83,6 +82,22 @@ class FreeBoardRepositoryTest {
         assertThat(page.hasNext()).isTrue(); //다음 페이지가 있는가
         assertThat(page.getTotalElements()).isEqualTo(10); //전체 데이터 수
 
+    }
+    @Test
+    void findFreeBoardWithUser() {
+
+        //given
+        User user = new User();
+        FreeBoard freeBoard = new FreeBoard();
+        freeBoard.addBoard(user);
+        freeBoardRepository.save(freeBoard);
+
+        //when
+        Optional<FreeBoard> board = freeBoardRepository.findFreeBoardWithUser(freeBoard.getId());
+
+        //then
+        assertThat(board.get()).isEqualTo(freeBoard);
+        assertThat(board.get().getUser()).isEqualTo(user);
     }
 
     private void createFreeBoards() {

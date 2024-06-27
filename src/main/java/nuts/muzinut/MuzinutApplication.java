@@ -11,5 +11,4 @@ public class MuzinutApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MuzinutApplication.class, args);
 	}
-
 }

@@ -101,7 +101,7 @@ class MailboxSongRepositoryTest {
         assertThat(notReadMailCount).isEqualTo(2); //읽지 않은 메일은 총 2개
     }
 
-    //유저가 메일을 읽으면 모든 읽지 않은 메일들을 읽음 표시로 설정한다
+    //유저가 메일을 읽으면 모든 읽지 않은 메일들을 읽음 표시로 바뀐다
     @Test
     void readMails() {
 
@@ -133,7 +133,7 @@ class MailboxSongRepositoryTest {
         //then
         assertThat(findMails.size()).isEqualTo(2); //user 가 받은 메시지는 2개
         assertThat(findMails)
-                .contains("message1", "message2"); //user 의 메시지 내용
+                .containsExactly("message1", "message2"); //user 의 메시지 내용
     }
 
     //모든 회원들에게 공지사항을 전송
@@ -183,7 +183,7 @@ class MailboxSongRepositoryTest {
         List<User> users = createFollow(); //u1, u2가  u3를 팔로우 했음
         User u1 = users.getFirst();
         User u3 = users.get(2); //음원을 업로드한 아티스트
-        followRepository.turnOffNotification(false, u1, u3.getId()); //알람 끄기
+        followRepository.updateNotificationStatus(false, u1, u3.getId()); //알람 끄기
         clearContext();
 
         //when

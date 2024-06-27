@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 @Entity
 @Getter
 @Setter
@@ -30,6 +32,11 @@ public class Follow {
         this.user = user;
         this.followingMemberId = followingUser.getId();
         this.notification = true; //처음 팔로우 했을 때 알림 설정은 기본적으로 켜져있음
+        // 방어 코드 추가
+        if (user.getFollowings() == null) {
+            user.setFollowings(new ArrayList<>());
+        }
+
         user.getFollowings().add(this);
     }
 

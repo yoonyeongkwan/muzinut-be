@@ -36,11 +36,12 @@ public interface MailboxRepository extends JpaRepository<Mailbox, Long> {
      */
     @Modifying
     @Query(
-            value = "insert into mailbox (user_id, message) " +
-                    "select user_id, ?1 " +
-                    "from users;", nativeQuery = true
+            value = "insert into mailbox (user_id, message, is_checked) " +
+                    "select user_id, ?1, false " +
+                    "from users", nativeQuery = true
     )
     void sendNotice(String message);
+
 
 
     /**
@@ -55,6 +56,5 @@ public interface MailboxRepository extends JpaRepository<Mailbox, Long> {
                     "from follow as f where f.FOLLOWING_MEMBER_ID = ?2 and f.NOTIFICATION = true;", nativeQuery = true
     )
     void sendArtistMusicUploaded(String message, Long followingMemberId);
-
 
 }

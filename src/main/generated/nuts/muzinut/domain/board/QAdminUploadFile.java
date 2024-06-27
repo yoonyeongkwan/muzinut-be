@@ -48,7 +48,7 @@ public class QAdminUploadFile extends EntityPathBase<AdminUploadFile> {
 
     public QAdminUploadFile(Class<? extends AdminUploadFile> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.adminBoard = inits.isInitialized("adminBoard") ? new QAdminBoard(forProperty("adminBoard")) : null;
+        this.adminBoard = inits.isInitialized("adminBoard") ? new QAdminBoard(forProperty("adminBoard"), inits.get("adminBoard")) : null;
     }
 
 }

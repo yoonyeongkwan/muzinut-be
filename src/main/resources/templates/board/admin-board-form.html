@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>상품 등록</h2>
+    </div>
+    <form method="post" id="uploadForm" enctype="multipart/form-data">
+        <ul>
+            <li>제목 <input type="text" name="title" /></li>
+            <li>본문 <input type="text" name="content" /></li>
+            <li>
+                첨부 파일들<input
+                    type="file"
+                    multiple="multiple"
+                    name="attachFiles"
+            />
+            </li>
+        </ul>
+        <input type="submit" onclick="submitForm()" />
+    </form>
+</div>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script>
+    //   const token = localStorage.getItem("token");
+    //   console.log(`Bearer ${token}`);
+
+    // 폼 요소 가져오기
+    const form = new FormData();
+    form.append("title", document.getElementById("title").value);
+    form.append("content", document.getElementById("content").value);
+
+    // 파일 입력 필드 추가
+    const attachFiles = document.getElementById("attachFiles").files;
+    for (let i = 0; i < attachFiles.length; i++) {
+      form.append("attachFiles", attachFiles[i]);
+    }
+
+    // 토큰 가져오기
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("토큰이 없습니다.");
+      alert("토큰이 없습니다. 로그인 후 다시 시도하세요.");
+      return;
+    }
+
+    console.log(`Bearer ${token}`);
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    };
+
+    // Axios를 사용하여 폼 데이터 전송
+    axios
+      .post("http://localhost:8080/admin-boards/new", form, config)
+      .then((response) => {
+        console.log("성공:", response.data);
+        alert("파일 업로드 성공");
+      })
+      .catch((error) => {
+        console.error("실패:", error);
+        alert("파일 업로드 실패");
+      });
+</script>
+</body>
+</html>

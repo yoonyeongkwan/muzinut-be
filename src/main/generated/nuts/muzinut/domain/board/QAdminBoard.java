@@ -18,40 +18,67 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
 
     private static final long serialVersionUID = 928402665L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QAdminBoard adminBoard = new QAdminBoard("adminBoard");
 
-    public final nuts.muzinut.domain.baseEntity.QBaseBoardEntity _super = new nuts.muzinut.domain.baseEntity.QBaseBoardEntity(this);
-
-    public final NumberPath<Long> adminId = createNumber("adminId", Long.class);
+    public final QBoard _super;
 
     public final ListPath<AdminUploadFile, QAdminUploadFile> adminUploadFiles = this.<AdminUploadFile, QAdminUploadFile>createList("adminUploadFiles", AdminUploadFile.class, QAdminUploadFile.class, PathInits.DIRECT2);
 
-    public final StringPath content = createString("content");
+    //inherited
+    public final ListPath<Comment, QComment> comments;
 
     //inherited
-    public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
+    public final DateTimePath<java.time.LocalDateTime> createdDt;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
-
-    //inherited
-    public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;
+    public final StringPath filename = createString("filename");
 
     //inherited
-    public final StringPath title = _super.title;
+    public final NumberPath<Long> id;
 
     //inherited
-    public final NumberPath<Integer> view = _super.view;
+    public final ListPath<Like, QLike> likes;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> modifiedDt;
+
+    //inherited
+    public final StringPath title;
+
+    // inherited
+    public final nuts.muzinut.domain.member.QUser user;
+
+    //inherited
+    public final NumberPath<Integer> view;
 
     public QAdminBoard(String variable) {
-        super(AdminBoard.class, forVariable(variable));
+        this(AdminBoard.class, forVariable(variable), INITS);
     }
 
     public QAdminBoard(Path<? extends AdminBoard> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QAdminBoard(PathMetadata metadata) {
-        super(AdminBoard.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QAdminBoard(PathMetadata metadata, PathInits inits) {
+        this(AdminBoard.class, metadata, inits);
+    }
+
+    public QAdminBoard(Class<? extends AdminBoard> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this._super = new QBoard(type, metadata, inits);
+        this.comments = _super.comments;
+        this.createdDt = _super.createdDt;
+        this.id = _super.id;
+        this.likes = _super.likes;
+        this.modifiedDt = _super.modifiedDt;
+        this.title = _super.title;
+        this.user = _super.user;
+        this.view = _super.view;
     }
 
 }

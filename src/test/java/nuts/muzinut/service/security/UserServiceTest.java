@@ -4,28 +4,26 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.Authority;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.UserDto;
-import nuts.muzinut.dto.security.AuthorityDto;
 import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.repository.member.UserRepository;
-import org.assertj.core.api.Assertions;
+import nuts.muzinut.service.member.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
 @Transactional
 class UserServiceTest {
 
-    @Autowired UserService userService;
+    @Autowired
+    UserService userService;
     @Autowired UserRepository userRepository;
 
     @Test

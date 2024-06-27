@@ -89,7 +89,7 @@ class FollowRepositoryTest {
         User artist = users.get(1);
 
         //when
-        followRepository.turnOffNotification(false, u1, artist.getId()); //알람 끄기
+        followRepository.updateNotificationStatus(false, u1, artist.getId()); //알람 끄기
         clearContext();
 
         //then
@@ -106,11 +106,11 @@ class FollowRepositoryTest {
         List<User> users = createFollow(); //users[0] 가 users[1] 을 팔로우
         User u1 = users.getFirst();
         User artist = users.get(1);
-        followRepository.turnOffNotification(false, u1, artist.getId()); //알람 끄기
+        followRepository.updateNotificationStatus(false, u1, artist.getId()); //알람 끄기
         clearContext();
 
         //when
-        followRepository.turnOnNotification(true, u1, artist.getId());
+        followRepository.updateNotificationStatus(true, u1, artist.getId());
         clearContext();
 
         //then

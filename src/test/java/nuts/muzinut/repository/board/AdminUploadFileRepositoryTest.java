@@ -4,18 +4,15 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -119,12 +116,31 @@ class AdminUploadFileRepositoryTest {
         uploadFileRepository.save(adminUploadFile);
 
         //when
-        uploadFileRepository.deleteByAdminBoardId(adminBoard.getId());
+        uploadFileRepository.deleteByAdminBoard(adminBoard);
         clearContext();
 
         //then
         Optional<AdminUploadFile> result = uploadFileRepository.findById(adminUploadFile.getId());
         assertThat(result.isEmpty()).isTrue();
+    }
+
+    @Test
+    void updateAttachedFile() {
+
+        //given
+        AdminBoard adminBoard = new AdminBoard();
+        AdminUploadFile adminUploadFile = new AdminUploadFile();
+        adminUploadFile.addFiles(adminBoard);
+        uploadFileRepository.save(adminUploadFile);
+
+        //when
+        uploadFileRepository.updateAttachedFile("s", "o", adminBoard);
+        clearContext();
+
+        //then
+        Optional<AdminUploadFile> result = uploadFileRepository.findById(adminUploadFile.getId());
+        assertThat(result.get().getStoreFilename()).isEqualTo("s");
+        assertThat(result.get().getOriginFilename()).isEqualTo("o");
     }
 
     private void clearContext() {

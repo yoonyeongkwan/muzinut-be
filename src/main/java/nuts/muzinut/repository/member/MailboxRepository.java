@@ -36,11 +36,12 @@ public interface MailboxRepository extends JpaRepository<Mailbox, Long> {
      */
     @Modifying
     @Query(
-            value = "insert into mailbox (user_id, message) " +
-                    "select user_id, ?1 " +
-                    "from users;", nativeQuery = true
+            value = "insert into mailbox (user_id, message, is_checked) " +
+                    "select user_id, ?1, false " +
+                    "from users", nativeQuery = true
     )
     void sendNotice(String message);
+
 
 
     /**

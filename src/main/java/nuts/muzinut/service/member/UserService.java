@@ -1,4 +1,4 @@
-package nuts.muzinut.service.security;
+package nuts.muzinut.service.member;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -12,11 +12,14 @@ import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
+import nuts.muzinut.service.security.SecurityRole;
+import nuts.muzinut.service.security.SecurityUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -28,7 +31,6 @@ public class UserService {
      * 일반 회원가입
      * @throws : 이미 가입된 회원이 동일한 username 으로 회원가입 한 경우 DuplicateMemberException 발생
      */
-    @Transactional
     public UserDto signup(UserDto userDto) {
         if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
@@ -54,7 +56,6 @@ public class UserService {
      * 관리자 회원가입
      * @throws : 이미 가입된 회원이 동일한 username 으로 회원가입 한 경우 DuplicateMemberException 발생
      */
-    @Transactional
     public UserDto adminSignup(UserDto userDto) {
         if (userRepository.findOneWithAuthoritiesByUsername(userDto.getUsername()).orElse(null) != null) {
             throw new DuplicateMemberException("이미 가입되어 있는 유저입니다.");
@@ -74,6 +75,7 @@ public class UserService {
 
         return UserDto.from(userRepository.save(user));
     }
+
     private Authority getAuthority(SecurityRole role) {
         Authority authority = Authority.builder()
                 .authorityName(role.toString())

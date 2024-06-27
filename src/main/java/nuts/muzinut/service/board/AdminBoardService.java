@@ -3,6 +3,7 @@ package nuts.muzinut.service.board;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.controller.board.FileType;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
@@ -19,40 +20,59 @@ import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
+import nuts.muzinut.repository.member.MailboxRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static nuts.muzinut.controller.board.FileType.*;
 import static nuts.muzinut.domain.board.QAdminBoard.*;
 import static nuts.muzinut.domain.board.QBoard.*;
 
 @Slf4j
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AdminBoardService {
 
     private final AdminBoardRepository adminBoardRepository;
     private final BoardRepository boardRepository;
-    private final BoardQueryRepository boardQueryRepository;
+//    private final BoardQueryRepository boardQueryRepository;
     private final AdminBoardQueryRepository queryRepository;
     private final AdminUploadFileRepository uploadFileRepository;
     private final UserRepository userRepository;
+    private final MailboxRepository mailboxRepository;
 
-    public AdminBoard createAdminBoard(AdminBoard adminBoard, String nickname) {
-        User user = userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new NotFoundEntityException("사용자가 없음"));
+    public AdminBoard createAdminBoard(AdminBoard adminBoard, User user) {
 
+        //연관 관계 셋팅
         adminBoard.addBoard(user);
-        return boardRepository.save(adminBoard);
+        mailboxRepository.sendNotice("new 공지 " + adminBoard.getTitle()); //공지사항 알림 전송
+        return adminBoardRepository.save(adminBoard);
     }
 
     public AdminBoard getAdminBoard(Long id) throws BoardNotExistException {
         return adminBoardRepository.findById(id).orElseThrow(
-                () -> new BoardNotExistException("어드민 게시판이 없습니다"));
+                () -> new BoardNotFoundException("어드민 게시판이 없습니다"));
+    }
+
+    public AdminBoard getAdminBoardWithUploadFiles(Long id) throws BoardNotExistException {
+        return adminBoardRepository.findAdminBoardWithUploadFiles(id).orElseThrow(
+                () -> new BoardNotFoundException("어드민 게시판이 없습니다"));
+    }
+
+    //첨부 파일들을 셋팅 해주는 메서드
+    public AdminBoard setAttachFileName(List<Map<FileType, String>> filenames, AdminBoard adminBoard) {
+        for (Map<FileType, String> f : filenames) {
+            adminBoard.getAdminUploadFiles().
+                    add(new AdminUploadFile(f.get(STORE_FILENAME), f.get(ORIGIN_FILENAME)));
+        }
+        return adminBoard;
     }
 
     /**
@@ -72,7 +92,8 @@ public class AdminBoardService {
         AdminBoardsDto boardsDto = new AdminBoardsDto();
         boardsDto.setPaging(page.getNumber(), page.getTotalPages(), page.getTotalElements());
         for (AdminBoard adminBoard : adminBoards) {
-            boardsDto.getAdminBoardsForms().add(new AdminBoardsForm(adminBoard.getId(), adminBoard.getTitle(), "muzi", adminBoard.getView(), adminBoard.getCreatedDt()));
+            boardsDto.getAdminBoardsForms().add(new AdminBoardsForm(adminBoard.getId(), adminBoard.getTitle(), "muzi",
+                    adminBoard.getView(), adminBoard.getLikes().size(), adminBoard.getCreatedDt()));
         }
         return boardsDto;
     }
@@ -100,59 +121,46 @@ public class AdminBoardService {
      * @return: dto
      */
     public DetailAdminBoardDto getDetailAdminBoard(Long boardId) {
-        List<Tuple> result = boardQueryRepository.getDetailBoard(boardId);
+        List<Tuple> result = queryRepository.getDetailAdminBoard(boardId);
 
         if (result.isEmpty()) {
             return null;
         }
 
-
         Tuple first = result.getFirst();
         Board findBoard = first.get(board);
-        AdminBoard findAdminBoard = adminBoardRepository.findAdminBoardWithUser(findBoard.getId()) //Todo 고칠꺼
-                .orElseThrow(() -> new NotFoundEntityException("adminBoard Not exist"));
+        AdminBoard findAdminBoard = first.get(adminBoard);
 
         if (findBoard == null) {
             return null;
         }
 
-        List<AdminUploadFile> files = uploadFileRepository.getAdminUploadFile(findAdminBoard.getId());
-        DetailAdminBoardDto detailAdminBoardDto =
-                new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getContent(),
-                        findAdminBoard.getView(), files); //어드민 게시판 관련 파일 셋팅
+        List<AdminUploadFile> files = findAdminBoard.getAdminUploadFiles(); //can be null
 
-        Long likeCount = first.get(3, Long.class);
-        detailAdminBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
 
-        Set<CommentDto> commentDtoSet = new HashSet<>();
-        Set<ReplyDto> replyDtoSet = new HashSet<>();
+        DetailAdminBoardDto detailAdminBoardDto = new DetailAdminBoardDto();
 
-        //data Setting
-        for (Tuple t : result) {
-            ReplyDto findReply = t.get(2, ReplyDto.class);
-            CommentDto findComment = t.get(1, CommentDto.class);
-
-            if (findComment.getId() != null) {
-                commentDtoSet.add(findComment);
-            }
-
-            if (findReply.getId() != null) {
-                replyDtoSet.add(findReply);
-            }
+        //첨부파일이 있는 경우 & 없는 경우
+        if (files != null) {
+            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getView(),
+                    files, findAdminBoard.getFilename()); //어드민 게시판 관련 파일 셋팅
+        } else {
+            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getView(), findAdminBoard.getFilename()); //어드민 게시판 관련 셋팅
         }
 
-//        log.info("commentDtoSet size: {}", commentDtoSet.size());
-//        log.info("replyDtoSet size: {}", replyDtoSet.size());
+        Long likeCount = first.get(2, Long.class);
+        detailAdminBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
 
-        //detailAdminBoardDto comments setting
-        List<CommentDto> comments = new ArrayList<>(commentDtoSet);
-        for (ReplyDto replyDto : replyDtoSet) {
-
-            for (CommentDto comment : comments) {
-                if (comment.getId() == replyDto.getCommentId()) {
-                    comment.getReplies().add(replyDto);
-                }
+        //댓글 및 대댓글 dto 에 셋팅
+        List<CommentDto> comments = new ArrayList<>();
+        for (Comment c : findBoard.getComments()) {
+            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt());
+            List<ReplyDto> replies = new ArrayList<>();
+            for (Reply r : c.getReplies()) {
+                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt()));
             }
+            commentDto.setReplies(replies);
+            comments.add(commentDto);
         }
         detailAdminBoardDto.setComments(comments);
 

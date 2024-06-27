@@ -16,4 +16,7 @@ public interface AdminBoardRepository extends JpaRepository<AdminBoard, Long> {
 
     @Query("select a from AdminBoard a join fetch a.user where a.id = :id")
     Optional<AdminBoard> findAdminBoardWithUser(@Param("id") Long boardId);
+
+    @Query("select a from AdminBoard a join fetch a.adminUploadFiles where a.id = :id")
+    Optional<AdminBoard> findAdminBoardWithUploadFiles(@Param("id") Long id);
 }

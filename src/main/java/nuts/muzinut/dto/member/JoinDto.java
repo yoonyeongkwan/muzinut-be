@@ -11,9 +11,9 @@ public class JoinDto {
     @NotNull
     private String username;
 
-    @NotNull
+    @NotNull(message = "비밀번호를 필수로 입력해야 합니다.")
     private String password;
 
-    @NotNull
+    @NotNull(message = "인증 번호를 입력해주세요")
     private String authNum;
 }

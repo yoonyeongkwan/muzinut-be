@@ -1,18 +1,17 @@
-package nuts.muzinut.dto.board.admin;
+package nuts.muzinut.dto.board.lounge;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
-//모든 어드민 게시판을 반환하는 form
 @Data
 @AllArgsConstructor
-public class AdminBoardsForm {
+public class LoungesForm {
     private Long id;
-    private String title;
     private String writer;
-    private int view;
-    private int like;
+    private String filename;
     private LocalDateTime createdDt;
+    private int like;
+    private int view;
 }

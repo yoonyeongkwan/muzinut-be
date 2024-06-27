@@ -13,10 +13,9 @@ import nuts.muzinut.dto.board.free.FreeBoardsDto;
 import nuts.muzinut.exception.*;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.FreeBoardService;
-import nuts.muzinut.service.security.UserService;
+import nuts.muzinut.service.member.UserService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
@@ -26,10 +25,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
+
+import static nuts.muzinut.controller.board.FileType.*;
 
 @Slf4j
 @Controller
-@RequestMapping("/free-boards")
+@RequestMapping("/community/free-boards")
 @RequiredArgsConstructor
 public class FreeBoardController {
 
@@ -53,19 +55,16 @@ public class FreeBoardController {
         FreeBoard freeBoard = new FreeBoard(freeBoardForm.getTitle());
         freeBoard.addBoard(user);
 
-        try {
-            fileStore.storeFile(quillFile, freeBoard); //자유 게시판 파일 저장
-            freeBoardService.save(freeBoard); //자유 게시판 저장
-            HttpHeaders header = new HttpHeaders();
-            header.setLocation(URI.create("/free-boards/" + freeBoard.getId())); //수정한 게시판으로 리다이렉트
+        Map<FileType, String> filename = fileStore.storeFile(quillFile);//자유 게시판 파일 저장
+        freeBoard.setFilename(filename.get(STORE_FILENAME)); //저장 파일 이름 설정
+        freeBoardService.save(freeBoard); //자유 게시판 저장
 
-            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                    .headers(header)
-                    .body(new MessageDto("자유 게시판이 생성되었습니다"));
-        } catch (NoUploadFileException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(null);
-        }
+        HttpHeaders header = new HttpHeaders();
+        header.setLocation(URI.create("/community/free-boards/" + freeBoard.getId())); //수정한 게시판으로 리다이렉트
+
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                .headers(header)
+                .body(new MessageDto("자유 게시판이 생성되었습니다"));
     }
 
     //특정 게시판 조회
@@ -115,21 +114,17 @@ public class FreeBoardController {
                 .orElseThrow(() -> new NotFoundMemberException("닉네임을 설정해주세요"));
         boolean isAuthorized = freeBoardService.checkAuth(id, user);
         if (isAuthorized) {
-            try {
-                FreeBoard freeBoard = freeBoardService.getFreeBoard(id);
-                String changeFilename = fileStore.updateFreeBoardFile(quillFile, freeBoard);//자유 게시판 파일 저장
-                log.info("change title: {}", freeBoardForm.getTitle());
-                freeBoardService.updateFreeBoard(freeBoard.getId(), freeBoardForm.getTitle(), changeFilename); //자유 게시판 저장
-                HttpHeaders header = new HttpHeaders();
-                header.setLocation(URI.create("/free-boards/" + freeBoard.getId())); //수정한 게시판으로 리다이렉트
+            FreeBoard freeBoard = freeBoardService.getFreeBoard(id);
+            //자유 게시판 파일 저장 및 기존 퀼 파일 삭제
+            String changeFilename = fileStore.updateFile(quillFile, freeBoard.getFilename());
+            log.info("change title: {}", freeBoardForm.getTitle());
+            freeBoardService.updateFreeBoard(freeBoard.getId(), freeBoardForm.getTitle(), changeFilename); //자유 게시판 저장
+            HttpHeaders header = new HttpHeaders();
+            header.setLocation(URI.create("/community/free-boards/" + freeBoard.getId())); //수정한 게시판으로 리다이렉트
 
-                return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                        .headers(header)
-                        .body(new MessageDto("자유 게시판이 수정되었습니다"));
-            } catch (NoUploadFileException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(null);
-            }
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .headers(header)
+                    .body(new MessageDto("자유 게시판이 수정되었습니다"));
 
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -150,7 +145,7 @@ public class FreeBoardController {
             freeBoardService.deleteFreeBoard(id); //자유 게시판 삭제
 
             HttpHeaders header = new HttpHeaders();
-            header.setLocation(URI.create("/free-boards?page=0")); //자유 게시판 홈페이지로 리다이렉트
+            header.setLocation(URI.create("/community/free-boards")); //자유 게시판 홈페이지로 리다이렉트
 
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                     .headers(header)

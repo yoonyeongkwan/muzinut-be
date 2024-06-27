@@ -9,9 +9,13 @@ import nuts.muzinut.domain.member.User;
 @Getter
 public class Lounge extends Board {
 
-    @Id @GeneratedValue
-    @Column(name = "lounge_id")
-    private Long id;
-
     private String filename; //react quill file
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public int addView() {
+        return ++this.view;
+    }
 }

@@ -7,7 +7,6 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.follow.FollowListDto;
 import nuts.muzinut.repository.member.FollowRepository;
-import nuts.muzinut.service.security.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

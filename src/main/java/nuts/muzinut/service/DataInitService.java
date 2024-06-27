@@ -14,7 +14,7 @@ import nuts.muzinut.repository.board.*;
 import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.member.FollowService;
-import nuts.muzinut.service.security.UserService;
+import nuts.muzinut.service.member.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

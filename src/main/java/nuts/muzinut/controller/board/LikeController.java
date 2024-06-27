@@ -19,7 +19,7 @@ public class LikeController {
     private final LikeService likeService;
 
     // 좋아요 토글
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/likes/{boardId}")
     public ResponseEntity<MessageDto> toggleLike(@PathVariable(value = "boardId") Long boardId) {
         log.info("Toggling like for board with ID: {}", boardId);

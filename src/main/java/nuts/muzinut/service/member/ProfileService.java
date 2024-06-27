@@ -3,7 +3,6 @@ package nuts.muzinut.service.member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.service.board.*;
-import nuts.muzinut.service.security.UserService;
 import org.springframework.stereotype.Service;
 
 @Slf4j

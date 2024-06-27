@@ -185,7 +185,8 @@ public class FileStore {
         return originalFilename.substring(pos + 1);
     }
 
-    public void setImageHeaderWithData(List<String> profileImages, MultiValueMap<String, Object> formData) {
+    //프로필 이미지를 폼 데이터에 넣어주는 메서드
+    public void setImageHeaderWithData(Set<String> profileImages, MultiValueMap<String, Object> formData) {
 
         List<String> imagesFullPath = profileImages.stream()
                 .map(this::getFullPath)

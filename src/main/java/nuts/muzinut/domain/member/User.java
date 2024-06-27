@@ -52,6 +52,9 @@ public class User {
     @Column(name = "profile_img_filename")
     private String profileImgFilename;
 
+    @Column(name = "profile_banner_img_filename")
+    private String profileBannerImgFilename;
+
     @Column(name = "account_number")
     private int accountNumber; //계좌 번호
 

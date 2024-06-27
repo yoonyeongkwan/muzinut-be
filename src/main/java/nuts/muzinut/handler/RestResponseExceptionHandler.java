@@ -49,4 +49,12 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     private ErrorResult NO_CONTENT(BoardNotExistException ex) {
         return new ErrorResult(NO_CONTENT.value(), "no content!");
     }
+
+    // 새로운 예외 핸들러 추가
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(value = { IllegalArgumentException.class })
+    @ResponseBody
+    private ErrorDto handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
+    }
 }

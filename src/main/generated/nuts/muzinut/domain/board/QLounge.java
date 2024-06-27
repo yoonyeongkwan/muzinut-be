@@ -32,7 +32,8 @@ public class QLounge extends EntityPathBase<Lounge> {
 
     public final StringPath filename = createString("filename");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    //inherited
+    public final NumberPath<Long> id;
 
     //inherited
     public final ListPath<Like, QLike> likes;
@@ -70,6 +71,7 @@ public class QLounge extends EntityPathBase<Lounge> {
         this._super = new QBoard(type, metadata, inits);
         this.comments = _super.comments;
         this.createdDt = _super.createdDt;
+        this.id = _super.id;
         this.likes = _super.likes;
         this.modifiedDt = _super.modifiedDt;
         this.title = _super.title;

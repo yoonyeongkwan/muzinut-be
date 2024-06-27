@@ -23,4 +23,5 @@ public class DetailRecruitBoardDto {
     private String author; // 작성자 정보 추가
     private List<CommentDto> comments; // 댓글 리스트 추가
     private long like;  // 좋아요 수 추가
+    private String profileImgFilename; // 프로필 이미지 파일명 추가
 }

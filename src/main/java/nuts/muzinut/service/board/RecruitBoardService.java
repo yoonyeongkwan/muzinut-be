@@ -24,10 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -83,8 +80,14 @@ public class RecruitBoardService {
         recruitBoard.incrementView();
 
         // 작성자 정보 가져오기
-        String author = recruitBoard.getUser().getNickname();
+        User user = recruitBoard.getUser();
+        String author = user.getNickname();
+        String profileImgFilename = user.getProfileImgFilename();
 
+        // 프로필 사진이 없는 경우 기본 이미지 설정
+        if (profileImgFilename == null || profileImgFilename.isEmpty()) {
+            profileImgFilename = "base.png"; // 기본 프로필 이미지 파일명
+        }
         // 댓글과 대댓글 가져오기
         List<Tuple> result = boardQueryRepository.getDetailBoard(id);
 
@@ -98,10 +101,26 @@ public class RecruitBoardService {
                 CommentDto findComment = t.get(1, CommentDto.class);
 
                 if (findComment.getId() != null) {
+                    // 댓글 작성자의 프로필 이미지 파일명 설정
+                    Optional<User> commentUser = userRepository.findByNickname(findComment.getCommentWriter());
+                    String commentProfileImgFilename = commentUser.isPresent() ? commentUser.get().getProfileImgFilename() : "base.png";
+                    if (commentProfileImgFilename == null || commentProfileImgFilename.isEmpty()) {
+                        commentProfileImgFilename = "base.png";
+                    }
+                    findComment.setProfileImgFilename(commentProfileImgFilename);
+
                     commentDtoSet.add(findComment);
                 }
 
                 if (findReply.getId() != null) {
+                    // 대댓글 작성자의 프로필 이미지 파일명 설정
+                    Optional<User> replyUser = userRepository.findByNickname(findReply.getReplyWriter());
+                    String replyProfileImgFilename = replyUser.isPresent() ? replyUser.get().getProfileImgFilename() : "base.png";
+                    if (replyProfileImgFilename == null || replyProfileImgFilename.isEmpty()) {
+                        replyProfileImgFilename = "base.png";
+                    }
+                    findReply.setProfileImgFilename(replyProfileImgFilename);
+
                     replyDtoSet.add(findReply);
                 }
             }
@@ -129,7 +148,8 @@ public class RecruitBoardService {
                 recruitBoard.getGenres(),
                 author,
                 commentDtoList,
-                likeRepository.countByBoard(recruitBoard)   // 좋아요 수 추가
+                likeRepository.countByBoard(recruitBoard),   // 좋아요 수 추가
+                profileImgFilename // 프로필 이미지 파일명 추가
         );
 
         return detailRecruitBoardDto;

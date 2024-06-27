@@ -14,6 +14,7 @@ public class ReplyDto {
     private String replyWriter;
     private Long commentId;
     private LocalDateTime createdDt;
+    private String profileImgFilename; // 프로필 이미지 파일명 추가
 
     @QueryProjection
     public ReplyDto(Long id, String content, String replyWriter, Long commentId, LocalDateTime createdDt) {

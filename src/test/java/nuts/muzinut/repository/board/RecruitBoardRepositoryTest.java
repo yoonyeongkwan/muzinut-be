@@ -38,7 +38,6 @@ class RecruitBoardRepositoryTest {
         RecruitBoard recruitBoard = new RecruitBoard();
         recruitBoard.setTitle(title);
         recruitBoard.setView(view);
-        recruitBoard.createRecruitBoard(user);
         if (genre != null) {
             recruitBoard.addGenre(genre);
         }

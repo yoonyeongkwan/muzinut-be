@@ -56,7 +56,7 @@ public class User {
     private String intro; //자기 소개
     private int nuts; //보유 너츠
     private int vote; //투표권
-    private int declaration; //신고 횟수
+    private int declaration; //신고 횟수~
 
     @ManyToMany
     @JoinTable(

@@ -22,4 +22,10 @@ public class RecruitBoardGenre {
         this.recruitBoard = recruitBoard;
         recruitBoard.getRecruitBoardGenres().add(this);
     }
+
+    // genre 설정 메서드
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
 }

@@ -11,6 +11,7 @@ import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.domain.nuts.NutsUsageHistory;
 import nuts.muzinut.domain.nuts.PaymentHistory;
 import nuts.muzinut.domain.nuts.SupportMsg;
+import org.springframework.security.core.parameters.P;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,9 +65,33 @@ public class User {
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "authority_name")})
     private Set<Authority> authorities;
 
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "playlist_id")
+    private Playlist playlist = new Playlist();
+
+    public User(String username, String password, String nickname) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.followings = new ArrayList<>(); // 필드 초기화 추가
+        this.comments = new ArrayList<>(); // 필드 초기화 추가
+    }
+
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+        this.nickname = username;
+        this.followings = new ArrayList<>(); // 필드 초기화 추가
+        this.comments = new ArrayList<>(); // 필드 초기화 추가
+    }
+
+    public String setNickname(String nickname) {
+        this.nickname = nickname;
+        return nickname;
+    }
+
+    public void changeProfileImg(String profileImgFilename) {
+        this.profileImgFilename = profileImgFilename;
     }
 
     //회원 관련
@@ -76,6 +101,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Follow> followings = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Friend> friends = new ArrayList<>();
+
     //음악 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Song> songList = new ArrayList<>();
@@ -83,10 +111,10 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PlayNut> playNutList = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Playlist playlist;
-
     //게시판 관련
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Board> boards = new ArrayList<>();
+
     @OneToMany(mappedBy = "user")
     private List<RecruitBoard> recruitBoards = new ArrayList<>();
 
@@ -96,14 +124,20 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Lounge> lounges = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Reply> replies = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private List<Like> likeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<AdminBoard> adminBoards = new ArrayList<>();
 
     //후원 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -121,4 +155,6 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<Message> messages = new ArrayList<>();
+
+
 }

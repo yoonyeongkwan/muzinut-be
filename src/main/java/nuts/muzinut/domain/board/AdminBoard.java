@@ -2,25 +2,34 @@ package nuts.muzinut.domain.board;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import nuts.muzinut.domain.baseEntity.BaseBoardEntity;
-import org.hibernate.validator.constraints.Length;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NoArgsConstructor
 @Getter
 @Table(name = "admin_board")
-public class AdminBoard extends BaseBoardEntity {
+public class AdminBoard extends Board {
 
-    @Id @GeneratedValue
-    @Column(name = "admin_board_id")
-    private Long id;
+    private String filename; //react quill file
 
-    private String content;
+    public AdminBoard(String title) {
+        super.title = title;
+    }
 
-    @Column(name = "admin_id")
-    private Long adminId;
+    public Long getId() {
+        return super.getId();
+    }
+
+    public void changeFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public void changeTitle(String title) {
+        this.title = title;
+    }
 
     @OneToMany(mappedBy = "adminBoard", cascade = CascadeType.ALL)
     private List<AdminUploadFile> adminUploadFiles = new ArrayList<>();

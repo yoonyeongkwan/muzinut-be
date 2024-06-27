@@ -1,0 +1,9 @@
+package nuts.muzinut.repository.board;
+
+import nuts.muzinut.domain.board.Board;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface BoardRepository extends JpaRepository<Board, Long> {
+
+    void deleteById(Long id);
+}

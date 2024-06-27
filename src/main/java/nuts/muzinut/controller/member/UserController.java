@@ -1,6 +1,7 @@
 package nuts.muzinut.controller.member;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
@@ -35,6 +36,7 @@ import java.util.Map;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
+@Slf4j
 @Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -96,21 +98,31 @@ public class UserController {
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }
 
+    /**
+     * 사용자의 프로필을 설정하는 메서드
+     * @param profileImg: 사용자가 설정하고 싶은 프로필 이미지
+     * @return: 리다이랙트 필요
+     * @throws IOException
+     */
+    @ResponseBody //Todo 리다이렉트 설정 필요
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(value = "/set-profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageDto> setProfile(MultipartFile profileImg) throws IOException {
+    public MessageDto setProfile(MultipartFile profileImg) throws IOException {
         User user = userService.getUserWithUsername()
-                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다.")); //진짜?
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
         if (StringUtils.hasText(user.getProfileImgFilename())) {
             //프로필 바꾸기
             String changeImgName = fileStore.updateFile(profileImg, user.getProfileImgFilename());
+            userService.setProfileName(changeImgName, user);
         } else {
             //프로필 처음 설정
             Map<FileType, String> filenames = fileStore.storeFile(profileImg);
-            user.changeProfileImg(filenames.get(STORE_FILENAME)); //파일명 설정.
+            userService.setProfileName(filenames.get(STORE_FILENAME), user);
         }
+
         return null;
     }
 
+    //Todo 자기소개 추가
 }

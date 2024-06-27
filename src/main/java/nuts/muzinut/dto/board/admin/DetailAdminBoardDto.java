@@ -23,6 +23,7 @@ public class DetailAdminBoardDto {
     private String title;
     private String writer = "muzi";
     private String quillFilename;
+    private String profileImg; //저장된 프로필 이미지 경로
     private int view;
     private List<AdminFilename> adminFilenames = new ArrayList<>();
 

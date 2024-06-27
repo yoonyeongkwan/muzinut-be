@@ -18,7 +18,7 @@ public class ReplyController {
     private final ReplyService replyService;
 
     // 대댓글 작성
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/replies/{commentId}")
     public ResponseEntity<MessageDto> addReply(
             @PathVariable("commentId") Long commentId,
@@ -27,7 +27,7 @@ public class ReplyController {
     }
 
     // 대댓글 수정
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/replies/{replyId}")
     public ResponseEntity<MessageDto> updateReply(
             @PathVariable("replyId") Long replyId,
@@ -36,7 +36,7 @@ public class ReplyController {
     }
 
     // 대댓글 삭제
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/replies/{replyId}")
     public ResponseEntity<MessageDto> deleteReply(@PathVariable("replyId") Long replyId) {
         return replyService.deleteReply(replyId);

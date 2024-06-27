@@ -18,7 +18,7 @@ public class CommentController {
     private final CommentService commentService;
 
     // 댓글 작성
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/comments/{boardId}")
     public ResponseEntity<MessageDto> addComment(
             @PathVariable("boardId") Long boardId,
@@ -27,7 +27,7 @@ public class CommentController {
     }
 
     // 댓글 수정
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/comments/{commentId}")
     public ResponseEntity<MessageDto> updateComment(
             @PathVariable("commentId") Long commentId,
@@ -36,7 +36,7 @@ public class CommentController {
     }
 
     // 댓글 삭제
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<MessageDto> deleteComment(@PathVariable("commentId") Long commentId) {
         return commentService.deleteComment(commentId);

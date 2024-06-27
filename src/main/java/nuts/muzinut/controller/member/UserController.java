@@ -106,7 +106,7 @@ public class UserController {
      */
     @ResponseBody //Todo 리다이렉트 설정 필요
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @PostMapping(value = "/set-profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/set-profile")
     public MessageDto setProfile(MultipartFile profileImg) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
@@ -121,8 +121,9 @@ public class UserController {
             userService.setProfileName(filenames.get(STORE_FILENAME), user);
         }
 
-        return new MessageDto("~~");
+        return new MessageDto("파일 저장 성공");
     }
 
     //Todo 자기소개 추가
+
 }

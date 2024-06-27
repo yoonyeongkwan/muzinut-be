@@ -185,13 +185,12 @@ public class FileStore {
         return originalFilename.substring(pos + 1);
     }
 
-    /*public void setImageHeaderWithData(List<String> profileImages, MultiValueMap<String, Object> formData) {
+    public void setImageHeaderWithData(List<String> profileImages, MultiValueMap<String, Object> formData) {
 
         List<String> imagesFullPath = profileImages.stream()
-                .filter(i -> extractExt(i).equals(FileExt(type)))
                 .map(this::getFullPath)
                 .toList();
-        imagesFullPath.forEach(i -> formData.add("profileImg", new FileSystemResource(i)));
-    }*/
 
+        imagesFullPath.forEach(i -> formData.add("profileImg", new FileSystemResource(i)));
+    }
 }

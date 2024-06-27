@@ -28,10 +28,11 @@ public class DetailLoungeDto {
         this.view = view;
     }
 
-    public DetailLoungeDto(Long id, String writer, int view, String quillFilename) {
+    public DetailLoungeDto(Long id, String writer, int view, String quillFilename, String profileImg) {
         this.id = id;
         this.writer = writer;
         this.view = view;
         this.quillFilename = quillFilename;
+        this.profileImg = profileImg;
     }
 }

@@ -26,9 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static nuts.muzinut.domain.board.QBoard.board;
 import static nuts.muzinut.domain.board.QFreeBoard.freeBoard;
@@ -108,7 +106,7 @@ public class LoungeService {
         }
 
         DetailLoungeDto detailLoungeDto = new DetailLoungeDto(findLounge.getId(), findLounge.getUser().getNickname(),
-                view ,findLounge.getFilename());
+                view ,findLounge.getFilename(), findLounge.getUser().getProfileImgFilename());
 
         Long likeCount = first.get(2, Long.class);
         detailLoungeDto.setLikeCount(likeCount); //좋아요 수 셋팅
@@ -135,9 +133,9 @@ public class LoungeService {
         return lounge.getUser() == user;
     }
 
-    public List<String> getProfileImages(DetailLoungeDto detailLoungeDto) {
+    public Set<String> getProfileImages(DetailLoungeDto detailLoungeDto) {
 
-        List<String> profileImages = new ArrayList<>();
+        Set<String> profileImages = new HashSet<>();
         addWriterProfile(profileImages, detailLoungeDto.getProfileImg()); //게시판 작성자의 프로필 추가
 
         for (CommentDto c : detailLoungeDto.getComments()) {
@@ -147,10 +145,11 @@ public class LoungeService {
                 addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
             }
         }
+        log.info("profileImage's size {}", profileImages.size());
         return profileImages;
     }
 
-    private void addWriterProfile(List<String> profileImages, String profileImg) {
+    private void addWriterProfile(Set<String> profileImages, String profileImg) {
         if (StringUtils.hasText(profileImg)) {
             profileImages.add(profileImg);
         }

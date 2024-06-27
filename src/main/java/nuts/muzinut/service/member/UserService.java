@@ -27,6 +27,10 @@ public class UserService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public void setProfileName(String filename, User user) {
+        userRepository.updateFilename(filename, user);
+    }
+
     /**
      * 일반 회원가입
      * @throws : 이미 가입된 회원이 동일한 username 으로 회원가입 한 경우 DuplicateMemberException 발생

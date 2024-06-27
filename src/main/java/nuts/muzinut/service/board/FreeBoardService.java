@@ -107,10 +107,10 @@ public class FreeBoardService {
         //댓글 및 대댓글 dto 에 셋팅
         List<CommentDto> comments = new ArrayList<>();
         for (Comment c : findBoard.getComments()) {
-            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt());
+            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt(), c.getUser().getProfileImgFilename());
             List<ReplyDto> replies = new ArrayList<>();
             for (Reply r : c.getReplies()) {
-                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt()));
+                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt(), r.getUser().getProfileImgFilename()));
             }
             commentDto.setReplies(replies);
             comments.add(commentDto);

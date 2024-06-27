@@ -16,6 +16,7 @@ public class DetailLoungeDto {
 
     private Long id;
     private String writer;
+    private String profileImg;
     private int view;
     private String quillFilename;
 

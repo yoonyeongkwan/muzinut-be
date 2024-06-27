@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.member.UserDto;
+import nuts.muzinut.dto.security.AuthorityDto;
 import nuts.muzinut.repository.board.CommentRepository;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.ReplyRepository;
@@ -29,28 +31,29 @@ public class DataInit {
     private final ReplyRepository replyRepository;
     private final DataInitService dataInitService;
     private final FreeBoardRepository freeBoardRepository;
+    private final UserService userService;
 
     @PersistenceContext
     EntityManager em;
 
-    @PostConstruct
-    public void init() {
-        dataInitService.initializeData();
-    }
-
 //    @PostConstruct
 //    public void init() {
-//        AuthorityDto authorityDto = new AuthorityDto("admin");
-//        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
-//        userService.adminSignup(userDto);
-//        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
-//        userService.signup(userDto2);
+//        dataInitService.initializeData();
+//    }
+
+    @PostConstruct
+    public void init() {
+        AuthorityDto authorityDto = new AuthorityDto("admin");
+        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
+        userService.adminSignup(userDto);
+        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
+        userService.signup(userDto2);
 //        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
 //        userService.signup(userDto3);
-//
+
 //        dataInitService.recruitBoardBoardScenario();
 //        dataInitService.commentScenario();
-//    }
+    }
 
 //    @PostConstruct
     public void adminBoardScenario() {

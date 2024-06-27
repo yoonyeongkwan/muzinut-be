@@ -28,7 +28,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
@@ -70,7 +72,7 @@ public class LoungeController {
     }
 
     //특정 게시판 조회
-    @GetMapping(value = "/{id}",produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
@@ -87,8 +89,22 @@ public class LoungeController {
         HttpHeaders fileHeaders = new HttpHeaders();
         String quillFilename = detailLoungeDto.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
-        fileHeaders.setContentType(MediaType.TEXT_HTML); //quill 파일 이므로 html
+//        fileHeaders.setContentType(MediaType.TEXT_HTML); //quill 파일 이므로 html
         formData.add("quillFile", new FileSystemResource(fullPath)); //파일 가져와서 셋팅
+
+        //사용자 프로필 관련
+        HttpHeaders profileHeaders = new HttpHeaders();
+
+        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
+        List<String> profileImages = loungeService.getProfileImages(detailLoungeDto);
+        List<String> imagesFullPath = profileImages.stream()
+                .map(fileStore::getFullPath)
+                .toList();
+        imagesFullPath.forEach(i -> formData.add("profileImg", new FileSystemResource(fullPath)));
+
+        //기본 프로필 이미지 추가
+        HttpHeaders baseImgHeaders = new HttpHeaders();
+
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }

@@ -2,6 +2,7 @@ package nuts.muzinut.domain.member;
 
 import lombok.*;
 import jakarta.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.chat.ChatMember;
 import nuts.muzinut.domain.chat.Message;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Table(name = "users")
 @Getter
 @Setter
+@Slf4j
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -91,6 +93,7 @@ public class User {
     }
 
     public void changeProfileImg(String profileImgFilename) {
+        log.info("change!");
         this.profileImgFilename = profileImgFilename;
     }
 

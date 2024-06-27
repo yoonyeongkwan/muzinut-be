@@ -24,6 +24,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,10 +116,10 @@ public class LoungeService {
         //댓글 및 대댓글 dto 에 셋팅
         List<CommentDto> comments = new ArrayList<>();
         for (Comment c : findBoard.getComments()) {
-            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt());
+            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt(), c.getUser().getProfileImgFilename());
             List<ReplyDto> replies = new ArrayList<>();
             for (Reply r : c.getReplies()) {
-                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt()));
+                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt(), r.getUser().getProfileImgFilename()));
             }
             commentDto.setReplies(replies);
             comments.add(commentDto);
@@ -132,5 +133,26 @@ public class LoungeService {
         Optional<Lounge> findLounge = loungeRepository.findLoungeWithUser(boardId);
         Lounge lounge = findLounge.orElseThrow(() -> new BoardNotFoundException("게시판이 존재하지 않습니다."));
         return lounge.getUser() == user;
+    }
+
+    public List<String> getProfileImages(DetailLoungeDto detailLoungeDto) {
+
+        List<String> profileImages = new ArrayList<>();
+        addWriterProfile(profileImages, detailLoungeDto.getProfileImg()); //게시판 작성자의 프로필 추가
+
+        for (CommentDto c : detailLoungeDto.getComments()) {
+            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
+
+            for (ReplyDto r : c.getReplies()) {
+                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
+            }
+        }
+        return profileImages;
+    }
+
+    private void addWriterProfile(List<String> profileImages, String profileImg) {
+        if (StringUtils.hasText(profileImg)) {
+            profileImages.add(profileImg);
+        }
     }
 }

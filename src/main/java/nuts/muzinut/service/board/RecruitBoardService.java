@@ -3,11 +3,13 @@ package nuts.muzinut.service.board;
 
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.recruit.*;
+import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
@@ -23,9 +25,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -80,14 +84,8 @@ public class RecruitBoardService {
         recruitBoard.incrementView();
 
         // 작성자 정보 가져오기
-        User user = recruitBoard.getUser();
-        String author = user.getNickname();
-        String profileImgFilename = user.getProfileImgFilename();
+        String author = recruitBoard.getUser().getNickname();
 
-        // 프로필 사진이 없는 경우 기본 이미지 설정
-        if (profileImgFilename == null || profileImgFilename.isEmpty()) {
-            profileImgFilename = "base.png"; // 기본 프로필 이미지 파일명
-        }
         // 댓글과 대댓글 가져오기
         List<Tuple> result = boardQueryRepository.getDetailBoard(id);
 
@@ -102,8 +100,8 @@ public class RecruitBoardService {
 
                 if (findComment.getId() != null) {
                     // 댓글 작성자의 프로필 이미지 파일명 설정
-                    Optional<User> commentUser = userRepository.findByNickname(findComment.getCommentWriter());
-                    String commentProfileImgFilename = commentUser.isPresent() ? commentUser.get().getProfileImgFilename() : "base.png";
+                    User commentUser = userRepository.findByNickname(findComment.getCommentWriter()).orElseThrow(() -> new RuntimeException("User not found"));
+                    String commentProfileImgFilename = commentUser.getProfileImgFilename();
                     if (commentProfileImgFilename == null || commentProfileImgFilename.isEmpty()) {
                         commentProfileImgFilename = "base.png";
                     }
@@ -114,8 +112,8 @@ public class RecruitBoardService {
 
                 if (findReply.getId() != null) {
                     // 대댓글 작성자의 프로필 이미지 파일명 설정
-                    Optional<User> replyUser = userRepository.findByNickname(findReply.getReplyWriter());
-                    String replyProfileImgFilename = replyUser.isPresent() ? replyUser.get().getProfileImgFilename() : "base.png";
+                    User replyUser = userRepository.findByNickname(findReply.getReplyWriter()).orElseThrow(() -> new RuntimeException("User not found"));
+                    String replyProfileImgFilename = replyUser.getProfileImgFilename();
                     if (replyProfileImgFilename == null || replyProfileImgFilename.isEmpty()) {
                         replyProfileImgFilename = "base.png";
                     }
@@ -149,7 +147,7 @@ public class RecruitBoardService {
                 author,
                 commentDtoList,
                 likeRepository.countByBoard(recruitBoard),   // 좋아요 수 추가
-                profileImgFilename // 프로필 이미지 파일명 추가
+                recruitBoard.getUser().getProfileImgFilename() // 프로필 이미지 파일명 추가
         );
 
         return detailRecruitBoardDto;
@@ -284,6 +282,29 @@ public class RecruitBoardService {
     private void checkUserAuthorization(RecruitBoard recruitBoard, String username) throws AccessDeniedException {
         if (!recruitBoard.getUser().getUsername().equals(username)) {
             throw new AccessDeniedException("해당 게시판에 대한 권한이 없습니다");
+        }
+    }
+
+
+    public Set<String> getProfileImages(DetailRecruitBoardDto detailRecruitBoardDto) {
+
+        Set<String> profileImages = new HashSet<>();
+        addWriterProfile(profileImages, detailRecruitBoardDto.getProfileImgFilename()); //게시판 작성자의 프로필 추가
+
+        for (CommentDto c : detailRecruitBoardDto.getComments()) {
+            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
+
+            for (ReplyDto r : c.getReplies()) {
+                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
+            }
+        }
+        log.info("profileImage's size {}", profileImages.size());
+        return profileImages;
+    }
+
+    private void addWriterProfile(Set<String> profileImages, String profileImg) {
+        if (StringUtils.hasText(profileImg)) {
+            profileImages.add(profileImg);
         }
     }
 }

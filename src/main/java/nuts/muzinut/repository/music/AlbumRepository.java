@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface AlbumRepository extends JpaRepository<Album, Long> {
 
     Optional<Album> findByName(String name);
+
+    Optional<Album> findByAlbumImg(String filename);
 }

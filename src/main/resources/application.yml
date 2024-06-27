@@ -9,6 +9,12 @@ spring:
     console:
       enabled: true
 
+  servlet:
+    multipart:
+      enabled: true
+      max-request-size: 110MB
+      max-file-size: 10MB
+
   file:
     dir: F:/final/project/muzinut-be/src/main/java/nuts/muzinut/file/
 

@@ -16,11 +16,15 @@ public class PlayView {
     @Column(name = "play_view_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "song_id")
     private Song song;
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDate playDt;
+
+    public PlayView(Song song) {
+        this.song = song;
+    }
 }

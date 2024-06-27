@@ -23,28 +23,18 @@ public class Song extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private String name; // 곡 이름
-    private String lyrics; // 가사
-
-    private String composer; // 작곡가
+    private String title;
+    private String lyrics;
     private String lyricist; // 작사가
+    private String composer; // 작곡가
 
-
-
-    @Column(name = "music_store_filename")
-    private String musicFilename;
-
-    public Song(String name, String lyrics, String composer, String lyricist, String musicFilename) {
-        this.name = name;
-        this.lyrics = lyrics;
-        this.composer = composer;
-        this.lyricist = lyricist;
-        this.musicFilename = musicFilename;
-    }
+    private String fileName;
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
     private List<SongGenre> songGenres = new ArrayList<>();
 
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    private List<PlayView> playViews = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
@@ -54,5 +44,15 @@ public class Song extends BaseTimeEntity {
     public void createMusic(User user) {
         this.user = user;
         user.getSongList().add(this);
+    }
+
+    public Song(User user, String title, String lyrics, String lyricist, String composer, String Filename, Album album) {
+        this.user = user;
+        this.title = title;
+        this.lyrics = lyrics;
+        this.lyricist = lyricist;
+        this.composer = composer;
+        this.fileName = Filename;
+        this.album = album;
     }
 }

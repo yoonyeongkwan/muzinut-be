@@ -121,7 +121,7 @@ public class UserController {
             userService.setProfileName(filenames.get(STORE_FILENAME), user);
         }
 
-        return null;
+        return new MessageDto("~~");
     }
 
     //Todo 자기소개 추가

@@ -98,15 +98,27 @@ public class UserService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
+
     /**
      * 토큰을 토대로 로그인 한 사용자인지 검증
      * @throws NotFoundMemberException: 스프링 시큐리티가 관리하지 않는 회원일 경우 exception 발생
      */
     @Transactional(readOnly = true)
     public Optional<User> getUserWithUsername() {
-
         return userRepository.findByUsername(
                 SecurityUtil.getCurrentUsername()
                         .orElseThrow(() -> new NotFoundMemberException("로그인 하지 않았거나 없는 회원입니다")));
     }
+
+    // 토큰의 사용자 이름 반환
+    @Transactional(readOnly = true)
+    public User findUserByUsername(String username) {
+        return userRepository.findOneWithAuthoritiesByUsername(username)
+                .orElseThrow(() -> new NotFoundMemberException("Member not found"));
+    }
+
 }

@@ -183,7 +183,7 @@ class MailboxRepositoryTest {
         List<User> users = createFollow(); //u1, u2가  u3를 팔로우 했음
         User u1 = users.getFirst();
         User u3 = users.get(2); //음원을 업로드한 아티스트
-        followRepository.turnOffNotification(false, u1, u3.getId()); //알람 끄기
+        followRepository.updateNotificationStatus(false, u1, u3.getId()); //알람 끄기
         clearContext();
 
         //when

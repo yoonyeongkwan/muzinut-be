@@ -12,6 +12,7 @@ import nuts.muzinut.dto.board.comment.ReplyDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static nuts.muzinut.domain.board.QBoard.*;
 import static nuts.muzinut.domain.board.QComment.*;
@@ -64,4 +65,14 @@ public class BoardQueryRepository {
                 .where(board.id.eq(boardId))
                 .fetch();
     }
+
+    public Optional<Board> findById(Long boardId) {
+        Board boardResult = queryFactory
+                .selectFrom(board)
+                .where(board.id.eq(boardId))
+                .fetchOne();
+
+        return Optional.ofNullable(boardResult);
+    }
+
 }

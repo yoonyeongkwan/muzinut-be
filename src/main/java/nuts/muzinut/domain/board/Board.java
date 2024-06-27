@@ -20,13 +20,13 @@ public class Board extends BaseBoardEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    public User user;
 
     //관계 매핑
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Like> likes = new ArrayList<>();
 
     //연관 관계 메서드

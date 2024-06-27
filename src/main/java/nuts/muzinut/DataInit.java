@@ -4,11 +4,14 @@ import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.member.UserDto;
-import nuts.muzinut.dto.security.AuthorityDto;
+import nuts.muzinut.repository.board.CommentRepository;
+import nuts.muzinut.repository.board.LikeRepository;
+import nuts.muzinut.repository.board.ReplyRepository;
 import nuts.muzinut.repository.board.*;
+import nuts.muzinut.service.DataInitService;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
@@ -20,28 +23,34 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class DataInit {
 
-    private final UserRepository userRepository;
-    private final AuthorityRepository authorityRepository;
-    private final UserService userService;
     private final AdminBoardRepository adminBoardRepository;
-    private final BoardQueryRepository repository;
     private final CommentRepository commentRepository;
     private final LikeRepository likeRepository;
-    private final AdminBoardService adminBoardService;
     private final ReplyRepository replyRepository;
+    private final DataInitService dataInitService;
     private final FreeBoardRepository freeBoardRepository;
-    @PersistenceContext EntityManager em;
+
+    @PersistenceContext
+    EntityManager em;
 
     @PostConstruct
     public void init() {
-        AuthorityDto authorityDto = new AuthorityDto("admin");
-        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
-        userService.adminSignup(userDto);
-        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
-        userService.signup(userDto2);
-
-//        createAdminBoards();
+        dataInitService.initializeData();
     }
+
+//    @PostConstruct
+//    public void init() {
+//        AuthorityDto authorityDto = new AuthorityDto("admin");
+//        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
+//        userService.adminSignup(userDto);
+//        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
+//        userService.signup(userDto2);
+//        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
+//        userService.signup(userDto3);
+//
+//        dataInitService.recruitBoardBoardScenario();
+//        dataInitService.commentScenario();
+//    }
 
 //    @PostConstruct
     public void adminBoardScenario() {
@@ -49,8 +58,8 @@ public class DataInit {
         user1.setNickname("tom");
         User user2 = new User();
         user2.setNickname("nick");
-        userRepository.save(user1);
-        userRepository.save(user2);
+//        userRepository.save(user1);
+//        userRepository.save(user2);
 
         Board adminBoard = new AdminBoard();
 
@@ -138,4 +147,5 @@ public class DataInit {
         em.flush();
         em.clear();
     }
+
 }

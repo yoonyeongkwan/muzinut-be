@@ -16,7 +16,7 @@ public class Comment extends BaseTimeEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
@@ -38,10 +38,18 @@ public class Comment extends BaseTimeEntity {
         this.content = content;
         this.board = board;
         board.getComments().add(this);
+        if (user.getComments() == null){
+            user.setComments(new ArrayList<>());
+        }
         user.getComments().add(this);
     }
 
     //관계 매핑
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL)
     private List<Reply> replies = new ArrayList<>();
+
+    // 댓글 내용 수정 메서드
+    public void modifyContent(String content) {
+        this.content = content;
+    }
 }

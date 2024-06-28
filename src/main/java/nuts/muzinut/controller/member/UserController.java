@@ -1,5 +1,7 @@
 package nuts.muzinut.controller.member;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
@@ -7,7 +9,9 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.JoinDto;
 import nuts.muzinut.dto.member.LoginDto;
+import nuts.muzinut.dto.member.ProfileDto;
 import nuts.muzinut.dto.member.UserDto;
+import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
 import nuts.muzinut.dto.security.TokenDto;
 import nuts.muzinut.exception.EmailVertFailException;
 import nuts.muzinut.exception.NotFoundMemberException;
@@ -15,22 +19,25 @@ import nuts.muzinut.jwt.JwtFilter;
 import nuts.muzinut.jwt.TokenProvider;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.MailSendService;
+import nuts.muzinut.service.member.ProfileService;
 import nuts.muzinut.service.member.UserService;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
@@ -45,8 +52,10 @@ public class UserController {
     private final UserService userService;
     private final FileStore fileStore;
     private final MailSendService mailService;
+    private final ProfileService profileService;
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final ObjectMapper objectMapper;
 
     @GetMapping("/join")
     public String joinForm() {
@@ -124,6 +133,57 @@ public class UserController {
         return new MessageDto("파일 저장 성공");
     }
 
-    //Todo 자기소개 추가
+    //프로필 닉네임, 자기소개 설정
+    @ResponseBody
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PutMapping("/set-profile-nickname-intro")
+    public MessageDto setProfileNicknameIntro(@Validated @RequestBody ProfileUpdateDto profileUpdateDto) {
+        User user = userService.getUserWithUsername()
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
+        userService.updateNicknameAndIntro(user.getId(), profileUpdateDto.getNickname(), profileUpdateDto.getIntro());
+        return new MessageDto("프로필 업데이트가 성공되었습니다. ");
+    }
+
+    // 프로필 배너 이미지 설정
+    @ResponseBody //Todo 리다이렉트 설정 필요
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping(value = "/set-profile-bannerImage")
+    public MessageDto setProfileBannerImage(@RequestParam("profileBannerImg") MultipartFile profileBannerImg) throws IOException {
+        User user = userService.getUserWithUsername()
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
+
+        if (StringUtils.hasText(user.getProfileBannerImgFilename())) {
+            //프로필 배너 바꾸기
+            String changeImgName = fileStore.updateFile(profileBannerImg, user.getProfileBannerImgFilename());
+            userService.setProfileBannerName(changeImgName, user);
+        } else {
+            //프로필 배너 처음 설정
+            Map<FileType, String> filenames = fileStore.storeFile(profileBannerImg);
+            userService.setProfileBannerName(filenames.get(STORE_FILENAME), user);
+        }
+
+        return new MessageDto("파일 저장 성공");
+    }
+
+    // 프로필 페이지 보여주는 메소드
+    @ResponseBody
+    @GetMapping(value = "/profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MultiValueMap<String, Object>> getUserProfile(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+
+        ProfileDto profileDto = profileService.getUserProfile(userId);
+        String jsonString = objectMapper.writeValueAsString(profileDto);
+
+        // JSON 데이터를 Multipart-form 데이터에 추가
+        HttpHeaders jsonHeaders = new HttpHeaders();
+        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> jsonEntity = new HttpEntity<>(jsonString, jsonHeaders);
+        formData.add("json_data", jsonEntity);
+
+        // 프로필 이미지와 배너 이미지를 폼 데이터에 추가
+        fileStore.setProfileAndBannerImage(profileDto.getProfileImgName(), profileDto.getProfileBannerImgName(), formData);
+
+        return new ResponseEntity<>(formData, HttpStatus.OK);
+    }
 }

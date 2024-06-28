@@ -2,20 +2,15 @@ package nuts.muzinut.controller.board;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.dto.MessageDto;
-import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.comment.ReplyDto;
-import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
 import nuts.muzinut.dto.board.recruit.RecruitBoardDto;
 import nuts.muzinut.dto.board.recruit.RecruitBoardForm;
 import nuts.muzinut.dto.board.recruit.SaveRecruitBoardDto;
 import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.RecruitBoardService;
 import org.springframework.data.domain.Page;
@@ -25,11 +20,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j

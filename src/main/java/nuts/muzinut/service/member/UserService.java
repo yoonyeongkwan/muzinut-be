@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.Authority;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.member.ProfileDto;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.exception.NotFoundMemberException;
@@ -14,6 +15,7 @@ import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.security.SecurityRole;
 import nuts.muzinut.service.security.SecurityUtil;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +29,22 @@ public class UserService {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // 프로필 이미지 설정
     public void setProfileName(String filename, User user) {
         userRepository.updateFilename(filename, user);
     }
+
+    // 프로필 닉네임, 자기소개 설정
+    @Transactional
+    public void updateNicknameAndIntro(Long userId, String nickname, String intro) {
+        userRepository.updateNicknameAndIntro(userId, nickname, intro);
+    }
+
+    // 프로필 배너 이미지 설정
+    public void setProfileBannerName(String filename, User user){
+        userRepository.updateProfileBannerImg(filename, user);
+    }
+
 
     /**
      * 일반 회원가입

@@ -20,12 +20,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByNickname(String nickname); //nickname 으로 검색 (아티스트 명을 검색할 때 활용)
 
+    // 프로필 이미지 설정
     @Modifying
     @Query("update User u set u.profileImgFilename = :filename where u = :user")
     void updateFilename(@Param("filename") String filename, @Param("user") User user);
 
-//    @Modifying
-//    @Query("update FreeBoard f set f.filename = :filename, f.title = :title " +
-//            "where f.id = :id")
+    // 프로필 닉네임, 자기소개 설정
+    @Modifying
+    @Query("update User u set u.nickname = :nickname, u.intro = :intro where u.id = :userId")
+    void updateNicknameAndIntro(@Param("userId") Long userId, @Param("nickname") String nickname, @Param("intro") String intro);
 
+    // 프로필 배너 이미지 설정
+    @Modifying
+    @Query("update User u set u.profileBannerImgFilename = :bannerFilename where u = :user")
+    void updateProfileBannerImg(@Param("bannerFilename") String bannerFilename, @Param("user") User user);
 }

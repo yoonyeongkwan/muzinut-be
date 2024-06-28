@@ -34,4 +34,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query("update User u set u.profileBannerImgFilename = :bannerFilename where u = :user")
     void updateProfileBannerImg(@Param("bannerFilename") String bannerFilename, @Param("user") User user);
+
+    // 유저가 작성한 게시글 제목 조회
+    @Query("select b.title from Board b where b.user.id = :userId")
+    List<String> findBoardTitlesByUserId(@Param("userId") Long userId);
 }

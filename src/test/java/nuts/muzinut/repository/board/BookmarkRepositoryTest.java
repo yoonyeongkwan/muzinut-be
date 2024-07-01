@@ -125,4 +125,47 @@ class BookmarkRepositoryTest {
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());
         assertThat(findBookmark.isEmpty()).isTrue();
     }
+
+    @Test
+    void existsByUserAndBoard() {
+
+        //given
+        User user = new User();
+        userRepository.save(user);
+
+        FreeBoard freeBoard = new FreeBoard();
+        freeBoardRepository.save(freeBoard);
+
+        Bookmark bookmark = new Bookmark();
+        bookmark.addBookmark(user, freeBoard);
+        bookmarkRepository.save(bookmark);
+
+        //when
+        boolean isBookmark = bookmarkRepository.existsByUserAndBoard(user, freeBoard);
+
+        //then
+        assertThat(isBookmark).isTrue();
+    }
+
+    @Test
+    void deleteByUserAndBoard() {
+
+        //given
+        User user = new User();
+        userRepository.save(user);
+
+        FreeBoard freeBoard = new FreeBoard();
+        freeBoardRepository.save(freeBoard);
+
+        Bookmark bookmark = new Bookmark();
+        bookmark.addBookmark(user, freeBoard);
+        bookmarkRepository.save(bookmark);
+
+        //when
+        bookmarkRepository.deleteByUserAndBoard(user, freeBoard.getId());
+
+        //then
+        boolean isBookmark = bookmarkRepository.existsByUserAndBoard(user, freeBoard);
+        assertThat(isBookmark).isFalse();
+    }
 }

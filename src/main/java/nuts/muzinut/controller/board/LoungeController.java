@@ -87,14 +87,9 @@ public class LoungeController {
         formData.add("json_data", jsonEntity);
 
         //해당 게시판의 quill 파일 추가
-//        HttpHeaders fileHeaders = new HttpHeaders();
         String quillFilename = detailLoungeDto.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
-//        fileHeaders.setContentType(MediaType.TEXT_HTML); //quill 파일 이므로 html
         formData.add("quillFile", new FileSystemResource(fullPath)); //파일 가져와서 셋팅
-
-        //사용자 프로필 관련
-//        HttpHeaders profileHeaders = new HttpHeaders();
 
         //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
         Set<String> profileImages = loungeService.getProfileImages(detailLoungeDto);

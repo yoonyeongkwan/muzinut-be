@@ -2,6 +2,7 @@ package nuts.muzinut.service.member;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.ProfileDto;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.DuplicateMemberException;
+import nuts.muzinut.exception.InvalidPasswordException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
@@ -45,6 +47,53 @@ public class UserService {
         userRepository.updateProfileBannerImg(filename, user);
     }
 
+
+    /**
+     *
+     * @param user: 비밀번호를 바꾸고 싶어하는 유저
+     * @param currentPassword: 현재 비밀번호
+     * @param newPassword: 바꿀 비밀번호
+     */
+    public void updatePassword(User user, String currentPassword, String newPassword) {
+        if (validatePassword(user, currentPassword)) {
+            log.info("correct password");
+            user.updatePassword(passwordEncoder.encode(newPassword));
+        }
+        throw new InvalidPasswordException("비밀번호가 맞지 않습니다");
+    }
+
+    //비밀번호 바꾸기 (비밀번호 찾기에서 활용)
+    public void updatePassword(User user, String newPassword) {
+        user.updatePassword(passwordEncoder.encode(newPassword));
+    }
+
+
+    //비밀번호 유효성 검사
+    public Boolean validatePassword(User user, String currentPassword) {
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            return false;
+        }
+        return true;
+    }
+
+    //회원인지 검증 (비밀번호 찾기에 사용)
+    public boolean isUser(String username) {
+        Optional<User> findUser = userRepository.findByUsername(username);
+        if (findUser.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
+
+    public User findByEmail(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new NotFoundMemberException("없는 회원입니다"));
+    }
+
+    //랜덤 닉네임을 생성해주는 메서드
+    public String randomNickname() {
+        return UUID.randomUUID().toString();
+    }
 
     /**
      * 일반 회원가입

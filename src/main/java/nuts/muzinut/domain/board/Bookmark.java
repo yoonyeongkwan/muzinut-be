@@ -16,18 +16,15 @@ public class Bookmark {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name = "board_id")
-    private Long boardId;
-
-    @Column(name = "board_type")
-    @Enumerated(EnumType.STRING)
-    private BoardType boardType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
 
     //연관 관계 메서드
-    public void addBookmark(User user, Long boardId, BoardType boardType) {
+    public void addBookmark(User user, Board board) {
         this.user = user;
-        this.boardId = boardId;
-        this.boardType = boardType;
+        this.board = board;
         user.getBookmarks().add(this);
+        board.getBookmarks().add(this);
     }
 }

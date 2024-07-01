@@ -33,7 +33,7 @@ class BookmarkRepositoryTest {
         freeBoardRepository.save(freeBoard);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(user, freeBoard.getId(), BoardType.FREE);
+        bookmark.addBookmark(user, freeBoard);
 
         //when
         bookmarkRepository.save(bookmark);
@@ -42,8 +42,6 @@ class BookmarkRepositoryTest {
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());
         assertThat(findBookmark.get()).isEqualTo(bookmark);
         assertThat(findBookmark.get().getUser()).isEqualTo(user);
-        assertThat(findBookmark.get().getBoardId()).isEqualTo(freeBoard.getId());
-        assertThat(findBookmark.get().getBoardType()).isEqualTo(BoardType.FREE);
     }
 
     @Test
@@ -57,7 +55,7 @@ class BookmarkRepositoryTest {
         recruitBoardRepository.save(recruitBoard);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(user, recruitBoard.getId(), BoardType.RECRUIT);
+        bookmark.addBookmark(user, recruitBoard);
 
         //when
         bookmarkRepository.save(bookmark);
@@ -66,8 +64,6 @@ class BookmarkRepositoryTest {
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());
         assertThat(findBookmark.get()).isEqualTo(bookmark);
         assertThat(findBookmark.get().getUser()).isEqualTo(user);
-        assertThat(findBookmark.get().getBoardId()).isEqualTo(recruitBoard.getId());
-        assertThat(findBookmark.get().getBoardType()).isEqualTo(BoardType.RECRUIT);
     }
 
     @Test
@@ -81,7 +77,7 @@ class BookmarkRepositoryTest {
         loungeRepository.save(lounge);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(user, lounge.getId(), BoardType.LOUNGE);
+        bookmark.addBookmark(user, lounge);
 
         //when
         bookmarkRepository.save(bookmark);
@@ -90,8 +86,6 @@ class BookmarkRepositoryTest {
         Optional<Bookmark> findBookmark = bookmarkRepository.findById(bookmark.getId());
         assertThat(findBookmark.get()).isEqualTo(bookmark);
         assertThat(findBookmark.get().getUser()).isEqualTo(user);
-        assertThat(findBookmark.get().getBoardId()).isEqualTo(lounge.getId());
-        assertThat(findBookmark.get().getBoardType()).isEqualTo(BoardType.LOUNGE);
     }
 
     @Test
@@ -121,7 +115,7 @@ class BookmarkRepositoryTest {
         loungeRepository.save(lounge);
 
         Bookmark bookmark = new Bookmark();
-        bookmark.addBookmark(user, lounge.getId(), BoardType.LOUNGE);
+        bookmark.addBookmark(user, lounge);
         bookmarkRepository.save(bookmark);
 
         //when

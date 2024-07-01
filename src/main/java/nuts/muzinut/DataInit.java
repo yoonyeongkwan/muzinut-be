@@ -104,6 +104,12 @@ public class DataInit {
         replyRepository.save(reply2);
     }
 
+//    @PostConstruct
+    public void commentLike() {
+        Comment comment = new Comment();
+        commentRepository.save(comment);
+    }
+
     private void createAdminBoards() {
         for (int i = 0; i < 20; i++) {
             AdminBoard adminBoard = new AdminBoard();

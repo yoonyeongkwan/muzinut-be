@@ -3,6 +3,7 @@ package nuts.muzinut.dto.board.lounge;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 
 import java.util.ArrayList;
@@ -12,12 +13,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DetailLoungeDto {
+public class DetailLoungeDto extends DetailBaseDto {
 
     private Long id;
     private String writer;
     private String profileImg;
     private int view;
+    private int commentSize;
     private String quillFilename;
 
     private List<CommentDto> comments = new ArrayList<>();

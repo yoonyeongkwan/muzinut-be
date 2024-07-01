@@ -2,15 +2,22 @@ package nuts.muzinut.controller.board;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.domain.board.EventBoard;
 import nuts.muzinut.domain.board.FreeBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
+import nuts.muzinut.dto.board.event.EventBoardForm;
 import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardForm;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
-import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.NoUploadFileException;
+import nuts.muzinut.exception.NotFoundMemberException;
+import nuts.muzinut.repository.board.EventBoardRepository;
+import nuts.muzinut.service.board.EventBoardService;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.FreeBoardService;
 import nuts.muzinut.service.member.UserService;
@@ -20,6 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,44 +36,52 @@ import java.net.URI;
 import java.util.Map;
 import java.util.Set;
 
-import static nuts.muzinut.controller.board.FileType.*;
+import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
 
 @Slf4j
-@Controller
-@RequestMapping("/community/free-boards")
+//@Controller
+@RequestMapping("/event/free-boards")
 @RequiredArgsConstructor
-public class FreeBoardController {
+public class EventBoardController {
 
     private final UserService userService;
     private final FileStore fileStore;
     private final FreeBoardService freeBoardService;
+    private final EventBoardService eventBoardService;
     private final ObjectMapper objectMapper;
 
     /**
-     * 자유 게시판 생성
-     * @param freeBoardForm: react quill file & title
+     * 이벤트 게시판 생성
+     * @param quillFile: 리액트 퀼 파일
+     * @param img: 섬네일 이미지
+     * @param form: 제목
      * @throws NoUploadFileException: 업로드 할 파일이 없는 경우
      * @throws IOException
      */
-    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @PostMapping
     public ResponseEntity<MessageDto> createBoard(
-            @RequestPart MultipartFile quillFile, @RequestPart FreeBoardForm freeBoardForm) throws IOException {
+            @RequestPart MultipartFile quillFile, @RequestPart MultipartFile img,
+            @Validated @RequestPart EventBoardForm form) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
-        FreeBoard freeBoard = new FreeBoard(freeBoardForm.getTitle());
-        freeBoard.addBoard(user);
 
-        Map<FileType, String> filename = fileStore.storeFile(quillFile);//자유 게시판 파일 저장
-        freeBoard.setFilename(filename.get(STORE_FILENAME)); //저장 파일 이름 설정
-        freeBoardService.save(freeBoard); //자유 게시판 저장
+        EventBoard eventBoard = new EventBoard(form.getTitle());
+        eventBoard.addBoard(user);
+
+        Map<FileType, String> filename = fileStore.storeFile(quillFile); //이벤트 게시판 퀼 파일 저장
+        eventBoard.setFilename(filename.get(STORE_FILENAME)); //저장 파일 이름 설정
+        Map<FileType, String> imgFilename = fileStore.storeFile(img); //이벤트 게시판 썸네일 이미지 파일 저장
+        eventBoard.setImg(imgFilename.get(STORE_FILENAME)); //저장 파일 이름 설정
+
+        eventBoardService.save(eventBoard); //이벤트 게시판 저장
 
         HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/community/free-boards/" + freeBoard.getId())); //수정한 게시판으로 리다이렉트
+        header.setLocation(URI.create("/community/event-boards/" + eventBoard.getId())); //생성한 게시판으로 리다이렉트
 
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .headers(header)
-                .body(new MessageDto("자유 게시판이 생성되었습니다"));
+                .body(new MessageDto("이벤트 게시판이 생성되었습니다"));
     }
 
     //특정 게시판 조회

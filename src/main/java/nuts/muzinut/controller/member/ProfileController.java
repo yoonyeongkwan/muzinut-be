@@ -6,17 +6,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.ProfileDto;
-import nuts.muzinut.exception.NotFoundEntityException;
-import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.FileStore;
+import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.member.ProfileService;
-import nuts.muzinut.service.member.UserService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 
@@ -29,6 +26,7 @@ public class ProfileController {
     private final ProfileService profileService;
     private final FileStore fileStore;
     private final ObjectMapper objectMapper;
+    private final FollowService followService;
 
     // 프로필 페이지 보여주는 메소드
     @ResponseBody
@@ -49,6 +47,8 @@ public class ProfileController {
         log.debug("Setting profile image: " + profileDto.getProfileImgName());
         log.debug("Setting banner image: " + profileDto.getProfileBannerImgName());
         fileStore.setProfileAndBannerImage(profileDto.getProfileImgName(), profileDto.getProfileBannerImgName(), formData);
+
+
 
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }

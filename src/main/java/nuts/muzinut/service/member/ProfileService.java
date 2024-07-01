@@ -45,6 +45,23 @@ public class ProfileService {
         Long followingCount = followService.countFollowing(user);
         Long followersCount = followService.countFollowers(userId);
 
+        // 현재 로그인한 사용자 확인
+        String currentUsername = getCurrentUsername();
+        log.info("currentUsername = {}", currentUsername);
+        User currentUser = null;
+        if (currentUsername.equals("anonymousUser")){
+            currentUser = null;
+        }else {
+            currentUser = findUserByUsername(currentUsername);
+        }
+
+        // 팔로잉 여부
+        boolean isFollowing = false;
+        if (currentUser != null) {
+            isFollowing = followService.isFollowing(currentUser, userId);
+            log.info("isFollowing = {}", isFollowing);
+        }
+
         if ( user.getProfileBannerImgFilename() == null) {
             user.setProfileBannerImgFilename("bannerBase.png");
         }
@@ -58,7 +75,8 @@ public class ProfileService {
                 user.getNickname(),
                 user.getIntro(),
                 followingCount,
-                followersCount
+                followersCount,
+                isFollowing
         );
 
         return profileDto;

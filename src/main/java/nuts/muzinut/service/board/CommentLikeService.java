@@ -34,7 +34,7 @@ public class CommentLikeService {
         } else {
             // 좋아요가 이미 눌려 있으면 좋아요 삭제
             likeRepository.deleteByUserAndBoard(user, commentId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(new MessageDto("댓글 좋아요가 취소되었습니다."));
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageDto("댓글 좋아요가 취소되었습니다."));
         }
     }
 }

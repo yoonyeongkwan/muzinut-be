@@ -43,7 +43,7 @@ public class AdminBoardQueryRepository {
                 .leftJoin(adminBoard).on(board.id.eq(adminBoard.id))
                 .leftJoin(adminBoard.adminUploadFiles, adminUploadFile)
 //                .leftJoin(adminUploadFile).on(adminUploadFile.adminBoard.eq(adminBoard))
-                .leftJoin(board.user, user) //추가
+                .leftJoin(board.user, user).fetchJoin() //추가
                 .leftJoin(board.comments, comment).fetchJoin()
                 .leftJoin(comment.replies, reply) //주석해제시 정상 작동
                 .where(board.id.eq(boardId))

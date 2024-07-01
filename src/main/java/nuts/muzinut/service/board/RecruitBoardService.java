@@ -4,7 +4,10 @@ package nuts.muzinut.service.board;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.domain.board.Board;
+import nuts.muzinut.domain.board.Comment;
 import nuts.muzinut.domain.board.RecruitBoard;
+import nuts.muzinut.domain.board.Reply;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
@@ -15,6 +18,7 @@ import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
 import nuts.muzinut.repository.board.RecruitBoardRepository;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
+import nuts.muzinut.repository.board.query.RecruitBoardQueryRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,8 +42,9 @@ public class RecruitBoardService {
     private final RecruitBoardRepository recruitBoardRepository;
     private final RecruitBoardGenreRepository recruitBoardGenreRepository;
     private final UserRepository userRepository;
-    private final BoardQueryRepository boardQueryRepository;
+//    private final BoardQueryRepository boardQueryRepository;
     private final LikeRepository likeRepository;
+    private final RecruitBoardQueryRepository boardQueryRepository;
 
     // 모집 게시판 생성 요청을 처리하는 메소드
     @Transactional
@@ -87,7 +92,7 @@ public class RecruitBoardService {
         String author = recruitBoard.getUser().getNickname();
 
         // 댓글과 대댓글 가져오기
-        List<Tuple> result = boardQueryRepository.getDetailBoard(id);
+        List<Tuple> result = boardQueryRepository.getDetailRecruitBoard(id);
 
         List<CommentDto> commentDtoList = new ArrayList<>();
         Set<CommentDto> commentDtoSet = new HashSet<>();
@@ -95,43 +100,39 @@ public class RecruitBoardService {
 
         if (!result.isEmpty()) {
             for (Tuple t : result) {
-                ReplyDto findReply = t.get(2, ReplyDto.class);
-                CommentDto findComment = t.get(1, CommentDto.class);
+                Board board = t.get(0, Board.class);
+                RecruitBoard recruitBoardResult = t.get(1, RecruitBoard.class);
+                Long likeCount = t.get(2, Long.class);
 
-                if (findComment.getId() != null) {
-                    // 댓글 작성자의 프로필 이미지 파일명 설정
-                    User commentUser = userRepository.findByNickname(findComment.getCommentWriter()).orElseThrow(() -> new RuntimeException("User not found"));
-                    String commentProfileImgFilename = commentUser.getProfileImgFilename();
-                    if (commentProfileImgFilename == null || commentProfileImgFilename.isEmpty()) {
-                        commentProfileImgFilename = "base.png";
+                // 댓글과 대댓글은 추출할 수 없으므로 따로 로직을 추가해야 함
+                List<Comment> comments = recruitBoardResult.getComments();
+                for (Comment comment : comments) {
+                    CommentDto commentDto = new CommentDto(
+                            comment.getId(),
+                            comment.getContent(),
+                            comment.getUser().getNickname(),
+                            comment.getCreatedDt(),
+                            comment.getUser().getProfileImgFilename() != null ? comment.getUser().getProfileImgFilename() : "base.png"
+                    );
+
+                    List<ReplyDto> replies = new ArrayList<>();
+                    for (Reply reply : comment.getReplies()) {
+                        ReplyDto replyDto = new ReplyDto(
+                                reply.getId(),
+                                reply.getContent(),
+                                reply.getUser().getNickname(),
+                                reply.getCreatedDt(),
+                                reply.getUser().getProfileImgFilename() != null ? reply.getUser().getProfileImgFilename() : "base.png"
+                        );
+                        replies.add(replyDto);
                     }
-                    findComment.setProfileImgFilename(commentProfileImgFilename);
 
-                    commentDtoSet.add(findComment);
-                }
-
-                if (findReply.getId() != null) {
-                    // 대댓글 작성자의 프로필 이미지 파일명 설정
-                    User replyUser = userRepository.findByNickname(findReply.getReplyWriter()).orElseThrow(() -> new RuntimeException("User not found"));
-                    String replyProfileImgFilename = replyUser.getProfileImgFilename();
-                    if (replyProfileImgFilename == null || replyProfileImgFilename.isEmpty()) {
-                        replyProfileImgFilename = "base.png";
-                    }
-                    findReply.setProfileImgFilename(replyProfileImgFilename);
-
-                    replyDtoSet.add(findReply);
-                }
-            }
-
-            List<CommentDto> comments = new ArrayList<>(commentDtoSet);
-            for (ReplyDto replyDto : replyDtoSet) {
-                for (CommentDto comment : comments) {
-                    if (comment.getId().equals(replyDto.getCommentId())) {
-                        comment.getReplies().add(replyDto);
-                    }
+                    commentDto.setReplies(replies);
+                    commentDtoSet.add(commentDto);
                 }
             }
-            commentDtoList = comments;
+
+            commentDtoList = new ArrayList<>(commentDtoSet);
         }
 
         DetailRecruitBoardDto detailRecruitBoardDto = new DetailRecruitBoardDto(
@@ -152,6 +153,7 @@ public class RecruitBoardService {
 
         return detailRecruitBoardDto;
     }
+
 
 
     // 모든 모집 게시판을 최신 순으로 조회하는 메소드 (페이징 처리)

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -100,7 +102,7 @@ public class FreeBoardService {
 
         DetailFreeBoardDto detailFreeBoardDto =
                 new DetailFreeBoardDto(findFreeBoard.getId() ,findFreeBoard.getTitle(),
-                        findFreeBoard.getUser().getNickname(), view, findFreeBoard.getFilename());
+                        findFreeBoard.getUser().getNickname(), view, findFreeBoard.getFilename(), findFreeBoard.getUser().getProfileImgFilename());
         Long likeCount = first.get(2, Long.class);
         detailFreeBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
 
@@ -125,4 +127,26 @@ public class FreeBoardService {
         FreeBoard findFreeBoard = freeBoard.orElseThrow(() -> new BoardNotFoundException("게시판이 존재하지 않습니다."));
         return findFreeBoard.getUser() == user;
     }
+
+    public Set<String> getProfileImages(DetailFreeBoardDto detailFreeBoardDto) {
+
+        Set<String> profileImages = new HashSet<>();
+        addWriterProfile(profileImages, detailFreeBoardDto.getProfileImg()); //게시판 작성자의 프로필 추가
+
+        for (CommentDto c : detailFreeBoardDto.getComments()) {
+            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
+
+            for (ReplyDto r : c.getReplies()) {
+                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
+            }
+        }
+        return profileImages;
+    }
+
+    private void addWriterProfile(Set<String> profileImages, String profileImg) {
+        if (StringUtils.hasText(profileImg)) {
+            profileImages.add(profileImg);
+        }
+    }
+
 }

@@ -5,6 +5,7 @@ import nuts.muzinut.domain.member.Authority;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.DuplicateMemberException;
+import nuts.muzinut.exception.InvalidPasswordException;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.member.UserService;
 import org.junit.jupiter.api.Test;
@@ -56,5 +57,42 @@ class UserServiceTest {
         //then (동일한 username 으로 로그인 시 예외 발생)
         assertThatThrownBy(() -> userService.signup(userDto))
                 .isInstanceOf(DuplicateMemberException.class);
+    }
+
+    @Test
+    void changePassword() {
+
+        //given
+        UserDto userDto = new UserDto("admin", "admin", "add");
+        userService.signup(userDto);
+        User findUser = userRepository.findAll().getFirst();
+
+        //when
+        userService.updatePassword(findUser, "admin", "admin!");
+
+        //then
+
+    }
+
+    @Test
+    void changePasswordWithWrongCurrentPassword() {
+
+        //given
+        UserDto userDto = new UserDto("admin", "admin", "add");
+        userService.signup(userDto);
+
+        //when
+        User findUser = userRepository.findAll().getFirst();
+
+        //then
+        assertThatThrownBy(() ->
+                userService.updatePassword(findUser, "admin~", "admin!"))
+                .isInstanceOf(InvalidPasswordException.class);
+    }
+
+    @Test
+    void randomNickname() {
+        String r = userService.randomNickname().substring(0, 10);
+        log.info("랜덤 닉네임: {}", r);
     }
 }

@@ -123,6 +123,7 @@ public class LoungeService {
             comments.add(commentDto);
         }
         detailLoungeDto.setComments(comments);
+        detailLoungeDto.setCommentSize(comments.size());
 
         return detailLoungeDto;
     }
@@ -145,7 +146,6 @@ public class LoungeService {
                 addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
             }
         }
-        log.info("profileImage's size {}", profileImages.size());
         return profileImages;
     }
 

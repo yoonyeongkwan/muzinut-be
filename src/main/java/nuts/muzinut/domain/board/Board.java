@@ -29,6 +29,9 @@ public class Board extends BaseBoardEntity {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Like> likes = new ArrayList<>();
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
+    private List<Bookmark> bookmarks = new ArrayList<>();
+
     //연관 관계 메서드
     public void addBoard(User user) {
         this.user = user;

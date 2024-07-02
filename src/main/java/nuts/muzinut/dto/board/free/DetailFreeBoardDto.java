@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.admin.AdminFilename;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,13 +17,14 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DetailFreeBoardDto {
+public class DetailFreeBoardDto extends DetailBaseDto {
 
     private Long id;
     private String title;
     private String writer = "muzi";
     private int view;
     private String quillFilename;
+    private String profileImg;
 
     private List<CommentDto> comments = new ArrayList<>();
     private Long likeCount;
@@ -33,13 +35,12 @@ public class DetailFreeBoardDto {
         this.view = view;
     }
 
-    public DetailFreeBoardDto(Long id ,String title, String writer, int view, String quillFilename) {
+    public DetailFreeBoardDto(Long id ,String title, String writer, int view, String quillFilename, String profileImg) {
         this.id = id;
         this.title = title;
         this.writer = writer;
         this.view = view;
         this.quillFilename = quillFilename;
+        this.profileImg = profileImg;
     }
-
-
 }

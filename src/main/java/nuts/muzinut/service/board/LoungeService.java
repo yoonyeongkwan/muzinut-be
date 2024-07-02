@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
@@ -24,10 +25,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static nuts.muzinut.domain.board.QBoard.board;
 import static nuts.muzinut.domain.board.QFreeBoard.freeBoard;
@@ -37,12 +37,10 @@ import static nuts.muzinut.domain.board.QLounge.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class LoungeService {
+public class LoungeService extends DetailCommon{
 
-//    private final FreeBoardRepository freeBoardRepository;
     private final LoungeRepository loungeRepository;
     private final BoardRepository boardRepository;
-//    private final FreeBoardQueryRepository queryRepository;
     private final LoungeQueryRepository queryRepository;
 
     public Lounge save(Lounge lounge) {
@@ -89,8 +87,8 @@ public class LoungeService {
      * 특정 라운지 게시판 조회
      * tuple (board, lounge, like.count)
      */
-    public DetailLoungeDto detailLounge(Long boardId) {
-        List<Tuple> result = queryRepository.getDetailLounge(boardId);
+    public DetailLoungeDto detailLounge(Long boardId, User user) {
+        List<Tuple> result = queryRepository.getDetailLounge(boardId, user);
 
         log.info("tuple: {}", result);
         if (result.isEmpty()) {
@@ -107,23 +105,16 @@ public class LoungeService {
         }
 
         DetailLoungeDto detailLoungeDto = new DetailLoungeDto(findLounge.getId(), findLounge.getUser().getNickname(),
-                view ,findLounge.getFilename());
+                view ,findLounge.getFilename(), findLounge.getUser().getProfileImgFilename());
 
         Long likeCount = first.get(2, Long.class);
+        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
         detailLoungeDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        detailLoungeDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
+        detailLoungeDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 
-        //댓글 및 대댓글 dto 에 셋팅
-        List<CommentDto> comments = new ArrayList<>();
-        for (Comment c : findBoard.getComments()) {
-            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt());
-            List<ReplyDto> replies = new ArrayList<>();
-            for (Reply r : c.getReplies()) {
-                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt()));
-            }
-            commentDto.setReplies(replies);
-            comments.add(commentDto);
-        }
-        detailLoungeDto.setComments(comments);
+        //게시판 댓글 & 대댓글 셋팅
+        detailLoungeDto.setComments(setCommentsAndReplies(user, findBoard));
 
         return detailLoungeDto;
     }

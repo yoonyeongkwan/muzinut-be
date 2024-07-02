@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
+import java.util.Set;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
@@ -72,7 +73,15 @@ public class FreeBoardController {
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id);
+
+        //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
+        User findUser = userService.getUserWithUsername().orElse(null);
+        DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id, findUser);
+
+        if (detailFreeBoardDto == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+
         String jsonString = objectMapper.writeValueAsString(detailFreeBoardDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가
@@ -82,11 +91,14 @@ public class FreeBoardController {
         formData.add("json_data", jsonEntity);
 
         //해당 게시판의 quill 파일 추가
-        HttpHeaders fileHeaders = new HttpHeaders();
         String quillFilename = detailFreeBoardDto.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
-        fileHeaders.setContentType(MediaType.TEXT_HTML);
         formData.add("quillFile", new FileSystemResource(fullPath));
+
+        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
+        Set<String> profileImages = freeBoardService.getProfileImages(detailFreeBoardDto.getProfileImg(),
+                detailFreeBoardDto.getComments());
+        fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }
@@ -117,7 +129,6 @@ public class FreeBoardController {
             FreeBoard freeBoard = freeBoardService.getFreeBoard(id);
             //자유 게시판 파일 저장 및 기존 퀼 파일 삭제
             String changeFilename = fileStore.updateFile(quillFile, freeBoard.getFilename());
-            log.info("change title: {}", freeBoardForm.getTitle());
             freeBoardService.updateFreeBoard(freeBoard.getId(), freeBoardForm.getTitle(), changeFilename); //자유 게시판 저장
             HttpHeaders header = new HttpHeaders();
             header.setLocation(URI.create("/community/free-boards/" + freeBoard.getId())); //수정한 게시판으로 리다이렉트

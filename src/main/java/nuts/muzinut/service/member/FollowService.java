@@ -86,7 +86,10 @@ public class FollowService {
         validateUser(user);
         List<Follow> followings = followRepository.findByUser(user);
         return followings.stream()
-                .map(follow -> new FollowListDto(follow.getFollowingMemberId()))
+                .map(follow -> {
+                    User followingUser = userService.findUserById(follow.getFollowingMemberId());
+                    return new FollowListDto(followingUser);
+                })
                 .collect(Collectors.toList());
     }
 

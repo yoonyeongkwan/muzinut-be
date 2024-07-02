@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.AdminUploadFile;
 import nuts.muzinut.domain.board.Comment;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 
 import java.util.ArrayList;
@@ -15,30 +16,33 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DetailAdminBoardDto {
+public class DetailAdminBoardDto extends DetailBaseDto {
 
-    private List<CommentDto> comments = new ArrayList<>();
     private Long likeCount;
-
     private String title;
     private String writer = "muzi";
     private String quillFilename;
+    private String profileImg; //저장된 게시판 작성자의 프로필 이미지 경로
     private int view;
+
+    private List<CommentDto> comments = new ArrayList<>();
     private List<AdminFilename> adminFilenames = new ArrayList<>();
 
-    public DetailAdminBoardDto(String title, int view, List<AdminUploadFile> files, String quillFilename) {
+    public DetailAdminBoardDto(String title, int view, List<AdminUploadFile> files, String quillFilename, String profileImg) {
         this.title = title;
         this.view = view;
         this.quillFilename = quillFilename;
+        this.profileImg = profileImg;
         for (AdminUploadFile file : files) {
             this.adminFilenames.add(new AdminFilename(file.getStoreFilename(), file.getOriginFilename(), file.getId()));
         }
     }
 
-    public DetailAdminBoardDto(String title, int view, String quillFilename) {
+    public DetailAdminBoardDto(String title, int view, String quillFilename, String profileImg) {
         this.title = title;
         this.view = view;
         this.quillFilename = quillFilename;
+        this.profileImg = profileImg;
     }
 
 

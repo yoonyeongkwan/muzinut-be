@@ -12,6 +12,7 @@ import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.FileStore;
@@ -28,7 +29,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
@@ -58,7 +62,7 @@ public class LoungeController {
         Lounge lounge = new Lounge();
         lounge.addBoard(user);
 
-        Map<FileType, String> filenames = fileStore.storeFile(quillFile);//라운지 게시판 파일 저장
+        Map<FileType, String> filenames = fileStore.storeFile(quillFile); //라운지 게시판 파일 저장
         lounge.setFilename(filenames.get(STORE_FILENAME)); //라운지 파일명 설정
         loungeService.save(lounge); //라운지 게시판 저장
         HttpHeaders header = new HttpHeaders();
@@ -70,11 +74,18 @@ public class LoungeController {
     }
 
     //특정 게시판 조회
-    @GetMapping(value = "/{id}",produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id);
+        User findUser = userService.getUserWithUsername().orElse(null);
+        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id, findUser);
+
+        if (detailLoungeDto == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+
+
         String jsonString = objectMapper.writeValueAsString(detailLoungeDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가
@@ -84,11 +95,14 @@ public class LoungeController {
         formData.add("json_data", jsonEntity);
 
         //해당 게시판의 quill 파일 추가
-        HttpHeaders fileHeaders = new HttpHeaders();
         String quillFilename = detailLoungeDto.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
-        fileHeaders.setContentType(MediaType.TEXT_HTML); //quill 파일 이므로 html
         formData.add("quillFile", new FileSystemResource(fullPath)); //파일 가져와서 셋팅
+
+        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
+        Set<String> profileImages = loungeService.getProfileImages(detailLoungeDto.getProfileImg(),
+                detailLoungeDto.getComments());
+        fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }

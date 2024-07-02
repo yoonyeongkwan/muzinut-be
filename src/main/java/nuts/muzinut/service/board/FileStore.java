@@ -9,8 +9,11 @@ import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.FreeBoardRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -162,6 +165,7 @@ public class FileStore {
         }
     }
 
+
     //파일을 삭제하는 메서드 (퀼 파일, 프로필 이미지 삭제할 때 사용)
     public void deleteFile(String filename) {
             File file = new File(fileDir + filename);
@@ -176,10 +180,29 @@ public class FileStore {
     }
 
     //확장자 명을 추출하는 메서드 ex) a.txt -> txt 추출
-    private String extractExt(String originalFilename) {
+    public String extractExt(String originalFilename) {
         int pos = originalFilename.lastIndexOf(".");
         return originalFilename.substring(pos + 1);
     }
 
+    //프로필 이미지를 폼 데이터에 넣어주는 메서드
+    public void setImageHeaderWithData(Set<String> profileImages, MultiValueMap<String, Object> formData) {
 
+        List<String> imagesFullPath = profileImages.stream()
+                .map(this::getFullPath)
+                .toList();
+
+        imagesFullPath.forEach(i -> formData.add("profileImg", new FileSystemResource(i)));
+    }
+
+    // 프로필 이미지와 배너 이미지를 폼 데이터에 넣어주는 메서드
+    public void setProfileAndBannerImage(String profileImage, String bannerImage, MultiValueMap<String, Object> formData) {
+        List<String> imagePaths = List.of(profileImage, bannerImage)
+                .stream()
+                .map(this::getFullPath)
+                .toList();
+
+        formData.add("profileImage", new FileSystemResource(imagePaths.get(0)));
+        formData.add("bannerImage", new FileSystemResource(imagePaths.get(1)));
+    }
 }

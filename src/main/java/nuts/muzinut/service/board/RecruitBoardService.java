@@ -3,16 +3,20 @@ package nuts.muzinut.service.board;
 
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
-import nuts.muzinut.domain.board.RecruitBoard;
+import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.recruit.*;
+import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
 import nuts.muzinut.repository.board.RecruitBoardRepository;
 import nuts.muzinut.repository.board.query.BoardQueryRepository;
+import nuts.muzinut.repository.board.query.RecruitBoardQueryRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,22 +27,24 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import static nuts.muzinut.domain.board.QAdminBoard.adminBoard;
+import static nuts.muzinut.domain.board.QBoard.board;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RecruitBoardService {
+public class RecruitBoardService extends DetailCommon{
 
     private final RecruitBoardRepository recruitBoardRepository;
     private final RecruitBoardGenreRepository recruitBoardGenreRepository;
     private final UserRepository userRepository;
-    private final BoardQueryRepository boardQueryRepository;
     private final LikeRepository likeRepository;
+    private final RecruitBoardQueryRepository boardQueryRepository;
 
     // 모집 게시판 생성 요청을 처리하는 메소드
     @Transactional
@@ -78,44 +84,24 @@ public class RecruitBoardService {
 
     // 특정 모집 게시판을 조회하는 서비스 메소드
     @Transactional
-    public DetailRecruitBoardDto getDetailBoard(Long id) {
+    public DetailRecruitBoardDto getDetailBoard(Long id, User user) {
         RecruitBoard recruitBoard = checkEntityExists(id);
         recruitBoard.incrementView();
 
-        // 작성자 정보 가져오기
-        String author = recruitBoard.getUser().getNickname();
+        List<Tuple> result = boardQueryRepository.getDetailRecruitBoard(id, user);
 
-        // 댓글과 대댓글 가져오기
-        List<Tuple> result = boardQueryRepository.getDetailBoard(id);
-
-        List<CommentDto> commentDtoList = new ArrayList<>();
-        Set<CommentDto> commentDtoSet = new HashSet<>();
-        Set<ReplyDto> replyDtoSet = new HashSet<>();
-
-        if (!result.isEmpty()) {
-            for (Tuple t : result) {
-                ReplyDto findReply = t.get(2, ReplyDto.class);
-                CommentDto findComment = t.get(1, CommentDto.class);
-
-                if (findComment.getId() != null) {
-                    commentDtoSet.add(findComment);
-                }
-
-                if (findReply.getId() != null) {
-                    replyDtoSet.add(findReply);
-                }
-            }
-
-            List<CommentDto> comments = new ArrayList<>(commentDtoSet);
-            for (ReplyDto replyDto : replyDtoSet) {
-                for (CommentDto comment : comments) {
-                    if (comment.getId().equals(replyDto.getCommentId())) {
-                        comment.getReplies().add(replyDto);
-                    }
-                }
-            }
-            commentDtoList = comments;
+        if (result.isEmpty()) {
+            return null;
         }
+
+        Tuple first = result.getFirst();
+        Board findBoard = first.get(board);
+        AdminBoard findAdminBoard = first.get(adminBoard);
+
+        if (findBoard == null) {
+            return null;
+        }
+
 
         DetailRecruitBoardDto detailRecruitBoardDto = new DetailRecruitBoardDto(
                 recruitBoard.getTitle(),
@@ -127,14 +113,18 @@ public class RecruitBoardService {
                 recruitBoard.getStartWorkDuration(),
                 recruitBoard.getEndWorkDuration(),
                 recruitBoard.getGenres(),
-                author,
-                commentDtoList,
-                likeRepository.countByBoard(recruitBoard)   // 좋아요 수 추가
+                user.getNickname(),
+                recruitBoard.getUser().getProfileImgFilename() // 프로필 이미지 파일명 추가
         );
+
+        Long likeCount = first.get(2, Long.class);
+        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
+        detailRecruitBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        detailRecruitBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
+        detailRecruitBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 
         return detailRecruitBoardDto;
     }
-
 
     // 모든 모집 게시판을 최신 순으로 조회하는 메소드 (페이징 처리)
     public RecruitBoardDto findAllRecruitBoards(int startPage) {
@@ -233,7 +223,7 @@ public class RecruitBoardService {
         RecruitBoardDto boardDto = new RecruitBoardDto();
         for (RecruitBoard recruitBoard : recruitBoards) {
             boardDto.getRecruitBoardsForms().add(new RecruitBoardsForm(
-                    recruitBoard.getId(), recruitBoard.getTitle(), recruitBoard.getUser().getId(), recruitBoard.getView(), recruitBoard.getCreatedDt(), recruitBoard.getLikes()
+                    recruitBoard.getId(), recruitBoard.getTitle(), recruitBoard.getUser().getNickname(), recruitBoard.getView(), recruitBoard.getCreatedDt(), recruitBoard.getLikes().stream().count()
             ));
         }
         return boardDto;
@@ -264,6 +254,29 @@ public class RecruitBoardService {
     private void checkUserAuthorization(RecruitBoard recruitBoard, String username) throws AccessDeniedException {
         if (!recruitBoard.getUser().getUsername().equals(username)) {
             throw new AccessDeniedException("해당 게시판에 대한 권한이 없습니다");
+        }
+    }
+
+
+    public Set<String> getProfileImages(DetailRecruitBoardDto detailRecruitBoardDto) {
+
+        Set<String> profileImages = new HashSet<>();
+        addWriterProfile(profileImages, detailRecruitBoardDto.getProfileImgFilename()); //게시판 작성자의 프로필 추가
+
+        for (CommentDto c : detailRecruitBoardDto.getComments()) {
+            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
+
+            for (ReplyDto r : c.getReplies()) {
+                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
+            }
+        }
+        log.info("profileImage's size {}", profileImages.size());
+        return profileImages;
+    }
+
+    private void addWriterProfile(Set<String> profileImages, String profileImg) {
+        if (StringUtils.hasText(profileImg)) {
+            profileImages.add(profileImg);
         }
     }
 }

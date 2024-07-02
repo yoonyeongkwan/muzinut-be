@@ -29,7 +29,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ResponseStatus(FORBIDDEN)
-    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class })
+    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class, InvalidPasswordException.class })
     @ResponseBody
     private ErrorDto forbidden(RuntimeException ex, WebRequest request) {
         return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
@@ -48,5 +48,13 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler({BoardNotExistException.class})
     private ErrorResult NO_CONTENT(BoardNotExistException ex) {
         return new ErrorResult(NO_CONTENT.value(), "no content!");
+    }
+
+    // 새로운 예외 핸들러 추가
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(value = { IllegalArgumentException.class })
+    @ResponseBody
+    private ErrorDto handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 }

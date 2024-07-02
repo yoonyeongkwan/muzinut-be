@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.ProfileDto;
+import nuts.muzinut.dto.music.AlbumDto;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.member.ProfileService;
@@ -56,16 +57,14 @@ public class ProfileController {
     // 탭 내용 가져오는 메소드
     @GetMapping("/{tab}")
     public ResponseEntity<?> getProfileTabContent(@PathVariable String tab, @RequestParam("userId") Long userId) throws JsonProcessingException {
-        // 현재 로그인한 사용자 정보 가져오기
-        String currentUsername = profileService.getCurrentUsername();
-        User currentUser = profileService.findUserByUsername(currentUsername);
+
 
         // 각 탭에 대한 내용 처리
         switch (tab) {
             case "album":
-//                // 앨범 데이터 가져오기
-//                List<AlbumDto> albums = profileService.getUserAlbums(userId);
-//                return new ResponseEntity<>(albums, HttpStatus.OK);
+                // 앨범 데이터 가져오기
+                List<AlbumDto> albums = profileService.getUserAlbums(userId);
+                return new ResponseEntity<>(albums, HttpStatus.OK);
 
             case "lounge":
 //                // 라운지 데이터 가져오기
@@ -73,6 +72,9 @@ public class ProfileController {
 //                return new ResponseEntity<>(lounges, HttpStatus.OK);
 
             case "community":
+                // 현재 로그인한 사용자 정보 가져오기
+                String currentUsername = profileService.getCurrentUsername();
+                User currentUser = profileService.findUserByUsername(currentUsername);
                 // 로그인한 사용자와 프로필 사용자가 동일한지 확인
                 if (!currentUser.getId().equals(userId)) {
                     return new ResponseEntity<>("본인의 프로필만 접근 가능", HttpStatus.FORBIDDEN);

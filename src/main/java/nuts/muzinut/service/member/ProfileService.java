@@ -6,10 +6,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.domain.music.Album;
+import nuts.muzinut.domain.music.Genre;
+import nuts.muzinut.domain.music.Song;
+import nuts.muzinut.domain.music.SongGenre;
 import nuts.muzinut.dto.member.ProfileDto;
+import nuts.muzinut.dto.music.AlbumDto;
+import nuts.muzinut.dto.music.SongDto;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.UserRepository;
+import nuts.muzinut.repository.music.AlbumRepository;
 import nuts.muzinut.service.board.*;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -27,7 +34,9 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,6 +45,7 @@ public class ProfileService {
 
     private final UserRepository userRepository;
     private final FollowService followService;
+    private final AlbumRepository albumRepository;
 
     // 프로필 페이지 보여주는 메소드
     public ProfileDto getUserProfile(Long userId) {
@@ -109,4 +119,41 @@ public class ProfileService {
         return userRepository.findOneWithAuthoritiesByUsername(username)
                 .orElseThrow(() -> new NotFoundMemberException("접근 권한이 없습니다."));
     }
+
+    // 사용자가 업로드한 앨범 가져오는 메소드
+    public List<AlbumDto> getUserAlbums(Long userId) {
+        List<Album> albums = albumRepository.findByUserId(userId);
+        return albums.stream()
+                .map(this::convertToAlbumDto)
+                .collect(Collectors.toList());
+    }
+
+    // 변환 메소드 추가
+    private SongDto convertToSongDto(Song song) {
+        List<String> genres = song.getSongGenres().stream()
+                .map(songGenre -> songGenre.getGenre().name())
+                .collect(Collectors.toList());
+
+        return new SongDto(
+                song.getTitle(),
+                song.getLyricist(),
+                song.getComposer(),
+                genres,
+                song.getLyrics(),
+                song.getFileName()
+        );
+    }
+
+    private AlbumDto convertToAlbumDto(Album album) {
+        List<SongDto> songDtos = album.getSongList().stream()
+                .map(this::convertToSongDto)
+                .collect(Collectors.toList());
+
+        return new AlbumDto(
+                album.getName(),
+                album.getIntro(),
+                songDtos
+        );
+    }
+
 }

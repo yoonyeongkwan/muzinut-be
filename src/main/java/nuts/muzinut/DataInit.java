@@ -38,7 +38,7 @@ public class DataInit {
 
     @PostConstruct
     public void init() {
-//        dataInitService.initializeData();
+        dataInitService.initializeData();
     }
 
 //    @PostConstruct
@@ -80,7 +80,7 @@ public class DataInit {
         createAdminBoards();
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void FreeBoardScenario() {
         User user1 = new User();
         user1.setNickname("tom");
@@ -104,7 +104,7 @@ public class DataInit {
         replyRepository.save(reply2);
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void commentLike() {
         Comment comment = new Comment();
         commentRepository.save(comment);

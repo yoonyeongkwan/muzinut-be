@@ -1,6 +1,9 @@
 HELP.md
 .gradle
+
 application.yml
+DataInit.class
+test/
 
 build/
 !gradle/wrapper/gradle-wrapper.jar

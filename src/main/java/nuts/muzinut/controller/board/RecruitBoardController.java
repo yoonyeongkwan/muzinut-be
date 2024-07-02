@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.RecruitBoard;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
 import nuts.muzinut.dto.board.recruit.RecruitBoardDto;
@@ -13,6 +14,7 @@ import nuts.muzinut.dto.board.recruit.SaveRecruitBoardDto;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.RecruitBoardService;
+import nuts.muzinut.service.member.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,6 +36,7 @@ public class RecruitBoardController {
     private final RecruitBoardService recruitBoardService;
     private final FileStore fileStore;
     private final ObjectMapper objectMapper;
+    private final UserService userService;
 
     // 모집 게시판 생성 폼을 보여주는 메소드
     @GetMapping("/recruit-boards/new")
@@ -59,7 +62,10 @@ public class RecruitBoardController {
     public ResponseEntity<MultiValueMap<String, Object>> getRecruitBoard(@PathVariable("id") Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        DetailRecruitBoardDto detailRecruitBoardDto = recruitBoardService.getDetailBoard(id);
+        //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
+        User findUser = userService.getUserWithUsername().orElse(null);
+
+        DetailRecruitBoardDto detailRecruitBoardDto = recruitBoardService.getDetailBoard(id, findUser);
         String jsonString = objectMapper.writeValueAsString(detailRecruitBoardDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가

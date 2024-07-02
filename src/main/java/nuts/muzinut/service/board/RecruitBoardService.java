@@ -33,16 +33,17 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+import static nuts.muzinut.domain.board.QBoard.board;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class RecruitBoardService {
+public class RecruitBoardService extends DetailCommon{
 
     private final RecruitBoardRepository recruitBoardRepository;
     private final RecruitBoardGenreRepository recruitBoardGenreRepository;
     private final UserRepository userRepository;
-//    private final BoardQueryRepository boardQueryRepository;
     private final LikeRepository likeRepository;
     private final RecruitBoardQueryRepository boardQueryRepository;
 
@@ -84,7 +85,7 @@ public class RecruitBoardService {
 
     // 특정 모집 게시판을 조회하는 서비스 메소드
     @Transactional
-    public DetailRecruitBoardDto getDetailBoard(Long id) {
+    public DetailRecruitBoardDto getDetailBoard(Long id, User user) {
         RecruitBoard recruitBoard = checkEntityExists(id);
         recruitBoard.incrementView();
 
@@ -96,13 +97,12 @@ public class RecruitBoardService {
 
         List<CommentDto> commentDtoList = new ArrayList<>();
         Set<CommentDto> commentDtoSet = new HashSet<>();
-        Set<ReplyDto> replyDtoSet = new HashSet<>();
 
         if (!result.isEmpty()) {
             for (Tuple t : result) {
-                Board board = t.get(0, Board.class);
+//                Board board = t.get(0, Board.class);
                 RecruitBoard recruitBoardResult = t.get(1, RecruitBoard.class);
-                Long likeCount = t.get(2, Long.class);
+//                Long likeCount = t.get(2, Long.class);
 
                 // 댓글과 대댓글은 추출할 수 없으므로 따로 로직을 추가해야 함
                 List<Comment> comments = recruitBoardResult.getComments();
@@ -112,7 +112,8 @@ public class RecruitBoardService {
                             comment.getContent(),
                             comment.getUser().getNickname(),
                             comment.getCreatedDt(),
-                            comment.getUser().getProfileImgFilename() != null ? comment.getUser().getProfileImgFilename() : "base.png"
+                            comment.getUser().getProfileImgFilename(),
+                            isLike(user, comment)
                     );
 
                     List<ReplyDto> replies = new ArrayList<>();
@@ -122,7 +123,7 @@ public class RecruitBoardService {
                                 reply.getContent(),
                                 reply.getUser().getNickname(),
                                 reply.getCreatedDt(),
-                                reply.getUser().getProfileImgFilename() != null ? reply.getUser().getProfileImgFilename() : "base.png"
+                                reply.getUser().getProfileImgFilename()
                         );
                         replies.add(replyDto);
                     }
@@ -133,6 +134,12 @@ public class RecruitBoardService {
             }
 
             commentDtoList = new ArrayList<>(commentDtoSet);
+        }
+
+        Tuple first = result.getFirst();
+        Board findBoard = first.get(board);
+        if (findBoard == null) {
+            return null;
         }
 
         DetailRecruitBoardDto detailRecruitBoardDto = new DetailRecruitBoardDto(
@@ -146,15 +153,18 @@ public class RecruitBoardService {
                 recruitBoard.getEndWorkDuration(),
                 recruitBoard.getGenres(),
                 author,
-                commentDtoList,
                 likeRepository.countByBoard(recruitBoard),   // 좋아요 수 추가
-                recruitBoard.getUser().getProfileImgFilename() // 프로필 이미지 파일명 추가
+                recruitBoard.getUser().getProfileImgFilename(), // 프로필 이미지 파일명 추가
+                commentDtoList
         );
+
+        if (user != null) {
+            detailRecruitBoardDto.setIsLike(isLike(user, findBoard));
+            detailRecruitBoardDto.setIsBookmark(isBookmark(user,findBoard));
+        }
 
         return detailRecruitBoardDto;
     }
-
-
 
     // 모든 모집 게시판을 최신 순으로 조회하는 메소드 (페이징 처리)
     public RecruitBoardDto findAllRecruitBoards(int startPage) {
@@ -253,7 +263,7 @@ public class RecruitBoardService {
         RecruitBoardDto boardDto = new RecruitBoardDto();
         for (RecruitBoard recruitBoard : recruitBoards) {
             boardDto.getRecruitBoardsForms().add(new RecruitBoardsForm(
-                    recruitBoard.getId(), recruitBoard.getTitle(), recruitBoard.getUser().getId(), recruitBoard.getView(), recruitBoard.getCreatedDt(), recruitBoard.getLikes()
+                    recruitBoard.getId(), recruitBoard.getTitle(), recruitBoard.getUser().getNickname(), recruitBoard.getView(), recruitBoard.getCreatedDt(), recruitBoard.getLikes().stream().count()
             ));
         }
         return boardDto;

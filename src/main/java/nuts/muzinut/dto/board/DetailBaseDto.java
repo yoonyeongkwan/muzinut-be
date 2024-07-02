@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class DetailBaseDto {
-    private Boolean isLike;
-    private Boolean isBookmark;
+    public Boolean isLike = false;
+    public Boolean isBookmark = false;
 }

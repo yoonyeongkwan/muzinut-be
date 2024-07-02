@@ -14,5 +14,5 @@ public class ProfileDto {
     private String intro;
     private Long followingCount;
     private Long followersCount;
-    private boolean isFollowing;
+    private boolean FollowStatus;
 }

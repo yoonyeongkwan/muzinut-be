@@ -80,7 +80,7 @@ public class DataInit {
         createAdminBoards();
     }
 
-//    @PostConstruct
+    @PostConstruct
     public void FreeBoardScenario() {
         User user1 = new User();
         user1.setNickname("tom");

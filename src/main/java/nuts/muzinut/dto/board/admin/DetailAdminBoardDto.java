@@ -22,7 +22,7 @@ public class DetailAdminBoardDto extends DetailBaseDto {
     private String title;
     private String writer = "muzi";
     private String quillFilename;
-    private String profileImg; //저장된 프로필 이미지 경로
+    private String profileImg; //저장된 게시판 작성자의 프로필 이미지 경로
     private int view;
 
     private List<CommentDto> comments = new ArrayList<>();

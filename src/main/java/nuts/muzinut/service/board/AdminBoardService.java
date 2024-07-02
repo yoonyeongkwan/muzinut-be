@@ -80,7 +80,7 @@ public class AdminBoardService extends DetailCommon{
      * @param startPage: 시작 페이지를 넘겨주면 그에 해당하는 데이터들을 가져온다.
      * @return
      */
-    public AdminBoardsDto getAdminBoards(int startPage) throws BoardNotExistException {
+    public AdminBoardsDto getAdminBoards(int startPage){
         PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt")); //Todo 한 페이지에 가져올 게시판 수를 정하기
         Page<AdminBoard> page = adminBoardRepository.findAll(pageRequest);
         List<AdminBoard> adminBoards = page.getContent();
@@ -159,26 +159,5 @@ public class AdminBoardService extends DetailCommon{
         detailAdminBoardDto.setComments(setCommentsAndReplies(user, findBoard));
 
         return detailAdminBoardDto;
-    }
-
-    public Set<String> getProfileImages(DetailAdminBoardDto detailAdminBoardDto) {
-
-        Set<String> profileImages = new HashSet<>();
-        addWriterProfile(profileImages, detailAdminBoardDto.getProfileImg()); //게시판 작성자의 프로필 추가
-
-        for (CommentDto c : detailAdminBoardDto.getComments()) {
-            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
-
-            for (ReplyDto r : c.getReplies()) {
-                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
-            }
-        }
-        return profileImages;
-    }
-
-    private void addWriterProfile(Set<String> profileImages, String profileImg) {
-        if (StringUtils.hasText(profileImg)) {
-            profileImages.add(profileImg);
-        }
     }
 }

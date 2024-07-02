@@ -43,7 +43,9 @@ public class RecruitBoard extends Board {
     // 기본 생성자
     public RecruitBoard() {
     }
-
+    public RecruitBoard(String title) {
+        super.title = title;
+    }
     // 새로운 생성자
     public RecruitBoard(User user, String content, int recruitMember, LocalDateTime startDuration, LocalDateTime endDuration, LocalDateTime startWorkDuration, LocalDateTime endWorkDuration, String title) {
         this.content = content;

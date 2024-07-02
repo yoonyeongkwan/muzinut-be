@@ -16,8 +16,8 @@ public class ArtistService {
 
     private final ArtistRepository artistRepository;
 
-    public PageDto<HotArtistDto> hotArtist(Pageable pageable) {
-        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber()-1, 10);
+    public PageDto<HotArtistDto> hotArtist(int pageable) {
+        PageRequest pageRequest = PageRequest.of(pageable-1, 10);
         Page<HotArtistDto> page = artistRepository.hotArtist(pageRequest);
 
         return new PageDto<>(

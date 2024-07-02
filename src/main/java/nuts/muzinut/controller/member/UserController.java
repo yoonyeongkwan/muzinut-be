@@ -98,7 +98,7 @@ public class UserController {
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(value = "/set-profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageDto> setProfile(MultipartFile profileImg) throws IOException {
+    public ResponseEntity<MessageDto> setProfile(@RequestPart("profileImg") MultipartFile profileImg) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다.")); //진짜?
 

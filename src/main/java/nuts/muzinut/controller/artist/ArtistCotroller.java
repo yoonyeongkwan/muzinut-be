@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class ArtistCotroller {
     private final ArtistService artistService;
 
     @GetMapping(value = "/hot-artist", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PageDto<HotArtistDto>> hotArtist(Pageable pageable) {
+    public ResponseEntity<PageDto<HotArtistDto>> hotArtist(@RequestParam(name = "pageable", defaultValue = "1")int pageable) {
         PageDto<HotArtistDto> hotArtist = artistService.hotArtist(pageable);
 
         return ResponseEntity.ok(hotArtist);

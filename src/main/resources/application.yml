@@ -34,11 +34,12 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create # 어플리케이션이 뜰때 기존에 있던 데이터를 모두 삭제함
+      ddl-auto: none # 어플리케이션이 뜰때 기존에 있던 데이터를 모두 삭제함
     properties:
       hibernate:
-        #        show_sql: true
+#                show_sql: true
         format_sql: true
+        default_batch_fetch_size: 1000
 
 jwt:
   header: Authorization

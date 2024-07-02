@@ -9,8 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HotSongDto {
 
-    private String title;
-    private String nickname;
     private Long songId;
     private String albumImg;
+    private String title;
+    private String nickname;
 }

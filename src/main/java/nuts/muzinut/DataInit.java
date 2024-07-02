@@ -104,7 +104,7 @@ public class DataInit {
         replyRepository.save(reply2);
     }
 
-//    @PostConstruct
+    @PostConstruct
     public void commentLike() {
         Comment comment = new Comment();
         commentRepository.save(comment);

@@ -2,6 +2,7 @@ package nuts.muzinut.domain.member;
 
 import lombok.*;
 import jakarta.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.chat.ChatMember;
 import nuts.muzinut.domain.chat.Message;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Table(name = "users")
 @Getter
 @Setter
+@Slf4j
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,7 +39,7 @@ public class User {
     @Column(name = "password", length = 100)
     private String password;
 
-    @Column(name = "nickname", length = 50)
+    @Column(name = "nickname", length = 50, unique = true)
     private String nickname;
 
     @Column(name = "activated")
@@ -85,13 +87,20 @@ public class User {
         this.comments = new ArrayList<>(); // 필드 초기화 추가
     }
 
+    //비지니스 메서드
     public String setNickname(String nickname) {
         this.nickname = nickname;
         return nickname;
     }
 
-    public void changeProfileImg(String profileImgFilename) {
-        this.profileImgFilename = profileImgFilename;
+    public void updatePassword(String newPassword) {
+        log.info("change password!");
+        this.password = newPassword;
+    }
+
+    public void updateMyself(String nickname, String intro) {
+        this.nickname = nickname;
+        this.intro = intro;
     }
 
     //회원 관련
@@ -138,6 +147,9 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     private List<AdminBoard> adminBoards = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<CommentLike> commentLikes = new ArrayList<>();
 
     //후원 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

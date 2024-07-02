@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsForm;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
@@ -13,13 +14,11 @@ import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
-import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
-import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.MailboxRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
@@ -27,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -38,7 +38,7 @@ import static nuts.muzinut.domain.board.QBoard.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class AdminBoardService {
+public class AdminBoardService extends DetailCommon{
 
     private final AdminBoardRepository adminBoardRepository;
     private final BoardRepository boardRepository;
@@ -118,10 +118,11 @@ public class AdminBoardService {
      * 특정 어드민 게시판의 정보를 가져와 dto 로 변환하는 메서드
      * tuple element (adminBoard, commentDto, replyDto, like.count)
      * @param boardId: adminBoard pk
+     * @param user: 게시판을 조회하는 회원 (비회원인 경우 null)
      * @return: dto
      */
-    public DetailAdminBoardDto getDetailAdminBoard(Long boardId) {
-        List<Tuple> result = queryRepository.getDetailAdminBoard(boardId);
+    public DetailAdminBoardDto getDetailAdminBoard(Long boardId, User user) {
+        List<Tuple> result = queryRepository.getDetailAdminBoard(boardId, user);
 
         if (result.isEmpty()) {
             return null;
@@ -137,34 +138,47 @@ public class AdminBoardService {
 
         List<AdminUploadFile> files = findAdminBoard.getAdminUploadFiles(); //can be null
 
-
         DetailAdminBoardDto detailAdminBoardDto = new DetailAdminBoardDto();
 
         //첨부파일이 있는 경우 & 없는 경우
         if (files != null) {
             detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getView(),
-                    files, findAdminBoard.getFilename()); //어드민 게시판 관련 파일 셋팅
+                    files, findAdminBoard.getFilename(), findAdminBoard.getUser().getProfileImgFilename()); //어드민 게시판 관련 파일 셋팅
         } else {
-            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getView(), findAdminBoard.getFilename()); //어드민 게시판 관련 셋팅
+            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getView(),
+                    findAdminBoard.getFilename(), findAdminBoard.getUser().getProfileImgFilename()); //어드민 게시판 관련 셋팅
         }
 
         Long likeCount = first.get(2, Long.class);
+        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
         detailAdminBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        detailAdminBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
+        detailAdminBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 
-        //댓글 및 대댓글 dto 에 셋팅
-        List<CommentDto> comments = new ArrayList<>();
-        for (Comment c : findBoard.getComments()) {
-            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt());
-            List<ReplyDto> replies = new ArrayList<>();
-            for (Reply r : c.getReplies()) {
-                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt()));
-            }
-            commentDto.setReplies(replies);
-            comments.add(commentDto);
-        }
-        detailAdminBoardDto.setComments(comments);
+        //게시판 댓글 & 대댓글 셋팅
+        detailAdminBoardDto.setComments(setCommentsAndReplies(user, findBoard));
 
         return detailAdminBoardDto;
     }
 
+    public Set<String> getProfileImages(DetailAdminBoardDto detailAdminBoardDto) {
+
+        Set<String> profileImages = new HashSet<>();
+        addWriterProfile(profileImages, detailAdminBoardDto.getProfileImg()); //게시판 작성자의 프로필 추가
+
+        for (CommentDto c : detailAdminBoardDto.getComments()) {
+            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
+
+            for (ReplyDto r : c.getReplies()) {
+                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
+            }
+        }
+        return profileImages;
+    }
+
+    private void addWriterProfile(Set<String> profileImages, String profileImg) {
+        if (StringUtils.hasText(profileImg)) {
+            profileImages.add(profileImg);
+        }
+    }
 }

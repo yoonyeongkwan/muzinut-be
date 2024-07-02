@@ -37,6 +37,7 @@ public class DataInit {
 //        dataInitService.initializeData();
 //    }
 
+
     @PostConstruct
     public void init() {
 //        AuthorityDto authorityDto = new AuthorityDto("admin");
@@ -95,6 +96,7 @@ public class DataInit {
 //
 //        createAdminBoards();
 //    }
+
 
 ////    @PostConstruct
 //    public void FreeBoardScenario() {
@@ -165,5 +167,6 @@ public class DataInit {
 //        em.flush();
 //        em.clear();
 //    }
+
 
 }

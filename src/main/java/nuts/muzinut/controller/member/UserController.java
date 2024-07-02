@@ -1,12 +1,12 @@
 package nuts.muzinut.controller.member;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
-import nuts.muzinut.dto.member.JoinDto;
-import nuts.muzinut.dto.member.LoginDto;
-import nuts.muzinut.dto.member.UserDto;
+import nuts.muzinut.dto.member.*;
 import nuts.muzinut.dto.security.TokenDto;
 import nuts.muzinut.exception.EmailVertFailException;
 import nuts.muzinut.exception.NotFoundMemberException;
@@ -17,7 +17,6 @@ import nuts.muzinut.service.member.MailSendService;
 import nuts.muzinut.service.member.UserService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +34,7 @@ import java.util.Map;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
+@Slf4j
 @Controller
 @RequestMapping("/users")
 @RequiredArgsConstructor
@@ -60,11 +60,10 @@ public class UserController {
     @PostMapping("/join")
     public MessageDto join(@Validated @RequestBody JoinDto joinDto) {
         Boolean Checked = mailService.CheckAuthNum(joinDto.getUsername(), joinDto.getAuthNum());
-        if(Checked){
+        if (Checked) {
             userService.signup(new UserDto(joinDto.getUsername(), joinDto.getPassword()));
             return new MessageDto("회원 가입 성공");
-        }
-        else{
+        } else {
             throw new EmailVertFailException("인증 번호가 일치하지 않습니다");
         }
     }
@@ -96,21 +95,66 @@ public class UserController {
         return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
     }
 
+    /**
+     * 사용자의 프로필을 설정하는 메서드
+     * @param profileImg: 사용자가 설정하고 싶은 프로필 이미지
+     * @throws IOException
+     * @return: 리다이랙트 필요
+     */
+    @ResponseBody //Todo 리다이렉트 설정 필요
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @PostMapping(value = "/set-profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MessageDto> setProfile(@RequestPart("profileImg") MultipartFile profileImg) throws IOException {
+    @PostMapping(value = "/set-profile")
+    public MessageDto setProfile(MultipartFile profileImg) throws IOException {
         User user = userService.getUserWithUsername()
-                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다.")); //진짜?
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
         if (StringUtils.hasText(user.getProfileImgFilename())) {
             //프로필 바꾸기
             String changeImgName = fileStore.updateFile(profileImg, user.getProfileImgFilename());
+            userService.setProfileName(changeImgName, user);
         } else {
             //프로필 처음 설정
             Map<FileType, String> filenames = fileStore.storeFile(profileImg);
-            user.changeProfileImg(filenames.get(STORE_FILENAME)); //파일명 설정.
+            userService.setProfileName(filenames.get(STORE_FILENAME), user);
         }
-        return null;
+
+        return new MessageDto("파일 저장 성공");
+    }
+
+    //비밀번호 수정
+    @ResponseBody
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping("/change-password")
+    public MessageDto changePassword(@Validated @RequestBody PasswordChangeForm form) {
+        User user = userService.getUserWithUsername()
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
+
+        userService.updatePassword(user, form.getCurrentPassword(), form.getNewPassword());
+        return new MessageDto("비밀번호가 수정되었습니다");
+    }
+
+    //비밀번호 찾기
+    @ResponseBody
+    @PostMapping("/find-password")
+    public MessageDto findPassword(@RequestBody @Validated @NotNull PasswordFindForm form) {
+        if (userService.isUser(form.getUsername())) {
+            mailService.findPassword(form.getUsername());
+            return new MessageDto("이메일이 전송되었습니다");
+        }
+        throw new NotFoundMemberException("가입된 회원이 아닙니다. 회원가입을 해주세요");
+    }
+
+    //비밀번호 새롭게 설정하기
+    @ResponseBody
+    @PutMapping("/find-password")
+    public MessageDto setNewPassword(@RequestBody @Validated SetNewPasswordForm form) {
+        Boolean checked = mailService.CheckAuthNum(form.getUsername(), form.getAuthNum());
+        if (checked) {
+            User findUser = userService.findByEmail(form.getUsername());
+            userService.updatePassword(findUser, form.getPassword());
+            return new MessageDto("비밀번호가 수정되었습니다");
+        }
+        throw new EmailVertFailException("인증 번호가 일치하지 않습니다");
     }
 
 }

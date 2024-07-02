@@ -14,9 +14,7 @@ import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.admin.AdminBoardForm;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
-import nuts.muzinut.exception.NotFoundFileException;
+import nuts.muzinut.exception.*;
 import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.UserService;
@@ -38,6 +36,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Slf4j
@@ -94,8 +93,14 @@ public class AdminBoardController {
     @ResponseBody
     @GetMapping(value = "/admin-boards/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getAdminBoard(@PathVariable Long id) throws JsonProcessingException {
+
+        DetailAdminBoardDto detailAdminBoard = new DetailAdminBoardDto();
+
+        //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
+        User findUser = userService.getUserWithUsername().orElse(null);
+        detailAdminBoard = adminBoardService.getDetailAdminBoard(id, findUser);
+
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
-        DetailAdminBoardDto detailAdminBoard = adminBoardService.getDetailAdminBoard(id);
         if (detailAdminBoard == null) {
             throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
         }
@@ -109,11 +114,13 @@ public class AdminBoardController {
         formData.add("admin_data", jsonEntity);
 
         //해당 게시판의 quill 파일 추가
-        HttpHeaders quillFileHeaders = new HttpHeaders();
         String quillFilename = detailAdminBoard.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
-        quillFileHeaders.setContentType(MediaType.TEXT_HTML);
         formData.add("quillFile", new FileSystemResource(fullPath));
+
+        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
+        Set<String> profileImages = adminBoardService.getProfileImages(detailAdminBoard);
+        fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }

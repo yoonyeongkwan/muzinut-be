@@ -38,7 +38,7 @@ public class DataInit {
 
     @PostConstruct
     public void init() {
-        dataInitService.initializeData();
+//        dataInitService.initializeData();
     }
 
 //    @PostConstruct

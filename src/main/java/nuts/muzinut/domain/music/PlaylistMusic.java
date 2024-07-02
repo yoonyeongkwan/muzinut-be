@@ -16,12 +16,12 @@ public class PlaylistMusic {
     private Playlist playlist;
 
     @Column(name = "music_id")
-    private Long musicId;
+    private Long songId;
 
     //편의 메서드
-    public void addRecord(Playlist playlist, Song song) {
+    public void addRecord(Playlist playlist, Long songId) {
         this.playlist = playlist;
-        this.musicId = song.getId();
+        this.songId = songId;
         playlist.getPlaylistMusics().add(this);
     }
 }

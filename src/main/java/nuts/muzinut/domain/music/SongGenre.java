@@ -3,19 +3,21 @@ package nuts.muzinut.domain.music;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "music_genre")
+@Table(name = "song_genre")
 @NoArgsConstructor
 @Getter
+@Setter
 public class SongGenre {
 
     @Id @GeneratedValue
-    @Column(name = "music_genre_id")
+    @Column(name = "song_genre_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "music_id")
+    @JoinColumn(name = "song_id")
     private Song song;
 
     @Enumerated(EnumType.STRING)

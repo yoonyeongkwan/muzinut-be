@@ -22,9 +22,7 @@ public class QBookmark extends EntityPathBase<Bookmark> {
 
     public static final QBookmark bookmark = new QBookmark("bookmark");
 
-    public final NumberPath<Long> boardId = createNumber("boardId", Long.class);
-
-    public final EnumPath<BoardType> boardType = createEnum("boardType", BoardType.class);
+    public final QBoard board;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -48,6 +46,7 @@ public class QBookmark extends EntityPathBase<Bookmark> {
 
     public QBookmark(Class<? extends Bookmark> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
+        this.board = inits.isInitialized("board") ? new QBoard(forProperty("board"), inits.get("board")) : null;
         this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
     }
 

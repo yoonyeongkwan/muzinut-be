@@ -4,11 +4,9 @@ package nuts.muzinut.service.board;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.domain.board.Board;
-import nuts.muzinut.domain.board.Comment;
-import nuts.muzinut.domain.board.RecruitBoard;
-import nuts.muzinut.domain.board.Reply;
+import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.recruit.*;
@@ -33,6 +31,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+import static nuts.muzinut.domain.board.QAdminBoard.adminBoard;
 import static nuts.muzinut.domain.board.QBoard.board;
 
 @Slf4j
@@ -89,58 +88,20 @@ public class RecruitBoardService extends DetailCommon{
         RecruitBoard recruitBoard = checkEntityExists(id);
         recruitBoard.incrementView();
 
-        // 작성자 정보 가져오기
-        String author = recruitBoard.getUser().getNickname();
+        List<Tuple> result = boardQueryRepository.getDetailRecruitBoard(id, user);
 
-        // 댓글과 대댓글 가져오기
-        List<Tuple> result = boardQueryRepository.getDetailRecruitBoard(id);
-
-        List<CommentDto> commentDtoList = new ArrayList<>();
-        Set<CommentDto> commentDtoSet = new HashSet<>();
-
-        if (!result.isEmpty()) {
-            for (Tuple t : result) {
-//                Board board = t.get(0, Board.class);
-                RecruitBoard recruitBoardResult = t.get(1, RecruitBoard.class);
-//                Long likeCount = t.get(2, Long.class);
-
-                // 댓글과 대댓글은 추출할 수 없으므로 따로 로직을 추가해야 함
-                List<Comment> comments = recruitBoardResult.getComments();
-                for (Comment comment : comments) {
-                    CommentDto commentDto = new CommentDto(
-                            comment.getId(),
-                            comment.getContent(),
-                            comment.getUser().getNickname(),
-                            comment.getCreatedDt(),
-                            comment.getUser().getProfileImgFilename(),
-                            isLike(user, comment)
-                    );
-
-                    List<ReplyDto> replies = new ArrayList<>();
-                    for (Reply reply : comment.getReplies()) {
-                        ReplyDto replyDto = new ReplyDto(
-                                reply.getId(),
-                                reply.getContent(),
-                                reply.getUser().getNickname(),
-                                reply.getCreatedDt(),
-                                reply.getUser().getProfileImgFilename()
-                        );
-                        replies.add(replyDto);
-                    }
-
-                    commentDto.setReplies(replies);
-                    commentDtoSet.add(commentDto);
-                }
-            }
-
-            commentDtoList = new ArrayList<>(commentDtoSet);
+        if (result.isEmpty()) {
+            return null;
         }
 
         Tuple first = result.getFirst();
         Board findBoard = first.get(board);
+        AdminBoard findAdminBoard = first.get(adminBoard);
+
         if (findBoard == null) {
             return null;
         }
+
 
         DetailRecruitBoardDto detailRecruitBoardDto = new DetailRecruitBoardDto(
                 recruitBoard.getTitle(),
@@ -152,16 +113,15 @@ public class RecruitBoardService extends DetailCommon{
                 recruitBoard.getStartWorkDuration(),
                 recruitBoard.getEndWorkDuration(),
                 recruitBoard.getGenres(),
-                author,
-                likeRepository.countByBoard(recruitBoard),   // 좋아요 수 추가
-                recruitBoard.getUser().getProfileImgFilename(), // 프로필 이미지 파일명 추가
-                commentDtoList
+                user.getNickname(),
+                recruitBoard.getUser().getProfileImgFilename() // 프로필 이미지 파일명 추가
         );
 
-        if (user != null) {
-            detailRecruitBoardDto.setIsLike(isLike(user, findBoard));
-            detailRecruitBoardDto.setIsBookmark(isBookmark(user,findBoard));
-        }
+        Long likeCount = first.get(2, Long.class);
+        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
+        detailRecruitBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        detailRecruitBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
+        detailRecruitBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 
         return detailRecruitBoardDto;
     }

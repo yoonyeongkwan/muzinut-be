@@ -3,6 +3,11 @@ package nuts.muzinut.service.board;
 import lombok.Data;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.comment.CommentDto;
+import nuts.muzinut.dto.board.comment.ReplyDto;
+
+import java.util.ArrayList;
+import java.util.List;
 
 //모든 상세 게시판 페이지에서 공통으로 쓰는 기능
 public class DetailCommon {
@@ -47,5 +52,36 @@ public class DetailCommon {
             }
         }
         return false;
+    }
+
+    public List<CommentDto> setCommentsAndReplies(User user, Board board) {
+        List<CommentDto> comments = new ArrayList<>();
+
+        for (Comment c : board.getComments()) {
+            CommentDto commentDto;
+            if (user != null) {
+                // 회원인 경우
+                commentDto = new CommentDto(
+                        c.getId(), c.getContent(), c.getUser().getNickname(),
+                        c.getCreatedDt(), c.getUser().getProfileImgFilename(),
+                        isLike(user, c), c.getCommentLikes().size()); //isLike 추가 (댓글에 대한 좋아요를 했는지 확인)
+            } else {
+                // 비회원인 경우
+                commentDto = new CommentDto(
+                        c.getId(), c.getContent(), c.getUser().getNickname(),
+                        c.getCreatedDt(), c.getUser().getProfileImgFilename(),
+                        c.getCommentLikes().size());
+            }
+
+            List<ReplyDto> replies = new ArrayList<>();
+            for (Reply r : c.getReplies()) {
+                replies.add(new ReplyDto(
+                        r.getId(), r.getContent(), r.getUser().getNickname(),
+                        r.getCreatedDt(), r.getUser().getProfileImgFilename()));
+            }
+            commentDto.setReplies(replies);
+            comments.add(commentDto);
+        }
+        return comments;
     }
 }

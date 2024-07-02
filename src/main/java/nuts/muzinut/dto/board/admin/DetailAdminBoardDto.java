@@ -18,14 +18,14 @@ import java.util.List;
 @Data
 public class DetailAdminBoardDto extends DetailBaseDto {
 
-    private List<CommentDto> comments = new ArrayList<>();
     private Long likeCount;
-
     private String title;
     private String writer = "muzi";
     private String quillFilename;
     private String profileImg; //저장된 프로필 이미지 경로
     private int view;
+
+    private List<CommentDto> comments = new ArrayList<>();
     private List<AdminFilename> adminFilenames = new ArrayList<>();
 
     public DetailAdminBoardDto(String title, int view, List<AdminUploadFile> files, String quillFilename, String profileImg) {

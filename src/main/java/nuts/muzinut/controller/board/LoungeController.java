@@ -12,6 +12,7 @@ import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.FileStore;
@@ -77,7 +78,14 @@ public class LoungeController {
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id);
+        User findUser = userService.getUserWithUsername().orElse(null);
+        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id, findUser);
+
+        if (detailLoungeDto == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+
+
         String jsonString = objectMapper.writeValueAsString(detailLoungeDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가

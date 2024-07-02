@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.QUser;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.repository.board.AdminBoardRepository;
-import nuts.muzinut.repository.board.CommentRepository;
-import nuts.muzinut.repository.board.LikeRepository;
-import nuts.muzinut.repository.board.ReplyRepository;
+import nuts.muzinut.repository.board.*;
 import nuts.muzinut.repository.member.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,7 @@ class AdminBoardQueryRepositoryTest {
     @Autowired LikeRepository likeRepository;
     @Autowired ReplyRepository replyRepository;
     @Autowired AdminBoardQueryRepository queryRepository;
+    @Autowired BookmarkRepository bookmarkRepository;
 
     @Rollback(value = false)
     @Test
@@ -46,6 +44,7 @@ class AdminBoardQueryRepositoryTest {
         userRepository.save(commentUser);
         AdminBoard board = new AdminBoard();
         board.addBoard(user);
+        adminBoardRepository.save(board);
         Comment comment = new Comment();
         comment.addComment(commentUser, board, "c1");
         Comment comment2 = new Comment();
@@ -54,15 +53,23 @@ class AdminBoardQueryRepositoryTest {
         reply.addReply(comment, "r1", commentUser);
         replyRepository.save(reply);
 
+        Bookmark bookmark = new Bookmark();
+        bookmark.addBookmark(user, board);
+        bookmarkRepository.save(bookmark);
+
+        Like like = new Like();
+        like.addLike(user, board);
+        likeRepository.save(like);
+
         //when
-        List<Tuple> result = queryRepository.getDetailAdminBoard(board.getId());
+        List<Tuple> result = queryRepository.getDetailAdminBoard(board.getId(), user);
 
         //then
         for (Tuple t : result) {
             log.info("tuple: {}", t);
         }
 
-        Tuple first = result.getFirst();
+/*        Tuple first = result.getFirst();
         Board findBoard = first.get(QBoard.board);
         log.info("adminBoard writer: {}", findBoard.getUser().getNickname());
 
@@ -72,6 +79,6 @@ class AdminBoardQueryRepositoryTest {
             for (Reply r : c.getReplies()) {
                 log.info("replies: {}", r.getContent());
             }
-        }
+        }*/
     }
 }

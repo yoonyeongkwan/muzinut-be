@@ -44,12 +44,12 @@ public class DataInit {
     @PostConstruct
     public void init() {
         AuthorityDto authorityDto = new AuthorityDto("admin");
-        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
-        userService.adminSignup(userDto);
-        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
-        userService.signup(userDto2);
-        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
-        userService.signup(userDto3);
+//        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
+//        userService.adminSignup(userDto);
+//        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
+//        userService.signup(userDto2);
+//        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
+//        userService.signup(userDto3);
 
 //        dataInitService.recruitBoardBoardScenario();
 //        dataInitService.commentScenario();

@@ -104,7 +104,7 @@ public class UserController {
     @ResponseBody //Todo 리다이렉트 설정 필요
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(value = "/set-profile")
-    public MessageDto setProfile(MultipartFile profileImg) throws IOException {
+    public MessageDto setProfile(@RequestPart("profileImg") MultipartFile profileImg) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 

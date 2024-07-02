@@ -3,6 +3,8 @@ HELP.md
 application.yml
 
 build/
+src/test/**
+ src/main/java/nuts/muzinut/file/**
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

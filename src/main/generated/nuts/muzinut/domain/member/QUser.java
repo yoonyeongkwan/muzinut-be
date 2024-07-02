@@ -36,6 +36,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final ListPath<nuts.muzinut.domain.chat.ChatMember, nuts.muzinut.domain.chat.QChatMember> chatMembers = this.<nuts.muzinut.domain.chat.ChatMember, nuts.muzinut.domain.chat.QChatMember>createList("chatMembers", nuts.muzinut.domain.chat.ChatMember.class, nuts.muzinut.domain.chat.QChatMember.class, PathInits.DIRECT2);
 
+    public final ListPath<nuts.muzinut.domain.board.CommentLike, nuts.muzinut.domain.board.QCommentLike> commentLikes = this.<nuts.muzinut.domain.board.CommentLike, nuts.muzinut.domain.board.QCommentLike>createList("commentLikes", nuts.muzinut.domain.board.CommentLike.class, nuts.muzinut.domain.board.QCommentLike.class, PathInits.DIRECT2);
+
     public final ListPath<nuts.muzinut.domain.board.Comment, nuts.muzinut.domain.board.QComment> comments = this.<nuts.muzinut.domain.board.Comment, nuts.muzinut.domain.board.QComment>createList("comments", nuts.muzinut.domain.board.Comment.class, nuts.muzinut.domain.board.QComment.class, PathInits.DIRECT2);
 
     public final NumberPath<Integer> declaration = createNumber("declaration", Integer.class);

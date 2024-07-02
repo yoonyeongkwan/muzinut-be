@@ -24,9 +24,9 @@ public class QPlaylistMusic extends EntityPathBase<PlaylistMusic> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Long> musicId = createNumber("musicId", Long.class);
-
     public final QPlaylist playlist;
+
+    public final NumberPath<Long> songId = createNumber("songId", Long.class);
 
     public QPlaylistMusic(String variable) {
         this(PlaylistMusic.class, forVariable(variable), INITS);

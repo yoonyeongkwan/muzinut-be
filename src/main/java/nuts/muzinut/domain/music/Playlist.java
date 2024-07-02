@@ -2,6 +2,7 @@ package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nuts.muzinut.domain.member.User;
 
 import java.util.ArrayList;

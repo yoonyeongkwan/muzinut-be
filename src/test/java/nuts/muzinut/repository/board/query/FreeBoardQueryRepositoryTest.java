@@ -48,7 +48,7 @@ class FreeBoardQueryRepositoryTest {
         replyRepository.save(reply);
 
         //when
-        List<Tuple> result = queryRepository.getDetailFreeBoardTest(freeBoard.getId());
+        List<Tuple> result = queryRepository.getDetailFreeBoard(freeBoard.getId(), user);
 
         //then
         for (Tuple t : result) {
@@ -78,7 +78,7 @@ class FreeBoardQueryRepositoryTest {
         freeBoardRepository.save(freeBoard);
 
         //when
-        List<Tuple> result = queryRepository.getDetailFreeBoardTest(freeBoard.getId());
+        List<Tuple> result = queryRepository.getDetailFreeBoard(freeBoard.getId(), user);
 
         //then
         for (Tuple t : result) {

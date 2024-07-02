@@ -73,7 +73,15 @@ public class FreeBoardController {
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id);
+
+        //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
+        User findUser = userService.getUserWithUsername().orElse(null);
+        DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id, findUser);
+
+        if (detailFreeBoardDto == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+
         String jsonString = objectMapper.writeValueAsString(detailFreeBoardDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가

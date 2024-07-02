@@ -1,27 +1,24 @@
 package nuts.muzinut.service.board;
 
 import com.querydsl.core.Tuple;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsForm;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
-import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
-import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
-import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.member.MailboxRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
@@ -125,7 +122,7 @@ public class AdminBoardService extends DetailCommon{
      * @return: dto
      */
     public DetailAdminBoardDto getDetailAdminBoard(Long boardId, User user) {
-        List<Tuple> result = queryRepository.getDetailAdminBoard(boardId);
+        List<Tuple> result = queryRepository.getDetailAdminBoard(boardId, user);
 
         if (result.isEmpty()) {
             return null;
@@ -153,42 +150,13 @@ public class AdminBoardService extends DetailCommon{
         }
 
         Long likeCount = first.get(2, Long.class);
+        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
         detailAdminBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
-        List<CommentDto> comments = new ArrayList<>();
+        detailAdminBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
+        detailAdminBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 
-        //회원인 경우 & 비회원인 경우
-        if (user != null) {
-
-            log.info("회원인 경우");
-            detailAdminBoardDto.setIsLike(isLike(user, findBoard)); //회원이 해당 게시판을 좋아요 눌렀는지 확인
-
-            //댓글 및 대댓글 dto 에 셋팅 (회원인 경우)
-            for (Comment c : findBoard.getComments()) {
-                CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(),
-                        c.getCreatedDt(), c.getUser().getProfileImgFilename(), isLike(user, c));
-                List<ReplyDto> replies = new ArrayList<>();
-                for (Reply r : c.getReplies()) {
-                    replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt(), r.getUser().getProfileImgFilename()));
-                }
-                commentDto.setReplies(replies);
-                comments.add(commentDto);
-            }
-            detailAdminBoardDto.setComments(comments);
-
-            return detailAdminBoardDto;
-        }
-
-        //댓글 및 대댓글 dto 에 셋팅 (비회원인 경우)
-        for (Comment c : findBoard.getComments()) {
-            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt(), c.getUser().getProfileImgFilename());
-            List<ReplyDto> replies = new ArrayList<>();
-            for (Reply r : c.getReplies()) {
-                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt(), r.getUser().getProfileImgFilename()));
-            }
-            commentDto.setReplies(replies);
-            comments.add(commentDto);
-        }
-        detailAdminBoardDto.setComments(comments);
+        //게시판 댓글 & 대댓글 셋팅
+        detailAdminBoardDto.setComments(setCommentsAndReplies(user, findBoard));
 
         return detailAdminBoardDto;
     }

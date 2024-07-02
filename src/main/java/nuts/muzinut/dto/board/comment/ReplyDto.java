@@ -13,8 +13,8 @@ public class ReplyDto {
     private String content;
     private String replyWriter;
     private String replyProfileImg; //대댓글을 작성한 사람의 프로필 이미지
-    private Long commentId;
     private LocalDateTime createdDt;
+    private Long commentId;
 
     @QueryProjection
     public ReplyDto(Long id, String content, String replyWriter, Long commentId,
@@ -23,7 +23,6 @@ public class ReplyDto {
         this.content = content;
         this.replyProfileImg = replyProfileImg;
         this.replyWriter = replyWriter;
-        this.commentId = commentId;
         this.createdDt = createdDt;
     }
 

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
@@ -33,7 +34,7 @@ import static nuts.muzinut.domain.board.QFreeBoard.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class FreeBoardService {
+public class FreeBoardService extends DetailCommon{
 
     private final FreeBoardRepository freeBoardRepository;
     private final BoardRepository boardRepository;
@@ -82,8 +83,8 @@ public class FreeBoardService {
      * 특정 자유 게시판 조회
      * tuple (board, freeBoard, like.count)
      */
-    public DetailFreeBoardDto detailFreeBoard(Long boardId) {
-        List<Tuple> result = queryRepository.getDetailFreeBoard(boardId);
+    public DetailFreeBoardDto detailFreeBoard(Long boardId, User user) {
+        List<Tuple> result = queryRepository.getDetailFreeBoard(boardId, user);
 
         log.info("tuple: {}", result);
         if (result.isEmpty()) {
@@ -103,21 +104,15 @@ public class FreeBoardService {
         DetailFreeBoardDto detailFreeBoardDto =
                 new DetailFreeBoardDto(findFreeBoard.getId() ,findFreeBoard.getTitle(),
                         findFreeBoard.getUser().getNickname(), view, findFreeBoard.getFilename(), findFreeBoard.getUser().getProfileImgFilename());
-        Long likeCount = first.get(2, Long.class);
-        detailFreeBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
 
-        //댓글 및 대댓글 dto 에 셋팅
-        List<CommentDto> comments = new ArrayList<>();
-        for (Comment c : findBoard.getComments()) {
-            CommentDto commentDto = new CommentDto(c.getId(), c.getContent(), c.getUser().getNickname(), c.getCreatedDt(), c.getUser().getProfileImgFilename());
-            List<ReplyDto> replies = new ArrayList<>();
-            for (Reply r : c.getReplies()) {
-                replies.add(new ReplyDto(r.getId(), r.getContent(), r.getUser().getNickname(), r.getCreatedDt(), r.getUser().getProfileImgFilename()));
-            }
-            commentDto.setReplies(replies);
-            comments.add(commentDto);
-        }
-        detailFreeBoardDto.setComments(comments);
+        Long likeCount = first.get(2, Long.class);
+        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
+        detailFreeBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        detailFreeBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
+        detailFreeBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
+
+        //게시판 댓글 & 대댓글 셋팅
+        detailFreeBoardDto.setComments(setCommentsAndReplies(user, findBoard));
 
         return detailFreeBoardDto;
     }

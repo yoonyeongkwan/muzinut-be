@@ -89,7 +89,8 @@ public class EventBoardController {
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id);
+        User findUser = userService.getUserWithUsername().orElse(null);
+        DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id, findUser);
         String jsonString = objectMapper.writeValueAsString(detailFreeBoardDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가

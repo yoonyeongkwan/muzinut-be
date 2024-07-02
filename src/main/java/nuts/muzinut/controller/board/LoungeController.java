@@ -62,7 +62,7 @@ public class LoungeController {
         Lounge lounge = new Lounge();
         lounge.addBoard(user);
 
-        Map<FileType, String> filenames = fileStore.storeFile(quillFile);//라운지 게시판 파일 저장
+        Map<FileType, String> filenames = fileStore.storeFile(quillFile); //라운지 게시판 파일 저장
         lounge.setFilename(filenames.get(STORE_FILENAME)); //라운지 파일명 설정
         loungeService.save(lounge); //라운지 게시판 저장
         HttpHeaders header = new HttpHeaders();
@@ -100,7 +100,8 @@ public class LoungeController {
         formData.add("quillFile", new FileSystemResource(fullPath)); //파일 가져와서 셋팅
 
         //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-        Set<String> profileImages = loungeService.getProfileImages(detailLoungeDto);
+        Set<String> profileImages = loungeService.getProfileImages(detailLoungeDto.getProfileImg(),
+                detailLoungeDto.getComments());
         fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);

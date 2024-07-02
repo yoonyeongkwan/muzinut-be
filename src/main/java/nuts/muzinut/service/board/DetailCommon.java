@@ -5,9 +5,12 @@ import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 //모든 상세 게시판 페이지에서 공통으로 쓰는 기능
 public class DetailCommon {
@@ -84,4 +87,26 @@ public class DetailCommon {
         }
         return comments;
     }
+
+    public Set<String> getProfileImages(String profileImg, List<CommentDto> comments) {
+
+        Set<String> profileImages = new HashSet<>();
+        addWriterProfile(profileImages, profileImg); //게시판 작성자의 프로필 추가
+
+        for (CommentDto c : comments) {
+            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
+
+            for (ReplyDto r : c.getReplies()) {
+                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
+            }
+        }
+        return profileImages;
+    }
+
+    private void addWriterProfile(Set<String> profileImages, String profileImg) {
+        if (StringUtils.hasText(profileImg)) {
+            profileImages.add(profileImg);
+        }
+    }
+
 }

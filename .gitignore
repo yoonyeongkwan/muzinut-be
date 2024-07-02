@@ -3,6 +3,7 @@ HELP.md
 application.yml
 
 build/
+DataInit.class
 test/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

@@ -40,11 +40,11 @@ public class DataInitService {
         AuthorityDto authorityDto = new AuthorityDto("admin");
         UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
         userService.adminSignup(userDto);
-        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
+        UserDto userDto2 = new UserDto("user@naver.com", "user", "maeng");
         userService.signup(userDto2);
-        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
+        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "juyoung");
         userService.signup(userDto3);
-        UserDto userDto4 = new UserDto("user3@naver.com", "user3", "user3!");
+        UserDto userDto4 = new UserDto("user3@naver.com", "user3", "muzinut");
         userService.signup(userDto4);
 
         recruitBoardBoardScenario();
@@ -53,9 +53,9 @@ public class DataInitService {
 
     private void followScenario() {
         // 사용자 불러오기
-        User user1 = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
-        User user2 = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
-        User user3 = userRepository.findByNickname("user3!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user1 = userRepository.findByNickname("maeng").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user2 = userRepository.findByNickname("juyoung").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user3 = userRepository.findByNickname("muzinut").orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         // FollowService를 사용하여 팔로우 관계 설정
         followService.toggleFollow(user1, user3.getId());
@@ -77,9 +77,9 @@ public class DataInitService {
 
     @Transactional
     public void recruitBoardBoardScenario() {
-        User user = userRepository.findByNickname("user!").orElseThrow(() -> new IllegalArgumentException("User not found"));
-        User user2 = userRepository.findByNickname("user2!").orElseThrow(() -> new IllegalArgumentException("User not found"));
-        User user3 = userRepository.findByNickname("user3!").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findByNickname("maeng").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user2 = userRepository.findByNickname("juyoung").orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user3 = userRepository.findByNickname("muzinut").orElseThrow(() -> new IllegalArgumentException("User not found"));
         log.info("User found: {}", user);
 
         RecruitBoard recruitBoard = new RecruitBoard(user, "Sample Content", 5,

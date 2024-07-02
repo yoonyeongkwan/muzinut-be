@@ -52,13 +52,16 @@ public class User {
     @Column(name = "profile_img_filename")
     private String profileImgFilename;
 
+    @Column(name = "profile_banner_img_filename")
+    private String profileBannerImgFilename;
+
     @Column(name = "account_number")
     private int accountNumber; //계좌 번호
 
     private String intro; //자기 소개
     private int nuts; //보유 너츠
     private int vote; //투표권
-    private int declaration; //신고 횟수
+    private int declaration; //신고 횟수~
 
     @ManyToMany
     @JoinTable(

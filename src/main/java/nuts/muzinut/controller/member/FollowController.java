@@ -33,10 +33,10 @@ public class FollowController {
 
     // 팔로우 토글
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("follow")
-    public ResponseEntity<MessageDto> toggleFollow(@RequestBody @Valid FollowDto followDto) {
+    @PostMapping("follow/{userId}")
+    public ResponseEntity<MessageDto> toggleFollow(@PathVariable Long userId) {
         User user = getAuthenticatedUser();
-        return followService.toggleFollow(user, followDto.getFollowingMemberId());
+        return followService.toggleFollow(user, userId);
     }
 
     // 현재 인증된 사용자의 이름을 반환하는 메소드

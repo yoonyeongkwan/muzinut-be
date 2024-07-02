@@ -29,10 +29,10 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
     //inherited
     public final ListPath<Comment, QComment> comments;
 
-    public final StringPath content = createString("content");
-
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDt;
+
+    public final StringPath filename = createString("filename");
 
     //inherited
     public final NumberPath<Long> id;

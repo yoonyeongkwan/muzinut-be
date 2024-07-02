@@ -12,6 +12,7 @@ import nuts.muzinut.dto.board.recruit.RecruitBoardDto;
 import nuts.muzinut.dto.board.recruit.RecruitBoardForm;
 import nuts.muzinut.dto.board.recruit.SaveRecruitBoardDto;
 import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.RecruitBoardService;
 import nuts.muzinut.service.member.UserService;
@@ -66,6 +67,11 @@ public class RecruitBoardController {
         User findUser = userService.getUserWithUsername().orElse(null);
 
         DetailRecruitBoardDto detailRecruitBoardDto = recruitBoardService.getDetailBoard(id, findUser);
+
+        if (detailRecruitBoardDto == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+
         String jsonString = objectMapper.writeValueAsString(detailRecruitBoardDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가

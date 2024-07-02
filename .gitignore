@@ -1,10 +1,11 @@
 HELP.md
 .gradle
-application.yml
+
 
 build/
 DataInit.class
-test/
+src/test/**
+application.yml
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

@@ -27,6 +27,7 @@ public class ArtistService {
     @Value("${spring.file.dir}")
     private String fileDir;
 
+
     public MultiValueMap<String, Object> hotArtist(int pageable) throws IOException {
         PageRequest pageRequest = PageRequest.of(pageable-1, 10);
         Page<HotArtistDto> page = artistRepository.hotArtist(pageRequest);
@@ -34,6 +35,7 @@ public class ArtistService {
                 page.getContent(),
                 page.getNumber(),
                 page.getSize(),
+                page.getTotalPages(),
                 page.getTotalPages()
         );
 

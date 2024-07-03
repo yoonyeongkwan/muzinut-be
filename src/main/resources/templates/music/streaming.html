@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Streaming</title>
+</head>
+<body>
+<h1>Music Streaming</h1>
+<audio id="music-player" controls>
+    <source id="music-source" src="" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+<script>
+    const musicPlayer = document.getElementById('music-player');
+    const musicSource = document.getElementById('music-source');
+
+    // 백엔드에서 보내는 음악 파일 URL
+    const musicUrl = '/api/music';
+
+    // 음악 재생 요청
+    function playMusic() {
+      fetch(musicUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      .then(response => response.blob())
+      .then(blob => {
+        const url = URL.createObjectURL(blob);
+        musicSource.src = url;
+        musicPlayer.load();
+        musicPlayer.play();
+      })
+      .catch(error => {
+        console.error('Error playing music:', error);
+      });
+    }
+
+    // 음악 재생 버튼 클릭 이벤트 리스너 등록
+    musicPlayer.addEventListener('click', playMusic);
+</script>
+</body>
+</html>

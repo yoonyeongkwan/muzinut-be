@@ -3,6 +3,7 @@ package nuts.muzinut.domain.music;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import nuts.muzinut.domain.member.User;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -23,11 +24,16 @@ public class SongLike {
     @JoinColumn(name = "song_id")
     private Song song;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDate likeDt;
 
-    public SongLike(Song song) {
+    public SongLike(User user, Song song) {
+        this.user = user;
         this.song = song;
     }
 }

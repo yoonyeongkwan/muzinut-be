@@ -6,14 +6,9 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import lombok.RequiredArgsConstructor;
-import nuts.muzinut.domain.board.Board;
-import nuts.muzinut.domain.board.FreeBoard;
-import nuts.muzinut.domain.board.RecruitBoard;
-import nuts.muzinut.domain.member.QFollow;
-import nuts.muzinut.domain.music.QSong;
 import nuts.muzinut.dto.mainpage.*;
-import nuts.muzinut.dto.music.SongPageDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -95,28 +90,45 @@ public class MainPageRepository {
 
     }
 
-    public List<Tuple> findHotBoard(){
-        return queryFactory
-                .select(board, freeBoard, recruitBoard, user)
-                .from(board)
-                .join(board.user, user)
-                .leftJoin(freeBoard).on(board.id.eq(freeBoard.id))
-                .leftJoin(recruitBoard).on(board.id.eq(recruitBoard.id))
-                .orderBy(board.view.desc())
-                .limit(5)
-                .fetch();
+    public List<Object[]> findHotBoard(){
+         String sql = "SELECT " +
+                "b.board_id, " +
+                "b.title, " +
+                "u.nickname, " +
+                "b.view, " +
+                "b.dtype " +
+                "FROM board b " +
+                "JOIN users u ON b.user_id = u.user_id " +
+                "ORDER BY b.view DESC " +
+                "LIMIT 5 ";
+        Query nativeQuery = em.createNativeQuery(sql);
+        return nativeQuery.getResultList();
     }
 
-    public List<Tuple> findNewBoard(){
-        return queryFactory
-                .select(board, freeBoard, recruitBoard, user)
-                .from(board)
-                .join(board.user, user)
-                .leftJoin(freeBoard).on(board.id.eq(freeBoard.id))
-                .leftJoin(recruitBoard).on(board.id.eq(recruitBoard.id))
-                .orderBy(board.createdDt.desc())
-                .limit(8)
-                .fetch();
+    public List<Object[]> findNewBoard(){
+        String sql = "(SELECT " +
+                    "b.board_id, " +
+                    "b.title, " +
+                    "u.nickname, " +
+                    "b.dtype " +
+                    "FROM board b " +
+                    "JOIN users u ON b.user_id = u.user_id " +
+                    "WHERE b.dtype = 'FreeBoard' " +
+                    "ORDER BY b.created_dt DESC " +
+                    "LIMIT 4) " +
+                    "UNION All " +
+                    "(SELECT " +
+                    "b.board_id, " +
+                    "b.title, " +
+                    "u.nickname, " +
+                    "b.dtype " +
+                    "FROM board b " +
+                    "JOIN users u ON b.user_id = u.user_id " +
+                    "WHERE b.dtype = 'RecruitBoard' " +
+                    "ORDER BY b.created_dt DESC " +
+                    "LIMIT 4)";
+        Query nativeQuery = em.createNativeQuery(sql);
+        return nativeQuery.getResultList();
     }
 
 }

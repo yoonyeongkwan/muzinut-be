@@ -28,6 +28,8 @@ public class QSongLike extends EntityPathBase<SongLike> {
 
     public final QSong song;
 
+    public final nuts.muzinut.domain.member.QUser user;
+
     public QSongLike(String variable) {
         this(SongLike.class, forVariable(variable), INITS);
     }
@@ -47,6 +49,7 @@ public class QSongLike extends EntityPathBase<SongLike> {
     public QSongLike(Class<? extends SongLike> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.song = inits.isInitialized("song") ? new QSong(forProperty("song"), inits.get("song")) : null;
+        this.user = inits.isInitialized("user") ? new nuts.muzinut.domain.member.QUser(forProperty("user"), inits.get("user")) : null;
     }
 
 }

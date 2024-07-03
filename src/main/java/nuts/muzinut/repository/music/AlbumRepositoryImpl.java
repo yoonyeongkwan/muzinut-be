@@ -18,7 +18,7 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<AlbumDetaillDto> albumDetaill(Long id) {
+    public List<AlbumDetaillDto> albumDetail(Long id) {
         return queryFactory
                 .select(Projections.constructor(AlbumDetaillDto.class,
                         album.name,
@@ -33,7 +33,7 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
     }
 
     @Override
-    public List<AlbumSongDetaillDto> albumSongDetaill(Long id) {
+    public List<AlbumSongDetaillDto> albumSongDetail(Long id) {
         return queryFactory
                 .select(Projections.constructor(AlbumSongDetaillDto.class,
                         song.id,

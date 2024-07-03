@@ -125,7 +125,7 @@ public class SongRepositoryImpl implements SongRepositoryCustom {
     }
     // Genre( KPOP, BALLAD, POP, HIPHOP, RNB, INDIE, TROT, VIRTUBER, ETC )
 
-    public List<SongDetaillDto> songDetaill(Long id){
+    public List<SongDetaillDto> songDetail(Long id){
 
 
         return queryFactory
@@ -145,7 +145,7 @@ public class SongRepositoryImpl implements SongRepositoryCustom {
                 .fetch();
     }
 
-    public List<SongGenreDto> songDetaillGenre(Long id){
+    public List<SongGenreDto> songDetailGenre(Long id){
 
         return queryFactory
                 .select(Projections.constructor(SongGenreDto.class,

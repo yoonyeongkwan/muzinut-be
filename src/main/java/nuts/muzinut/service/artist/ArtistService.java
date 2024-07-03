@@ -24,6 +24,7 @@ public class ArtistService {
                 page.getContent(),
                 page.getNumber(),
                 page.getSize(),
+                page.getTotalPages(),
                 page.getTotalPages()
         );
     }

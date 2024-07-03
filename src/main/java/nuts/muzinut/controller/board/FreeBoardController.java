@@ -50,7 +50,7 @@ public class FreeBoardController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping
     public ResponseEntity<MessageDto> createBoard(
-            @RequestPart MultipartFile quillFile, @RequestPart FreeBoardForm freeBoardForm) throws IOException {
+            @RequestPart("quillFile") MultipartFile quillFile, @RequestPart("freeBoardForm") FreeBoardForm freeBoardForm) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
         FreeBoard freeBoard = new FreeBoard(freeBoardForm.getTitle());

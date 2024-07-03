@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface AlbumRepositoryCustom {
 
-    List<AlbumDetaillDto> albumDetaill(Long id);
+    List<AlbumDetaillDto> albumDetail(Long id);
 
-    List<AlbumSongDetaillDto> albumSongDetaill(Long id);
+    List<AlbumSongDetaillDto> albumSongDetail(Long id);
 }

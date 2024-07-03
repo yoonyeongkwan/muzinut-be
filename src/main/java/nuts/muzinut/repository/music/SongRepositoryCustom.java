@@ -1,8 +1,6 @@
 package nuts.muzinut.repository.music;
 
 
-import com.querydsl.core.Tuple;
-import nuts.muzinut.domain.music.Genre;
 import nuts.muzinut.dto.music.SongDetaillDto;
 import nuts.muzinut.dto.music.SongGenreDto;
 import nuts.muzinut.dto.music.SongPageDto;
@@ -20,8 +18,8 @@ public interface SongRepositoryCustom {
 
     Page<SongPageDto> genreSong(String genre, Pageable pageable);
 
-    List<SongDetaillDto> songDetaill(Long id);
+    List<SongDetaillDto> songDetail(Long id);
 
-    List<SongGenreDto> songDetaillGenre(Long id);
+    List<SongGenreDto> songDetailGenre(Long id);
 
 }

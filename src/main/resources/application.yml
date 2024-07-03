@@ -34,7 +34,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: none # 어플리케이션이 뜰때 기존에 있던 데이터를 모두 삭제함
+      ddl-auto: create # 어플리케이션이 뜰때 기존에 있던 데이터를 모두 삭제함
     properties:
       hibernate:
 #                show_sql: true

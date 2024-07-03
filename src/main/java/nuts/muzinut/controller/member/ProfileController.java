@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.domain.music.Album;
 import nuts.muzinut.dto.member.profile.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.service.board.FileStore;
-import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.member.ProfileService;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
@@ -28,7 +28,6 @@ public class ProfileController {
     private final ProfileService profileService;
     private final FileStore fileStore;
     private final ObjectMapper objectMapper;
-    private final FollowService followService;
 
     // 프로필 페이지 보여주는 메소드
     @ResponseBody
@@ -85,8 +84,12 @@ public class ProfileController {
                 HttpEntity<String> allAlbumsEntity = new HttpEntity<>(allAlbumsJson, allAlbumsHeaders);
                 albumData.add("allAlbums", allAlbumsEntity);
 
-                // 앨범 이미지 파일을 추가
-                fileStore.setAlbumImages(mainSong.getFileName(), albumData);
+                // 메인 곡의 앨범 이미지 파일을 추가
+                if (mainSong != null && mainSong.getAlbumImg() != null) {
+                    fileStore.setAlbumImages(mainSong.getAlbumImg(), albumData);
+                }
+
+                // 모든 앨범 이미지 파일을 추가
                 for (ProfileAlbumListDto album : allAlbums) {
                     fileStore.setAlbumImages(album.getAlbumImg(), albumData);
                 }

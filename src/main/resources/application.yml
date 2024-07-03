@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/muzinut
+    url: jdbc:h2:tcp://localhost/~/db/muzinut
     username: sa
     password: 12
     driver-class-name: org.h2.Driver
@@ -16,7 +16,8 @@ spring:
       max-file-size: 10MB
 
   file:
-    dir: F:/final/project/muzinut-be/src/main/java/nuts/muzinut/file/
+    dir: C:/Users/wndud/study/project/muzinut/file/
+    base-img: C:/Users/wndud/study/project/muzinut/file/base.png
 
   mail:
     host: smtp.naver.com
@@ -37,9 +38,8 @@ spring:
       ddl-auto: create # 어플리케이션이 뜰때 기존에 있던 데이터를 모두 삭제함
     properties:
       hibernate:
-#                show_sql: true
+        #        show_sql: true
         format_sql: true
-        default_batch_fetch_size: 1000
 
 jwt:
   header: Authorization

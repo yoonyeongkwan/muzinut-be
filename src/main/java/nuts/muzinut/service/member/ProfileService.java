@@ -3,6 +3,7 @@ package nuts.muzinut.service.member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.domain.music.Album;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.dto.member.profile.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
@@ -120,12 +121,16 @@ public class ProfileService {
                 .map(genre -> genre.getGenre().toString())
                 .collect(joining(", "));
 
+        Album album = mainSong.getAlbum();
+        String albumImg = (album != null) ? album.getAlbumImg() : null;
+
         return new ProfileSongDto(
                 mainSong.getFileName(),
                 mainSong.getTitle(),
                 songGenre,
                 mainSong.getLyrics(),
-                mainSong.getPlayViews().size()
+                mainSong.getPlayViews().size(),
+                albumImg // 앨범 image 추가
         );
     }
 

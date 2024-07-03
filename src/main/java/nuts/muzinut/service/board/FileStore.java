@@ -208,7 +208,7 @@ public class FileStore {
 
     // 앨범 이미지를 폼 데이터에 넣어주는 메서드
     public void setAlbumImages(String albumImgName, MultiValueMap<String, Object> formData) {
-        FileSystemResource albumImgResource = new FileSystemResource("path/to/album/images/" + albumImgName);
+        FileSystemResource albumImgResource = new FileSystemResource(fileDir+"/albumImg/"+ albumImgName);
         formData.add("albumImage", albumImgResource);
     }
 }

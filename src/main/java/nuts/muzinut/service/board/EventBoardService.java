@@ -16,6 +16,7 @@ import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
 import nuts.muzinut.dto.board.free.FreeBoardsForm;
 import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.EventBoardRepository;
 import nuts.muzinut.repository.board.query.EventBoardQueryRepository;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 import static nuts.muzinut.domain.board.QBoard.board;
 import static nuts.muzinut.domain.board.QFreeBoard.freeBoard;
@@ -43,15 +45,24 @@ public class EventBoardService extends DetailCommon{
         return eventBoardRepository.save(eventBoard);
     }
 
-    public DetailEventBoardDto getDetailEventBoard(Long boardId) {
-        return null;
+    public EventBoard getEventBoard(Long id) {
+        return eventBoardRepository.findById(id)
+                .orElseThrow(() -> new BoardNotFoundException("찾고자하는 이벤트 게시판이 없습니다"));
+    }
+
+    public void updateEventBoard(String filename, String title, String img, Long BoardId) {
+        eventBoardRepository.updateEventBoard(filename, title, img, BoardId);
+    }
+
+    public void deleteEventBoard(Long id) {
+        eventBoardRepository.deleteById(id);
     }
 
     /**
      * 특정 이벤트 게시판 조회
      * tuple (board, eventBoard, like.count)
      */
-    public DetailEventBoardDto detailEventBoard(Long boardId, User user) {
+    public DetailEventBoardDto getDetailEventBoard(Long boardId, User user) {
         List<Tuple> result = queryRepository.getDetailEventBoard(boardId, user);
 
         log.info("tuple: {}", result);
@@ -92,7 +103,7 @@ public class EventBoardService extends DetailCommon{
         List<EventBoard> eventBoards = page.getContent();
 
         if (eventBoards.isEmpty()) {
-            throw new BoardNotExistException("기재된 어드민 게시판이 없습니다.");
+            throw new BoardNotExistException("기재된 이벤트 게시판이 없습니다.");
         }
 
         EventBoardsDto boardsDto = new EventBoardsDto();
@@ -102,5 +113,11 @@ public class EventBoardService extends DetailCommon{
                     e.getCreatedDt(), e.getLikes().size(), e.getView()));
         }
         return boardsDto;
+    }
+
+    public boolean checkAuth(Long boardId, User user) {
+        Optional<EventBoard> eventBoard = eventBoardRepository.findEventBoardWithUser(boardId);
+        EventBoard findEventBoard = eventBoard.orElseThrow(() -> new BoardNotFoundException("게시판이 존재하지 않습니다."));
+        return findEventBoard.getUser() == user;
     }
 }

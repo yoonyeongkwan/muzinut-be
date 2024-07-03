@@ -21,7 +21,7 @@ import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.member.UserService;
 import org.springframework.stereotype.Component;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class DataInit {
 
@@ -36,23 +36,23 @@ public class DataInit {
     @PersistenceContext
     EntityManager em;
 
-    @PostConstruct
-    public void init() {
-        dataInitService.initializeData();
-    }
-
 //    @PostConstruct
 //    public void init() {
-//        AuthorityDto authorityDto = new AuthorityDto("admin");
-//        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
-//        userService.adminSignup(userDto);
-//        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
-//        userService.signup(userDto2);
-////        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
-////        userService.signup(userDto3);
-//
-////        dataInitService.recruitBoardBoardScenario();
+//        dataInitService.initializeData();
 //    }
+
+    @PostConstruct
+    public void init() {
+        AuthorityDto authorityDto = new AuthorityDto("admin");
+        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
+        userService.adminSignup(userDto);
+        UserDto userDto2 = new UserDto("user@naver.com", "user", "user!");
+        userService.signup(userDto2);
+//        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
+//        userService.signup(userDto3);
+
+//        dataInitService.recruitBoardBoardScenario();
+    }
 
 //    @PostConstruct
     public void adminBoardScenario() {
@@ -80,7 +80,7 @@ public class DataInit {
         createAdminBoards();
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void FreeBoardScenario() {
         User user1 = new User();
         user1.setNickname("tom");
@@ -104,7 +104,7 @@ public class DataInit {
         replyRepository.save(reply2);
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void commentLike() {
         Comment comment = new Comment();
         commentRepository.save(comment);

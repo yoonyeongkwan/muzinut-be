@@ -121,7 +121,6 @@ public class AdminBoardController {
         formData.add("quillFile", new FileSystemResource(fullPath));
 
         //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-//        Set<String> profileImages = adminBoardService.getProfileImages(detailAdminBoard);
         Set<String> profileImages = adminBoardService.getProfileImages(detailAdminBoard.getProfileImg(), detailAdminBoard.getComments());
         fileStore.setImageHeaderWithData(profileImages, formData);
 

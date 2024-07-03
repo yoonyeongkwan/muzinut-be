@@ -64,7 +64,7 @@ public class LoungeService extends DetailCommon{
         loungeRepository.updateLounge(filename, id);
     }
 
-    //Todo 모든 라운지 조회
+    //모든 라운지 조회
     public LoungesDto getLounges(int startPage) throws BoardNotExistException {
         PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt")); //Todo 한 페이지에 가져올 게시판 수를 정하기
         Page<Lounge> page = loungeRepository.findAll(pageRequest);
@@ -78,14 +78,14 @@ public class LoungeService extends DetailCommon{
         loungesDto.setPaging(page.getNumber(), page.getTotalPages(), page.getTotalElements()); //paging 처리
         for (Lounge l : lounges) {
             loungesDto.getLoungesForms().add(new LoungesForm(l.getId(), l.getUser().getNickname(), l.getFilename(),
-                    l.getCreatedDt(), l.getLikes().size(), l.getView()));
+                    l.getCreatedDt(), l.getLikeCount(), l.getView()));
         }
         return loungesDto;
     }
 
     /**
      * 특정 라운지 게시판 조회
-     * tuple (board, lounge, like.count)
+     * tuple (board, lounge, detailBaseDto)
      */
     public DetailLoungeDto detailLounge(Long boardId, User user) {
         List<Tuple> result = queryRepository.getDetailLounge(boardId, user);
@@ -107,9 +107,8 @@ public class LoungeService extends DetailCommon{
         DetailLoungeDto detailLoungeDto = new DetailLoungeDto(findLounge.getId(), findLounge.getUser().getNickname(),
                 view ,findLounge.getFilename(), findLounge.getUser().getProfileImgFilename());
 
-        Long likeCount = first.get(2, Long.class);
-        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
-        detailLoungeDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
+        detailLoungeDto.setLikeCount(findBoard.getLikeCount()); //좋아요 수 셋팅
         detailLoungeDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
         detailLoungeDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 

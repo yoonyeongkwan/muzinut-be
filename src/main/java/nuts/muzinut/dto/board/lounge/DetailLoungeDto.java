@@ -21,9 +21,9 @@ public class DetailLoungeDto extends DetailBaseDto {
     private int view;
     private int commentSize;
     private String quillFilename;
+    private int likeCount;
 
     private List<CommentDto> comments = new ArrayList<>();
-    private Long likeCount;
 
     public DetailLoungeDto(String writer, int view) {
         this.writer = writer;

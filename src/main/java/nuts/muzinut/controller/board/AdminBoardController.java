@@ -204,10 +204,12 @@ public class AdminBoardController {
      */
     @ResponseBody
     @GetMapping("/admin-boards")
-    public ResponseEntity<AdminBoardsDto> getAdminBoards(@RequestParam(value = "page", defaultValue = "0") int page) {
+    public ResponseEntity<AdminBoardsDto> getAdminBoards(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "sort", defaultValue = "DATE") SortType sort) {
 
         try {
-            AdminBoardsDto adminBoards = adminBoardService.getAdminBoards(page);
+            AdminBoardsDto adminBoards = adminBoardService.getAdminBoards(page, sort);
             return ResponseEntity.ok()
                     .body(adminBoards);
         } catch (BoardNotExistException e) {

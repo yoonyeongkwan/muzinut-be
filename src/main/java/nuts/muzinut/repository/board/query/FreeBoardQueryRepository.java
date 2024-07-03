@@ -64,10 +64,6 @@ public class FreeBoardQueryRepository {
 
         return queryFactory
                 .select(board, freeBoard,
-                        JPAExpressions
-                                .select(like.count())
-                                .from(like)
-                                .where(like.board.id.eq(boardId)),
                         Projections.fields(DetailBaseDto.class,
                                 isLikeExpression.as("boardLikeStatus"),
                                 isBookmarkExpression.as("isBookmark")))

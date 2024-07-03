@@ -15,6 +15,10 @@ public class AdminBoard extends Board {
 
     private String filename; //react quill file
 
+    public int addView() {
+        return ++this.view;
+    }
+
     public AdminBoard(String title) {
         super.title = title;
     }

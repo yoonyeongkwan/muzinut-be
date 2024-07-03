@@ -40,17 +40,25 @@ public class AlbumService {
 
     public String saveAlbumImg(MultipartFile albumImg) {
         String randomFileName = makeFileName();
-        File storeAlbumImg = new File(fileDir + "/albumImg/" + randomFileName + ".png");
+
+        // 확장자 추출
+        String fileType = getFileType(albumImg);
+
+        File storeAlbumImg = new File(fileDir + "/albumImg/" + randomFileName + "." + fileType);
 
         // 저장 경로가 없으면 저장경로 생성
         File storeDir = new File(fileDir + "/albumImg/");
-        if(!storeDir.exists()) storeDir.mkdir();
+        if(!storeDir.exists()) storeDir.mkdirs();
 
         try {
             albumImg.transferTo(storeAlbumImg);
         }catch(IOException e) {
             e.printStackTrace();
         }
+
+        // 랜덤 파일 이름 + 확장명 이름으로 설정
+        randomFileName += randomFileName + "." + fileType;
+
         return randomFileName;
     }
 
@@ -71,14 +79,16 @@ public class AlbumService {
                 File storeSong = new File(fileDir + "/songFile/" + randomFileName + ".mp3");
                 // 저장 경로가 없으면 저장경로 생성
                 File storeDir = new File(fileDir + "/songFile/");
-                if(!storeDir.exists()) storeDir.mkdir();
+                if(!storeDir.exists()) storeDir.mkdirs();
                 try {
                     songFiles.get(i).transferTo(storeSong);
                 }catch(IOException e) {
                     e.printStackTrace();
                 }
+
                 // 저장될 파일 이름으로 변경
-                albumData.getSongs().get(i).setOriginFilename(randomFileName);
+                String fileType = getFileType(songFiles.get(i));
+                albumData.getSongs().get(i).setOriginFilename(randomFileName + "." + fileType);
             }
         }
 
@@ -164,6 +174,11 @@ public class AlbumService {
 
         }
         return randomFileName;
+    }
+
+    public String getFileType(MultipartFile file) {
+        String fileName = file.getOriginalFilename();
+        return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 }
 

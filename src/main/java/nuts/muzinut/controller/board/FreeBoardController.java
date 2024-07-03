@@ -96,7 +96,8 @@ public class FreeBoardController {
         formData.add("quillFile", new FileSystemResource(fullPath));
 
         //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-        Set<String> profileImages = freeBoardService.getProfileImages(detailFreeBoardDto);
+        Set<String> profileImages = freeBoardService.getProfileImages(detailFreeBoardDto.getProfileImg(),
+                detailFreeBoardDto.getComments());
         fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);

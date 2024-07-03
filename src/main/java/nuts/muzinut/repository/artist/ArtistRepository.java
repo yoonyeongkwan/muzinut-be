@@ -27,7 +27,7 @@ public class ArtistRepository {
                         user.id,
                         user.nickname,
                         follow.count().as("follower"),
-                        user.profileImgFilename))
+                        user.profileImgFilename.as("img")))
                 .from(follow)
                 .join(user).on(user.id.eq(follow.followingMemberId))
                 .groupBy(user.id)

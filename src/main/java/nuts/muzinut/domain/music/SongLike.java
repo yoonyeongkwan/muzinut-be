@@ -2,6 +2,7 @@ package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nuts.muzinut.domain.member.User;
 import org.springframework.data.annotation.CreatedDate;
@@ -11,8 +12,8 @@ import java.time.LocalDate;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Getter
-@Setter
+@Getter @Setter
+@NoArgsConstructor
 public class SongLike {
 
     @Id
@@ -31,6 +32,7 @@ public class SongLike {
     @CreatedDate
     @Column(updatable = false)
     private LocalDate likeDt;
+
 
     public SongLike(User user, Song song) {
         this.user = user;

@@ -10,6 +10,7 @@ import nuts.muzinut.domain.board.FreeBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.event.EventBoardForm;
+import nuts.muzinut.dto.board.event.EventBoardsDto;
 import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardForm;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
@@ -40,7 +41,7 @@ import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
 
 @Slf4j
 //@Controller
-@RequestMapping("/event/free-boards")
+@RequestMapping("/community/event-boards")
 @RequiredArgsConstructor
 public class EventBoardController {
 
@@ -91,6 +92,7 @@ public class EventBoardController {
 
         User findUser = userService.getUserWithUsername().orElse(null);
         DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id, findUser);
+
         String jsonString = objectMapper.writeValueAsString(detailFreeBoardDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가
@@ -105,27 +107,28 @@ public class EventBoardController {
         formData.add("quillFile", new FileSystemResource(fullPath));
 
         //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-        Set<String> profileImages = freeBoardService.getProfileImages(detailFreeBoardDto);
+        Set<String> profileImages = freeBoardService.getProfileImages(detailFreeBoardDto.getProfileImg(),
+                detailFreeBoardDto.getComments());
         fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }
 
-    //모든 자유 게시판 조회
+    //모든 이벤트 게시판 조회
     @GetMapping()
-    public ResponseEntity<FreeBoardsDto> getFreeBoards(
+    public ResponseEntity<EventBoardsDto> getFreeBoards(
             @RequestParam(value = "page", defaultValue = "0") int page) {
         try {
-            FreeBoardsDto freeBoards = freeBoardService.getFreeBoards(page);
+            EventBoardsDto eventBoards = eventBoardService.getEventBoards(page);
             return ResponseEntity.ok()
-                    .body(freeBoards);
+                    .body(eventBoards);
         } catch (BoardNotExistException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT)
                     .body(null);
         }
     }
     
-    //자유 게시판 수정
+    //라운지 게시판 수정
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<MessageDto> updateFreeBoard(
@@ -133,6 +136,7 @@ public class EventBoardController {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("닉네임을 설정해주세요"));
         boolean isAuthorized = freeBoardService.checkAuth(id, user);
+
         if (isAuthorized) {
             FreeBoard freeBoard = freeBoardService.getFreeBoard(id);
             //자유 게시판 파일 저장 및 기존 퀼 파일 삭제

@@ -74,6 +74,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final ListPath<nuts.muzinut.domain.music.PlayNut, nuts.muzinut.domain.music.QPlayNut> playNutList = this.<nuts.muzinut.domain.music.PlayNut, nuts.muzinut.domain.music.QPlayNut>createList("playNutList", nuts.muzinut.domain.music.PlayNut.class, nuts.muzinut.domain.music.QPlayNut.class, PathInits.DIRECT2);
 
+    public final StringPath profileBannerImgFilename = createString("profileBannerImgFilename");
+
     public final StringPath profileImgFilename = createString("profileImgFilename");
 
     public final ListPath<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard> recruitBoards = this.<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard>createList("recruitBoards", nuts.muzinut.domain.board.RecruitBoard.class, nuts.muzinut.domain.board.QRecruitBoard.class, PathInits.DIRECT2);

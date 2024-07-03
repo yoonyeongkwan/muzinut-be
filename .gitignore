@@ -1,10 +1,12 @@
 HELP.md
 .gradle
-application.yml
+
 
 build/
-src/test/**
 src/main/java/nuts/muzinut/file/**
+DataInit.class
+src/test/**
+application.yml
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

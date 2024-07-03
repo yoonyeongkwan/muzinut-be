@@ -61,7 +61,7 @@ public class FreeBoardService extends DetailCommon{
         freeBoardRepository.updateFreeBoard(filename, title, id);
     }
 
-    public FreeBoardsDto getFreeBoards(int startPage) throws BoardNotExistException {
+    public FreeBoardsDto getFreeBoards(int startPage){
         PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt")); //Todo 한 페이지에 가져올 게시판 수를 정하기
         Page<FreeBoard> page = freeBoardRepository.findAll(pageRequest);
         List<FreeBoard> freeBoards = page.getContent();
@@ -122,26 +122,4 @@ public class FreeBoardService extends DetailCommon{
         FreeBoard findFreeBoard = freeBoard.orElseThrow(() -> new BoardNotFoundException("게시판이 존재하지 않습니다."));
         return findFreeBoard.getUser() == user;
     }
-
-    public Set<String> getProfileImages(DetailFreeBoardDto detailFreeBoardDto) {
-
-        Set<String> profileImages = new HashSet<>();
-        addWriterProfile(profileImages, detailFreeBoardDto.getProfileImg()); //게시판 작성자의 프로필 추가
-
-        for (CommentDto c : detailFreeBoardDto.getComments()) {
-            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
-
-            for (ReplyDto r : c.getReplies()) {
-                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
-            }
-        }
-        return profileImages;
-    }
-
-    private void addWriterProfile(Set<String> profileImages, String profileImg) {
-        if (StringUtils.hasText(profileImg)) {
-            profileImages.add(profileImg);
-        }
-    }
-
 }

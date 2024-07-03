@@ -21,7 +21,6 @@ import org.springframework.util.MultiValueMap;
 import java.util.ArrayList;
 import java.util.List;
 
-@Transactional
 @RequiredArgsConstructor
 @Service
 public class SongService {

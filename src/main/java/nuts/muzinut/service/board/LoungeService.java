@@ -124,25 +124,4 @@ public class LoungeService extends DetailCommon{
         Lounge lounge = findLounge.orElseThrow(() -> new BoardNotFoundException("게시판이 존재하지 않습니다."));
         return lounge.getUser() == user;
     }
-
-    public Set<String> getProfileImages(DetailLoungeDto detailLoungeDto) {
-
-        Set<String> profileImages = new HashSet<>();
-        addWriterProfile(profileImages, detailLoungeDto.getProfileImg()); //게시판 작성자의 프로필 추가
-
-        for (CommentDto c : detailLoungeDto.getComments()) {
-            addWriterProfile(profileImages, c.getCommentProfileImg()); //댓글 작성자의 프로필 추가
-
-            for (ReplyDto r : c.getReplies()) {
-                addWriterProfile(profileImages, r.getReplyProfileImg()); //대댓글 작성자의 프로필 추가
-            }
-        }
-        return profileImages;
-    }
-
-    private void addWriterProfile(Set<String> profileImages, String profileImg) {
-        if (StringUtils.hasText(profileImg)) {
-            profileImages.add(profileImg);
-        }
-    }
 }

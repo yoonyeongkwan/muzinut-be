@@ -194,4 +194,15 @@ public class FileStore {
 
         imagesFullPath.forEach(i -> formData.add("profileImg", new FileSystemResource(i)));
     }
+
+    // 프로필 이미지와 배너 이미지를 폼 데이터에 넣어주는 메서드
+    public void setProfileAndBannerImage(String profileImage, String bannerImage, MultiValueMap<String, Object> formData) {
+        List<String> imagePaths = List.of(profileImage, bannerImage)
+                .stream()
+                .map(this::getFullPath)
+                .toList();
+
+        formData.add("profileImage", new FileSystemResource(imagePaths.get(0)));
+        formData.add("bannerImage", new FileSystemResource(imagePaths.get(1)));
+    }
 }

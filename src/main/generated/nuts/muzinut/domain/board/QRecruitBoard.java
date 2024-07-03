@@ -25,6 +25,9 @@ public class QRecruitBoard extends EntityPathBase<RecruitBoard> {
     public final QBoard _super;
 
     //inherited
+    public final ListPath<Bookmark, QBookmark> bookmarks;
+
+    //inherited
     public final ListPath<Comment, QComment> comments;
 
     public final StringPath content = createString("content");
@@ -81,6 +84,7 @@ public class QRecruitBoard extends EntityPathBase<RecruitBoard> {
     public QRecruitBoard(Class<? extends RecruitBoard> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new QBoard(type, metadata, inits);
+        this.bookmarks = _super.bookmarks;
         this.comments = _super.comments;
         this.createdDt = _super.createdDt;
         this.id = _super.id;

@@ -10,7 +10,6 @@ import nuts.muzinut.domain.music.Album;
 @NoArgsConstructor
 public class ProfileSongDto {
 
-    private String fileName;
     private String title;
     private String genre;
     private String intro;

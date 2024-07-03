@@ -57,7 +57,7 @@ public class AlbumService {
         }
 
         // 랜덤 파일 이름 + 확장명 이름으로 설정
-        randomFileName += randomFileName + "." + fileType;
+        randomFileName = randomFileName + "." + fileType;
 
         return randomFileName;
     }

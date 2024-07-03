@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.domain.music.Album;
 import nuts.muzinut.dto.member.profile.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;

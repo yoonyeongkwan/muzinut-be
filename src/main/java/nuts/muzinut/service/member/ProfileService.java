@@ -125,7 +125,6 @@ public class ProfileService {
         String albumImg = (album != null) ? album.getAlbumImg() : null;
 
         return new ProfileSongDto(
-                mainSong.getFileName(),
                 mainSong.getTitle(),
                 songGenre,
                 mainSong.getLyrics(),

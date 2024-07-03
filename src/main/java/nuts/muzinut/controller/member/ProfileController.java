@@ -5,8 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.member.ProfileDto;
-import nuts.muzinut.dto.music.AlbumDto;
+import nuts.muzinut.dto.member.profile.ProfileSongDto;
+import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
+import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.FollowService;
 import nuts.muzinut.service.member.ProfileService;
@@ -55,23 +56,49 @@ public class ProfileController {
     }
 
     // 탭 내용 가져오는 메소드
-    @GetMapping("/{tab}")
+    @GetMapping(value = "/{tab}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> getProfileTabContent(@PathVariable String tab, @RequestParam("userId") Long userId) throws JsonProcessingException {
 
 
         // 각 탭에 대한 내용 처리
         switch (tab) {
             case "album":
-                // 앨범 데이터 가져오기
-                List<AlbumDto> albums = profileService.getUserAlbums(userId);
-                return new ResponseEntity<>(albums, HttpStatus.OK);
+                // 메인 곡 데이터 가져오기
+                ProfileSongDto mainSong = profileService.getMainSong(userId);
+
+                // 모든 앨범 목록 데이터 가져오기
+                List<ProfileAlbumListDto> allAlbums = profileService.getAllAlbums(userId);
+
+                MultiValueMap<String, Object> albumData = new LinkedMultiValueMap<>();
+
+                // 메인 곡 데이터를 JSON으로 변환하여 추가
+                String mainSongJson = objectMapper.writeValueAsString(mainSong);
+                HttpHeaders mainSongHeaders = new HttpHeaders();
+                mainSongHeaders.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<String> mainSongEntity = new HttpEntity<>(mainSongJson, mainSongHeaders);
+                albumData.add("mainSong", mainSongEntity);
+
+                // 모든 앨범 목록 데이터를 JSON으로 변환하여 추가
+                String allAlbumsJson = objectMapper.writeValueAsString(allAlbums);
+                HttpHeaders allAlbumsHeaders = new HttpHeaders();
+                allAlbumsHeaders.setContentType(MediaType.APPLICATION_JSON);
+                HttpEntity<String> allAlbumsEntity = new HttpEntity<>(allAlbumsJson, allAlbumsHeaders);
+                albumData.add("allAlbums", allAlbumsEntity);
+
+                // 앨범 이미지 파일을 추가
+                fileStore.setAlbumImages(mainSong.getFileName(), albumData);
+                for (ProfileAlbumListDto album : allAlbums) {
+                    fileStore.setAlbumImages(album.getAlbumImg(), albumData);
+                }
+
+                return new ResponseEntity<>(albumData, HttpStatus.OK);
 
             case "lounge":
 //                // 라운지 데이터 가져오기
 //                List<LoungeDto> lounges = profileService.getUserLounges(userId);
 //                return new ResponseEntity<>(lounges, HttpStatus.OK);
 
-            case "community":
+            case "board":
                 // 현재 로그인한 사용자 정보 가져오기
                 String currentUsername = profileService.getCurrentUsername();
                 User currentUser = profileService.findUserByUsername(currentUsername);

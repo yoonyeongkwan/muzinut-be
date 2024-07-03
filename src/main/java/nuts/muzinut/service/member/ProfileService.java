@@ -1,42 +1,27 @@
 package nuts.muzinut.service.member;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.domain.music.Album;
-import nuts.muzinut.domain.music.Genre;
 import nuts.muzinut.domain.music.Song;
-import nuts.muzinut.domain.music.SongGenre;
-import nuts.muzinut.dto.member.ProfileDto;
-import nuts.muzinut.dto.music.AlbumDto;
-import nuts.muzinut.dto.music.SongDto;
+import nuts.muzinut.dto.member.profile.ProfileSongDto;
+import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
+import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.AlbumRepository;
-import nuts.muzinut.service.board.*;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import nuts.muzinut.repository.music.SongRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
+
+import static java.util.stream.Collectors.*;
 
 @Slf4j
 @Service
@@ -46,6 +31,7 @@ public class ProfileService {
     private final UserRepository userRepository;
     private final FollowService followService;
     private final AlbumRepository albumRepository;
+    private final SongRepository songRepository;
 
     // 프로필 페이지 보여주는 메소드
     public ProfileDto getUserProfile(Long userId) {
@@ -120,40 +106,34 @@ public class ProfileService {
                 .orElseThrow(() -> new NotFoundMemberException("접근 권한이 없습니다."));
     }
 
-    // 사용자가 업로드한 앨범 가져오는 메소드
-    public List<AlbumDto> getUserAlbums(Long userId) {
-        List<Album> albums = albumRepository.findByUserId(userId);
-        return albums.stream()
-                .map(this::convertToAlbumDto)
-                .collect(Collectors.toList());
-    }
+    // 메인 곡을 보여주는 메소드
+    public ProfileSongDto getMainSong(Long userId) {
+        List<Song> songs = songRepository.findSongsByUserIdOrderByLikesAndId(userId);
 
-    // 변환 메소드 추가
-    private SongDto convertToSongDto(Song song) {
-        List<String> genres = song.getSongGenres().stream()
-                .map(songGenre -> songGenre.getGenre().name())
-                .collect(Collectors.toList());
+        if (songs.isEmpty()) {
+            return null; // 곡이 없을 경우 처리
+        }
 
-        return new SongDto(
-                song.getTitle(),
-                song.getLyricist(),
-                song.getComposer(),
-                genres,
-                song.getLyrics(),
-                song.getFileName()
+        Song mainSong = songs.get(0); // 좋아요 수가 가장 높은 곡 또는 첫 번째 등록된 곡
+
+        String songGenre = mainSong.getSongGenres().stream()
+                .map(genre -> genre.getGenre().toString())
+                .collect(joining(", "));
+
+        return new ProfileSongDto(
+                mainSong.getFileName(),
+                mainSong.getTitle(),
+                songGenre,
+                mainSong.getLyrics(),
+                mainSong.getPlayViews().size()
         );
     }
 
-    private AlbumDto convertToAlbumDto(Album album) {
-        List<SongDto> songDtos = album.getSongList().stream()
-                .map(this::convertToSongDto)
-                .collect(Collectors.toList());
-
-        return new AlbumDto(
-                album.getName(),
-                album.getIntro(),
-                songDtos
-        );
+    // 앨범 리스트를 보여주는 메소드
+    public List<ProfileAlbumListDto> getAllAlbums(Long userId) {
+        // 사용자의 모든 앨범을 가져오는 로직을 작성합니다.
+        return albumRepository.findAllByUserIdOrderByLatest(userId).stream()
+                .map(album -> new ProfileAlbumListDto(album.getAlbumImg(), album.getName()))
+                .collect(toList());
     }
-
 }

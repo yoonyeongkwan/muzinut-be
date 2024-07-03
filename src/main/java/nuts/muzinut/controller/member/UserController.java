@@ -10,6 +10,7 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.*;
 import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
+import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.dto.security.TokenDto;
 import nuts.muzinut.exception.EmailVertFailException;
 import nuts.muzinut.exception.NotFoundMemberException;

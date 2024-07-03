@@ -205,4 +205,10 @@ public class FileStore {
         formData.add("profileImage", new FileSystemResource(imagePaths.get(0)));
         formData.add("bannerImage", new FileSystemResource(imagePaths.get(1)));
     }
+
+    // 앨범 이미지를 폼 데이터에 넣어주는 메서드
+    public void setAlbumImages(String albumImgName, MultiValueMap<String, Object> formData) {
+        FileSystemResource albumImgResource = new FileSystemResource("path/to/album/images/" + albumImgName);
+        formData.add("albumImage", albumImgResource);
+    }
 }

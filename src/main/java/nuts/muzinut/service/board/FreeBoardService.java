@@ -94,7 +94,6 @@ public class FreeBoardService extends DetailCommon{
         Tuple first = result.getFirst();
         Board findBoard = first.get(board);
         FreeBoard findFreeBoard = first.get(freeBoard);
-        log.info("comment size: {}", findFreeBoard.getComments().size());
         int view = findFreeBoard.addView();
 
         if (findBoard == null || findFreeBoard == null) {

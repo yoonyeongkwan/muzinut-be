@@ -28,6 +28,7 @@ import static nuts.muzinut.domain.board.QComment.comment;
 import static nuts.muzinut.domain.board.QFreeBoard.*;
 import static nuts.muzinut.domain.board.QLike.like;
 import static nuts.muzinut.domain.board.QReply.reply;
+import static nuts.muzinut.domain.member.QUser.*;
 import static nuts.muzinut.domain.member.QUser.user;
 
 @Slf4j
@@ -68,11 +69,11 @@ public class FreeBoardQueryRepository {
                                 .from(like)
                                 .where(like.board.id.eq(boardId)),
                         Projections.fields(DetailBaseDto.class,
-                                isLikeExpression.as("isLike"),
+                                isLikeExpression.as("boardLikeStatus"),
                                 isBookmarkExpression.as("isBookmark")))
                 .from(board)
                 .leftJoin(freeBoard).on(board.id.eq(freeBoard.id))
-                .leftJoin(board.user, QUser.user).fetchJoin() //추가
+                .leftJoin(board.user, QUser.user)
                 .leftJoin(board.comments, comment).fetchJoin()
                 .where(board.id.eq(boardId))
                 .fetch();

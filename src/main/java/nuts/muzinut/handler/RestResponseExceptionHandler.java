@@ -40,14 +40,13 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
             BoardNotFoundException.class, NoUploadFileException.class })
     @ResponseBody
     private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
-        log.info("BoardNotFoundException 호출");
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ExceptionHandler({BoardNotExistException.class})
     private ErrorResult NO_CONTENT(BoardNotExistException ex) {
-        return new ErrorResult(NO_CONTENT.value(), "no content!");
+        return new ErrorResult(NO_CONTENT.value(), ex.getMessage());
     }
 
     // 새로운 예외 핸들러 추가

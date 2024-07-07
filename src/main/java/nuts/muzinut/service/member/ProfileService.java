@@ -127,8 +127,9 @@ public class ProfileService {
         return new ProfileSongDto(
                 mainSong.getTitle(),
                 songGenre,
-                mainSong.getLyrics(),
-                mainSong.getPlayViews().size(),
+                mainSong.getLyricist(),
+                mainSong.getComposer(),
+                mainSong.getSongLikes().size(),
                 albumImg // 앨범 image 추가
         );
     }

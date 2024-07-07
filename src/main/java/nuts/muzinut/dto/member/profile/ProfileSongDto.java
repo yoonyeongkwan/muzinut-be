@@ -12,7 +12,8 @@ public class ProfileSongDto {
 
     private String title;
     private String genre;
-    private String intro;
+    private String lyricist; // 작사가
+    private String composer; // 작곡가
     private int likeCount;
     private String albumImg; // 앨범 이미지 추가
 }

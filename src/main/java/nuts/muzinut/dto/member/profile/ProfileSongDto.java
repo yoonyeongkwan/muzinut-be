@@ -10,7 +10,7 @@ import nuts.muzinut.domain.music.Album;
 @NoArgsConstructor
 public class ProfileSongDto {
 
-    private String title;
+    private String songTitle;
     private String genre;
     private String lyricist; // 작사가
     private String composer; // 작곡가

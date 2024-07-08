@@ -66,7 +66,7 @@ public class RecruitBoardController {
         //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
         User findUser = userService.getUserWithUsername().orElse(null);
 
-        DetailRecruitBoardDto detailRecruitBoardDto = recruitBoardService.getDetailBoard(id, findUser);
+        DetailRecruitBoardDto detailRecruitBoardDto = recruitBoardService.getDetailRecruitBoard(id, findUser);
 
         if (detailRecruitBoardDto == null) {
             throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");

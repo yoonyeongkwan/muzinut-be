@@ -10,12 +10,10 @@ import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.recruit.*;
-import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
 import nuts.muzinut.repository.board.RecruitBoardRepository;
-import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.board.query.RecruitBoardQueryRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
@@ -84,7 +82,7 @@ public class RecruitBoardService extends DetailCommon{
 
     // 특정 모집 게시판을 조회하는 서비스 메소드
     @Transactional
-    public DetailRecruitBoardDto getDetailBoard(Long id, User user) {
+    public DetailRecruitBoardDto getDetailRecruitBoard(Long id, User user) {
 //        RecruitBoard findRecruitBoard = checkEntityExists(id);
 //        findRecruitBoard.incrementView();
 

@@ -10,5 +10,5 @@ import lombok.NoArgsConstructor;
 public class ProfileAlbumListDto {
 
     private String albumImg;
-    private String name;
+    private String albumTitle;
 }

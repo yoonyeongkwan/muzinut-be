@@ -148,17 +148,17 @@ public class UserController {
     @ResponseBody //Todo 리다이렉트 설정 필요
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(value = "/set-profile-bannerImage")
-    public MessageDto setProfileBannerImage(@RequestParam("profileBannerImg") MultipartFile profileBannerImg) throws IOException {
+    public MessageDto setProfileBannerImage(@RequestParam("bannerImg") MultipartFile bannerImg) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
         if (StringUtils.hasText(user.getProfileBannerImgFilename())) {
             //프로필 배너 바꾸기
-            String changeImgName = fileStore.updateFile(profileBannerImg, user.getProfileBannerImgFilename());
+            String changeImgName = fileStore.updateFile(bannerImg, user.getProfileBannerImgFilename());
             userService.setProfileBannerName(changeImgName, user);
         } else {
             //프로필 배너 처음 설정
-            Map<FileType, String> filenames = fileStore.storeFile(profileBannerImg);
+            Map<FileType, String> filenames = fileStore.storeFile(bannerImg);
             userService.setProfileBannerName(filenames.get(STORE_FILENAME), user);
         }
 

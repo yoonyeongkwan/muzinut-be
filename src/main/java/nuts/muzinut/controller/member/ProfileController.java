@@ -5,20 +5,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
+import nuts.muzinut.dto.board.comment.CommentDto;
+import nuts.muzinut.dto.board.event.DetailEventBoardDto;
+import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
+import nuts.muzinut.dto.board.lounge.LoungesDto;
+import nuts.muzinut.dto.board.lounge.LoungesForm;
+import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
 import nuts.muzinut.dto.member.profile.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.exception.NotFoundMemberException;
-import nuts.muzinut.service.board.FileStore;
+import nuts.muzinut.service.board.*;
 import nuts.muzinut.service.member.ProfileService;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Slf4j
 @Controller
@@ -27,8 +38,11 @@ import java.util.Map;
 public class ProfileController {
 
     private final ProfileService profileService;
+    private final LoungeService loungeService;
     private final FileStore fileStore;
     private final ObjectMapper objectMapper;
+
+    private final RestTemplate restTemplate;
 
     // 프로필 정보를 가져오는 메소드
     private MultiValueMap<String, Object> getProfileInfo(Long userId, String tab) throws JsonProcessingException {
@@ -73,7 +87,22 @@ public class ProfileController {
                 break;
 
             case "lounge":
-                // 라운지 데이터 추가 로직
+                MultiValueMap<String, Object> loungeData = new LinkedMultiValueMap<String, Object>();
+                LoungesDto loungesDto = loungeService.getLoungesByUserId(userId, 0);
+                if (loungesDto == null || loungesDto.getLoungesForms().isEmpty()) {
+                    addJsonMessageToFormData(formData, "No Lounge");
+                } else {
+                    addJsonEntityToFormData(formData, "posts-json-data", loungesDto);
+                    //해당 게시판의 quill 파일 추가
+                    HttpHeaders fileHeaders = new HttpHeaders();
+                    for (LoungesForm l : loungesDto.getLoungesForms()) {
+                        String fullPath = fileStore.getFullPath(l.getFilename());
+                        fileHeaders.setContentType(MediaType.TEXT_HTML); //quill 파일 이므로 html
+                        formData.add("quillFile", new FileSystemResource(fullPath)); //파일 가져와서 셋팅
+                    }
+                }
+
+                formData.addAll(loungeData);
                 break;
 
             case "board":
@@ -132,4 +161,45 @@ public class ProfileController {
         HttpEntity<String> entity = new HttpEntity<>(jsonValue, headers);
         formData.add(key, entity);
     }
+
+    // 게시물 제목 클릭 시 특정 게시물 조회로 넘어가는 메소드
+    @GetMapping(value = "community/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MultiValueMap<String, Object>> getBoardDetails(@PathVariable Long id) {
+        Map<String, Object> boardDetails = profileService.getBoardDetails(id);
+        String boardType = (String) boardDetails.get("boardType");
+        ResponseEntity<MultiValueMap<String, Object>> responseEntity;
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity;
+
+        switch (boardType) {
+            case "AdminBoard":
+            case "FreeBoard":
+            case "EventBoard":
+                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+                entity = new HttpEntity<>(headers);
+                responseEntity = restTemplate.exchange(
+                        "http://localhost:8080/community/" + boardType.toLowerCase() + "-boards/" + id,
+                        HttpMethod.GET,
+                        entity,
+                        new ParameterizedTypeReference<MultiValueMap<String, Object>>() {}
+                );
+                break;
+            case "RecruitBoard":
+                headers.setContentType(MediaType.APPLICATION_JSON);
+                entity = new HttpEntity<>(headers);
+                responseEntity = restTemplate.exchange(
+                        "http://localhost:8080/community/recruit-boards/" + id,
+                        HttpMethod.GET,
+                        entity,
+                        new ParameterizedTypeReference<MultiValueMap<String, Object>>() {}
+                );
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid board type: " + boardType);
+        }
+
+        return responseEntity;
+    }
+
 }

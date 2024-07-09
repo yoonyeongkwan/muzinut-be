@@ -13,5 +13,4 @@ public class LoungesForm {
     private String filename;
     private LocalDateTime createdDt;
     private int like;
-    private int view;
 }

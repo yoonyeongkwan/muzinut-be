@@ -9,15 +9,18 @@ import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.event.DetailEventBoardDto;
 import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
+import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
 import nuts.muzinut.dto.member.profile.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
+import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.*;
 import nuts.muzinut.service.member.ProfileService;
+import nuts.muzinut.service.member.UserService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
@@ -39,6 +42,7 @@ public class ProfileController {
 
     private final ProfileService profileService;
     private final LoungeService loungeService;
+    private final UserService userService;
     private final FileStore fileStore;
     private final ObjectMapper objectMapper;
 
@@ -160,6 +164,34 @@ public class ProfileController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(jsonValue, headers);
         formData.add(key, entity);
+    }
+
+    // 라운지 댓글 클릭시 특정 라운지의 댓글, 대댓글 조회하는 메소드
+    @GetMapping(value = "lounge/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MultiValueMap<String, Object>> getDetailLounge(@PathVariable Long id) throws JsonProcessingException {
+        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
+
+        User findUser = userService.getUserWithUsername().orElse(null);
+        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id, findUser);
+
+        if (detailLoungeDto == null) {
+            throw new BoardNotFoundException("해당 라운지가 존재하지 않습니다");
+        }
+
+        // JSON 데이터를 Multipart-form 데이터에 추가
+        addJsonEntityToFormData(formData, "detailLoungeDto", detailLoungeDto);
+
+        // 해당 게시판의 quill 파일 추가
+        String quillFilename = detailLoungeDto.getQuillFilename();
+        String fullPath = fileStore.getFullPath(quillFilename);
+        formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
+
+        // 댓글 및 대댓글 작성자의 프로필 이미지 추가
+        Set<String> profileImages = loungeService.getProfileImages(detailLoungeDto.getProfileImg(),
+                detailLoungeDto.getComments());
+        fileStore.setImageHeaderWithData(profileImages, formData);
+
+        return new ResponseEntity<>(formData, HttpStatus.OK);
     }
 
     // 게시물 제목 클릭 시 특정 게시물 조회로 넘어가는 메소드

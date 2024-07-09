@@ -2,9 +2,13 @@ package nuts.muzinut.controller.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.controller.board.FileType;
+import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.event.DetailEventBoardDto;
@@ -24,15 +28,21 @@ import nuts.muzinut.service.member.UserService;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
 
 @Slf4j
 @Controller
@@ -91,6 +101,7 @@ public class ProfileController {
                 break;
 
             case "lounge":
+                // 모든 라운지 조회 메서드
                 MultiValueMap<String, Object> loungeData = new LinkedMultiValueMap<String, Object>();
                 LoungesDto loungesDto = loungeService.getLoungesByUserId(userId, 0);
                 if (loungesDto == null || loungesDto.getLoungesForms().isEmpty()) {
@@ -166,8 +177,29 @@ public class ProfileController {
         formData.add(key, entity);
     }
 
+    // 라운지 생성 메소드
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping(value = "/lounge")
+    public ResponseEntity<MessageDto> createBoard(
+            @RequestPart MultipartFile quillFile) throws IOException {
+        User user = userService.getUserWithUsername()
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
+        Lounge lounge = new Lounge();
+        lounge.addBoard(user);
+
+        Map<FileType, String> filenames = fileStore.storeFile(quillFile); //라운지 게시판 파일 저장
+        lounge.setFilename(filenames.get(STORE_FILENAME)); //라운지 파일명 설정
+        loungeService.save(lounge); //라운지 게시판 저장
+        HttpHeaders header = new HttpHeaders();
+        header.setLocation(URI.create("/profile/lounges/" + lounge.getId())); //생성한 라운지로 리다이렉트
+
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                .headers(header)
+                .body(new MessageDto("라운지 게시판이 생성되었습니다"));
+    }
+
     // 라운지 댓글 클릭시 특정 라운지의 댓글, 대댓글 조회하는 메소드
-    @GetMapping(value = "lounge/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "/lounge/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getDetailLounge(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
@@ -194,8 +226,59 @@ public class ProfileController {
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
 
+    // 라운지 수정 메서드
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PutMapping("/lounge/{id}")
+    public ResponseEntity<MessageDto> updateLounges(
+            @RequestPart @NotNull MultipartFile quillFile, @PathVariable Long id) throws IOException {
+        User user = userService.getUserWithUsername()
+                .orElseThrow(() -> new NotFoundMemberException("닉네임을 설정해주세요"));
+        boolean isAuthorized = loungeService.checkAuth(id, user);
+        if (isAuthorized) {
+            Lounge lounge = loungeService.getLounge(id);
+            //라운지 게시판 파일 저장 및 기존 퀼 파일 삭제
+            String changeFilename = fileStore.updateFile(quillFile, lounge.getFilename());
+            loungeService.updateLounge(lounge.getId(), changeFilename); //라운지 게시판 저장
+            HttpHeaders header = new HttpHeaders();
+            header.setLocation(URI.create("/profile/lounge/" + lounge.getId())); //수정한 게시판으로 리다이렉트
+
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .headers(header)
+                    .body(new MessageDto("라운지 게시판이 수정되었습니다"));
+
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(null);
+    }
+
+    //라운지 게시판 삭제
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @DeleteMapping("/lounge/{id}")
+    public ResponseEntity<MessageDto> deleteLounges(@PathVariable Long id) throws IOException {
+        User user = userService.getUserWithUsername()
+                .orElseThrow(() -> new NotFoundMemberException("닉네임을 설정해주세요"));
+        boolean isAuthorized = loungeService.checkAuth(id, user);
+
+        if (isAuthorized) {
+            Lounge lounge = loungeService.getLounge(id); //게시판 조회
+            fileStore.deleteFile(lounge.getFilename()); //라운지 게시판의 파일 삭제
+            loungeService.deleteLounge(id); //라운지 게시판 삭제
+
+            HttpHeaders header = new HttpHeaders();
+            String redirectUrl = String.format("/profile?userId=%d&tab=lounge", user.getId());
+            header.setLocation(URI.create(redirectUrl)); // 라운지 탭으로 리다이렉트
+
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .headers(header)
+                    .body(new MessageDto("라운지 게시판이 삭제되었습니다"));
+
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(null);
+    }
+
     // 게시물 제목 클릭 시 특정 게시물 조회로 넘어가는 메소드
-    @GetMapping(value = "community/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/community/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getBoardDetails(@PathVariable Long id) {
         Map<String, Object> boardDetails = profileService.getBoardDetails(id);
         String boardType = (String) boardDetails.get("boardType");

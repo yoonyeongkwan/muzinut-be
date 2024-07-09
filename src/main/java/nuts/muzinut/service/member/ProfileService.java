@@ -3,13 +3,10 @@ package nuts.muzinut.service.member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.Board;
+import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Album;
 import nuts.muzinut.domain.music.Song;
-import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
-import nuts.muzinut.dto.board.event.DetailEventBoardDto;
-import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
-import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
 import nuts.muzinut.dto.member.profile.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
@@ -19,13 +16,8 @@ import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.AlbumRepository;
 import nuts.muzinut.repository.music.SongRepository;
-import nuts.muzinut.service.board.AdminBoardService;
-import nuts.muzinut.service.board.EventBoardService;
-import nuts.muzinut.service.board.FreeBoardService;
-import nuts.muzinut.service.board.RecruitBoardService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -170,5 +162,10 @@ public class ProfileService {
 
         postDetails.put("boardType", boardType);
         return postDetails;
+    }
+
+    // 라운지 생성하는 메소드
+    public Lounge save(Lounge lounge) {
+        return loungeRepository.save(lounge);
     }
 }

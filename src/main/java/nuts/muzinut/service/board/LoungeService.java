@@ -66,7 +66,7 @@ public class LoungeService extends DetailCommon{
         loungeRepository.updateLounge(filename, id);
     }
 
-    // 모든 라운지 조회
+    //모든 라운지 조회
     public LoungesDto getLounges(int startPage) throws BoardNotExistException {
         return getLoungesByUserId(null, startPage);
     }
@@ -98,7 +98,7 @@ public class LoungeService extends DetailCommon{
 
     /**
      * 특정 라운지 게시판 조회
-     * tuple (board, lounge, like.count)
+     * tuple (board, lounge, detailBaseDto)
      */
     public DetailLoungeDto detailLounge(Long boardId, User user) {
         List<Tuple> result = queryRepository.getDetailLounge(boardId, user);
@@ -120,9 +120,8 @@ public class LoungeService extends DetailCommon{
         DetailLoungeDto detailLoungeDto = new DetailLoungeDto(findLounge.getId(), findLounge.getUser().getNickname(),
                 view ,findLounge.getFilename(), findLounge.getUser().getProfileImgFilename());
 
-        Long likeCount = first.get(2, Long.class);
-        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
-        detailLoungeDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
+        detailLoungeDto.setLikeCount(findBoard.getLikeCount()); //좋아요 수 셋팅
         detailLoungeDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
         detailLoungeDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 

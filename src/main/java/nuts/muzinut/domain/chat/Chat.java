@@ -3,6 +3,7 @@ package nuts.muzinut.domain.chat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,18 +18,8 @@ public class Chat {
     @Column(name = "chat_id")
     private Long id;
 
-    @Column(name = "type")
-    @Enumerated(EnumType.STRING)
-    private RoomType roomType; //dm 인지, 단체 톡방인지.. 등
-
-    @Column(name = "participate_count")
-    private int participateCount; //채팅방에 참여한 총 인원 수
-
-    public Chat(RoomType roomType) {
-        this.roomType = roomType;
-    }
-
-    private LocalDateTime created_dt;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime created_dt = LocalDateTime.now();
 
     //연관 관계
     @OneToMany(mappedBy = "chat")
@@ -38,8 +29,4 @@ public class Chat {
     List<Message> messages = new ArrayList<>();
 
     //비지니스 로직
-    public void addParticipate() {
-        this.participateCount += 1;
-    }
-
 }

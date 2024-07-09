@@ -63,6 +63,9 @@ public class User {
     private int vote; //투표권
     private int declaration; //신고 횟수~
 
+    @Lob
+    private byte[] base64Data;
+
     @ManyToMany
     @JoinTable(
             name = "user_authority",
@@ -115,6 +118,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Friend> friends = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Block> blocks = new ArrayList<>();
 
     //음악 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

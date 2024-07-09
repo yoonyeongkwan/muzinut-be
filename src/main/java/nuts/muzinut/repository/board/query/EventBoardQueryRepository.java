@@ -40,10 +40,6 @@ public class EventBoardQueryRepository {
 
         return queryFactory
                 .select(board, eventBoard,
-                        JPAExpressions
-                                .select(like.count())
-                                .from(like)
-                                .where(like.board.id.eq(boardId)),
                         Projections.fields(DetailBaseDto.class,
                                 isLikeExpression.as("boardLikeStatus"),
                                 isBookmarkExpression.as("isBookmark")))

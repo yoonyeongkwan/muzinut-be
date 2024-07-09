@@ -37,6 +37,10 @@ public class UserService {
     // 프로필 닉네임, 자기소개 설정
     @Transactional
     public void updateNicknameAndIntro(Long userId, String nickname, String intro) {
+        Boolean exists = userRepository.existsByNickname(nickname);
+        if (exists) {
+            throw new DuplicateMemberException("이미 사용중인 닉네임 입니다");
+        }
         userRepository.updateNicknameAndIntro(userId, nickname, intro);
     }
 

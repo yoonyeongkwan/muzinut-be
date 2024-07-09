@@ -59,7 +59,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         //Todo 경로 허용 반경 조정
-                        .requestMatchers("/api/hello", "/api/authenticate", "/api/signup", "/mail/**", "/**").permitAll()
+                        .requestMatchers("/api/hello", "/api/authenticate", "/api/signup", "/mail/**", "/**", "**").permitAll()
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .anyRequest().authenticated()
                 )

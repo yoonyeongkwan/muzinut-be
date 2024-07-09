@@ -106,9 +106,10 @@ public class FreeBoardController {
     //모든 자유 게시판 조회
     @GetMapping()
     public ResponseEntity<FreeBoardsDto> getFreeBoards(
-            @RequestParam(value = "page", defaultValue = "0") int page) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "sort", defaultValue = "DATE") SortType sort) {
         try {
-            FreeBoardsDto freeBoards = freeBoardService.getFreeBoards(page);
+            FreeBoardsDto freeBoards = freeBoardService.getFreeBoards(page, sort);
             return ResponseEntity.ok()
                     .body(freeBoards);
         } catch (BoardNotExistException e) {

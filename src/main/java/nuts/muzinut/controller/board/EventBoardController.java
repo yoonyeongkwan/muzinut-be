@@ -123,9 +123,10 @@ public class EventBoardController {
     //모든 이벤트 게시판 조회
     @GetMapping()
     public ResponseEntity<EventBoardsDto> getFreeBoards(
-            @RequestParam(value = "page", defaultValue = "0") int page) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "sort", defaultValue = "DATE") SortType sort) {
         try {
-            EventBoardsDto eventBoards = eventBoardService.getEventBoards(page);
+            EventBoardsDto eventBoards = eventBoardService.getEventBoards(page, sort);
             return ResponseEntity.ok()
                     .body(eventBoards);
         } catch (BoardNotExistException e) {

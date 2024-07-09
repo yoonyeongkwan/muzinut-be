@@ -64,7 +64,7 @@ public class DetailCommon {
     }
 
     //이미지 파일명을 가져와서 base64로 인코딩 하여 반환하는 메서드
-    private String encodeFileToBase64(String filename){
+    public String encodeFileToBase64(String filename){
         log.info("파일명: {}", filename);
         try {
             if (StringUtils.hasText(filename)) {

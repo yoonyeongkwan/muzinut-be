@@ -7,7 +7,7 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Album;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.dto.member.profile.ProfileSongDto;
-import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
+import nuts.muzinut.dto.member.profile.ProfileAlbumDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
@@ -15,22 +15,19 @@ import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.AlbumRepository;
 import nuts.muzinut.repository.music.SongRepository;
+import nuts.muzinut.service.board.DetailCommon;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ProfileService {
+public class ProfileService extends DetailCommon {
 
     private final UserRepository userRepository;
     private final FollowService followService;
@@ -63,16 +60,9 @@ public class ProfileService {
             log.info("isFollowing = {}", isFollowing);
         }
 
-        if ( user.getProfileBannerImgFilename() == null) {
-            user.setProfileBannerImgFilename("bannerBase.png");
-        }
-        if ( user.getProfileImgFilename() == null) {
-            user.setProfileImgFilename("base.png");
-        }
-
         ProfileDto profileDto = new ProfileDto(
                 user.getProfileBannerImgFilename(),
-                user.getProfileImgFilename(),
+                encodeFileToBase64(user.getProfileImgFilename()),
                 user.getNickname(),
                 user.getIntro(),
                 followingCount,
@@ -111,39 +101,54 @@ public class ProfileService {
                 .orElseThrow(() -> new NotFoundMemberException("접근 권한이 없습니다."));
     }
 
-    // 메인 곡을 보여주는 메소드
-    public ProfileSongDto getMainSong(Long userId) {
+    // 앨범 탭을 보여주는 메소드
+    public ProfileSongDto getAlbumTab(Long userId) {
         List<Song> songs = songRepository.findSongsByUserIdOrderByLikesAndId(userId);
+        ProfileDto profileDto = getUserProfile(userId);
 
         if (songs.isEmpty()) {
-            return null; // 곡이 없을 경우 처리
+            return new ProfileSongDto(
+                    encodeFileToBase64(profileDto.getProfileBannerImgName()),
+                    encodeFileToBase64(profileDto.getProfileImgName()),
+                    profileDto.getNickname(),
+                    profileDto.getIntro(),
+                    profileDto.getFollowingCount(),
+                    profileDto.getFollowersCount(),
+                    profileDto.isFollowStatus()
+            );
         }
 
-        Song mainSong = songs.get(0); // 좋아요 수가 가장 높은 곡 또는 첫 번째 등록된 곡
-
+        Song mainSong = songs.get(0);
         String songGenre = mainSong.getSongGenres().stream()
                 .map(genre -> genre.getGenre().toString())
-                .collect(joining(", "));
+                .collect(Collectors.joining(", "));
 
         Album album = mainSong.getAlbum();
         String albumImg = (album != null) ? album.getAlbumImg() : null;
 
+        List<ProfileAlbumDto> allAlbums = albumRepository.findAllByUserIdOrderByLatest(userId).stream()
+                .map(a -> new ProfileAlbumDto(
+                        encodeFileToBase64(a.getAlbumImg()),
+                        a.getName()
+                ))
+                .collect(Collectors.toList());
+
         return new ProfileSongDto(
+                encodeFileToBase64(profileDto.getProfileBannerImgName()),
+                encodeFileToBase64(profileDto.getProfileImgName()),
+                profileDto.getNickname(),
+                profileDto.getIntro(),
+                profileDto.getFollowingCount(),
+                profileDto.getFollowersCount(),
+                profileDto.isFollowStatus(),
                 mainSong.getTitle(),
                 songGenre,
                 mainSong.getLyricist(),
                 mainSong.getComposer(),
                 mainSong.getSongLikes().size(),
-                albumImg // 앨범 image 추가
+                encodeFileToBase64(albumImg),
+                allAlbums
         );
-    }
-
-    // 앨범 리스트를 보여주는 메소드
-    public List<ProfileAlbumListDto> getAllAlbums(Long userId) {
-        // 사용자의 모든 앨범을 가져오는 로직을 작성합니다.
-        return albumRepository.findAllByUserIdOrderByLatest(userId).stream()
-                .map(album -> new ProfileAlbumListDto(album.getAlbumImg(), album.getName()))
-                .collect(toList());
     }
 
     // 게시물 상세 정보를 가져오는 메소드

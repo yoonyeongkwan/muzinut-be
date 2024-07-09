@@ -167,23 +167,12 @@ public class UserController {
 
     // 프로필 페이지 보여주는 메소드
     @ResponseBody
-    @GetMapping(value = "/profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getUserProfile(@RequestParam("userId") Long userId) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+    @GetMapping(value = "/profile")
+    public ResponseEntity<ProfileDto> getUserProfile(@RequestParam("userId") Long userId) throws JsonProcessingException {
 
         ProfileDto profileDto = profileService.getUserProfile(userId);
-        String jsonString = objectMapper.writeValueAsString(profileDto);
 
-        // JSON 데이터를 Multipart-form 데이터에 추가
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> jsonEntity = new HttpEntity<>(jsonString, jsonHeaders);
-        formData.add("json_data", jsonEntity);
-
-        // 프로필 이미지와 배너 이미지를 폼 데이터에 추가
-        fileStore.setProfileAndBannerImage(profileDto.getProfileImgName(), profileDto.getProfileBannerImgName(), formData);
-
-        return new ResponseEntity<>(formData, HttpStatus.OK);
+        return new ResponseEntity<>(profileDto, HttpStatus.OK);
     }
 
     // 마이페이지 - 내가 작성한 게시글을 보여주는 메소드

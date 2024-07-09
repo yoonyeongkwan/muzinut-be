@@ -3,7 +3,6 @@ package nuts.muzinut.service.member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.Board;
-import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Album;
 import nuts.muzinut.domain.music.Song;
@@ -162,10 +161,5 @@ public class ProfileService {
 
         postDetails.put("boardType", boardType);
         return postDetails;
-    }
-
-    // 라운지 생성하는 메소드
-    public Lounge save(Lounge lounge) {
-        return loungeRepository.save(lounge);
     }
 }

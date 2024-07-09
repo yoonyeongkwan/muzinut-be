@@ -13,4 +13,5 @@ public class LoungesForm {
     private String filename;
     private LocalDateTime createdDt;
     private int like;
+    private int commentSize;  // commentSize 필드 추가
 }

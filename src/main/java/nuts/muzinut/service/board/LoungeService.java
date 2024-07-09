@@ -91,7 +91,7 @@ public class LoungeService extends DetailCommon{
         loungesDto.setPaging(page.getNumber(), page.getTotalPages(), page.getTotalElements()); // paging 처리
         for (Lounge l : lounges) {
             loungesDto.getLoungesForms().add(new LoungesForm(l.getId(), l.getUser().getNickname(), l.getFilename(),
-                    l.getCreatedDt(), l.getLikes().size()));
+                    l.getCreatedDt(), l.getLikes().size(), l.getComments().size()));
         }
         return loungesDto;
     }

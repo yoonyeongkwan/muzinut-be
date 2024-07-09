@@ -10,7 +10,6 @@ import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.FreeBoardRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 import static nuts.muzinut.controller.board.FileType.*;
@@ -191,6 +191,10 @@ public class FileStore {
         List<String> imagesFullPath = profileImages.stream()
                 .map(this::getFullPath)
                 .toList();
+
+        for (String p : imagesFullPath) {
+        }
+
 
         imagesFullPath.forEach(i -> formData.add("profileImg", new FileSystemResource(i)));
     }

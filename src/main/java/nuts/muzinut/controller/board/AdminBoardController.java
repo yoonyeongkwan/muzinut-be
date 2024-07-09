@@ -94,18 +94,19 @@ public class AdminBoardController {
     @GetMapping(value = "/admin-boards/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getAdminBoard(@PathVariable Long id) throws JsonProcessingException {
 
-        DetailAdminBoardDto detailAdminBoard = new DetailAdminBoardDto();
-
         //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
         User findUser = userService.getUserWithUsername().orElse(null);
 
-
-        detailAdminBoard = adminBoardService.getDetailAdminBoard(id, findUser);
+        DetailAdminBoardDto detailAdminBoard = adminBoardService.getDetailAdminBoard(id, findUser);
 
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
         if (detailAdminBoard == null) {
             throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
         }
+
+        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
+        Set<String> profileImages = adminBoardService.getProfileImages(detailAdminBoard.getProfileImg(), detailAdminBoard.getComments());
+//        fileStore.setImageHeaderWithData(profileImages, formData);
 
         String jsonString = objectMapper.writeValueAsString(detailAdminBoard);
 
@@ -120,9 +121,6 @@ public class AdminBoardController {
         String fullPath = fileStore.getFullPath(quillFilename);
         formData.add("quillFile", new FileSystemResource(fullPath));
 
-        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-        Set<String> profileImages = adminBoardService.getProfileImages(detailAdminBoard.getProfileImg(), detailAdminBoard.getComments());
-        fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }

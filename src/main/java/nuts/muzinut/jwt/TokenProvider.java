@@ -4,6 +4,7 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.exception.TokenException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -99,31 +100,31 @@ public class TokenProvider implements InitializingBean {
         return new UsernamePasswordAuthenticationToken(principal, token, authorities); //스프링 시큐리티의 인증 및 권한 부여 과정에서 사용
     }
 
-    public boolean validateToken(String token) {
+    public String validateToken(String token) {
         try {
             //setSigningKey 는 JWT의 서명을 검증할 때 사용할 키를 설정
             //parseClaimsJws() 메서드는 JWT 토큰을 파싱하고, 서명을 검증하며, 클레임을 추출
             Jws<Claims> jwsClaims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
 
             Claims claims = jwsClaims.getBody();
-            String subject = claims.getSubject(); //토큰의 주체 (사용자 이름 등)
+            String subject = claims.getSubject(); //토큰의 주체 (username <- 이메일)
             Date expiration = claims.getExpiration(); //토큰 만료 시간
 
             log.info("token subject: {}", subject);
             log.info("token expiration: {}", expiration);
 
-            return true;
+            return subject;
 
             //Todo 예외에 맞는 json 반환
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            logger.info("잘못된 JWT 서명입니다.");
+//            log.info("1e ", e.getCause());
+            throw new TokenException("잘못된 JWT 서명입니다. {}", e.getCause());
         } catch (ExpiredJwtException e) {
-            logger.info("만료된 JWT 토큰입니다.");
+            throw new TokenException("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
-            logger.info("지원되지 않는 JWT 토큰입니다.");
+            throw new TokenException("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            logger.info("JWT 토큰이 잘못되었습니다.");
+            throw new TokenException("JWT 토큰이 잘못되었습니다.");
         }
-        return false;
     }
 }

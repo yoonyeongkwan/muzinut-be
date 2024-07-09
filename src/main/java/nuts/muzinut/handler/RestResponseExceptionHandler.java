@@ -35,9 +35,10 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
     }
 
+    //토큰에 대한 예외처리 추가
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class,
-            BoardNotFoundException.class, NoUploadFileException.class })
+            BoardNotFoundException.class, NoUploadFileException.class, TokenException.class })
     @ResponseBody
     private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());

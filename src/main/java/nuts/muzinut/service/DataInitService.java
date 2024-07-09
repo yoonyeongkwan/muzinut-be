@@ -86,8 +86,23 @@ public class DataInitService {
                 LocalDateTime.now(), LocalDateTime.now().plusDays(7),
                 LocalDateTime.now().plusDays(8), LocalDateTime.now().plusDays(14),
                 "Sample Title");
+        RecruitBoard recruitBoard2 = new RecruitBoard(user2, "Sample Content2", 4,
+                LocalDateTime.now(), LocalDateTime.now().plusDays(16),
+                LocalDateTime.now().plusDays(7), LocalDateTime.now().plusDays(10),
+                "Sample Title2");
+        RecruitBoard recruitBoard3 = new RecruitBoard(user3, "Sample Content3", 3,
+                LocalDateTime.now(), LocalDateTime.now().plusDays(10),
+                LocalDateTime.now().plusDays(9), LocalDateTime.now().plusDays(34),
+                "Sample Title3");
+        RecruitBoard recruitBoard4 = new RecruitBoard(user, "Sample Content4", 8,
+                LocalDateTime.now(), LocalDateTime.now().plusDays(8),
+                LocalDateTime.now().plusDays(8), LocalDateTime.now().plusDays(8),
+                "Sample Title4");
 
         recruitBoardRepository.save(recruitBoard);
+        recruitBoardRepository.save(recruitBoard2);
+        recruitBoardRepository.save(recruitBoard3);
+        recruitBoardRepository.save(recruitBoard4);
 
         Comment comment1 = new Comment();
         comment1.addComment(user, recruitBoard, "sample");

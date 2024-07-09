@@ -16,10 +16,12 @@ import nuts.muzinut.dto.board.lounge.LoungesDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.LoungeRepository;
 import nuts.muzinut.repository.board.query.FreeBoardQueryRepository;
 import nuts.muzinut.repository.board.query.LoungeQueryRepository;
+import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -40,8 +42,8 @@ import static nuts.muzinut.domain.board.QLounge.*;
 public class LoungeService extends DetailCommon{
 
     private final LoungeRepository loungeRepository;
-    private final BoardRepository boardRepository;
     private final LoungeQueryRepository queryRepository;
+    private final UserRepository userRepository;
 
     public Lounge save(Lounge lounge) {
         return loungeRepository.save(lounge);
@@ -49,7 +51,7 @@ public class LoungeService extends DetailCommon{
 
     /**
      * @throws BoardNotFoundException: 찾고자 하는 자유 게시판이 없는 경우 404
-     * @return: FreeBoard 엔티티
+     * @return: Lounge 엔티티
      */
     public Lounge getLounge(Long id) {
         return loungeRepository.findById(id)
@@ -66,19 +68,30 @@ public class LoungeService extends DetailCommon{
 
     //모든 라운지 조회
     public LoungesDto getLounges(int startPage) throws BoardNotExistException {
-        PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt")); //Todo 한 페이지에 가져올 게시판 수를 정하기
-        Page<Lounge> page = loungeRepository.findAll(pageRequest);
-        List<Lounge> lounges = page.getContent();
+        return getLoungesByUserId(null, startPage);
+    }
 
-        if (lounges.isEmpty()) {
-            throw new BoardNotExistException("라운지 게시판이 없습니다.");
-        }
+    // 특정 사용자의 라운지 조회
+    public LoungesDto getLoungesByUserId(Long userId, int startPage) throws BoardNotExistException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 회원입니다."));
+
+        PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt"));
+        Page<Lounge> page;
+
+        page = loungeRepository.findAllByUserId(userId, pageRequest);
+
+        List<Lounge> lounges = page.getContent();
+//
+//        if (lounges.isEmpty()) {
+//            throw new BoardNotExistException("라운지 게시판이 없습니다.");
+//        }
 
         LoungesDto loungesDto = new LoungesDto();
-        loungesDto.setPaging(page.getNumber(), page.getTotalPages(), page.getTotalElements()); //paging 처리
+        loungesDto.setPaging(page.getNumber(), page.getTotalPages(), page.getTotalElements()); // paging 처리
         for (Lounge l : lounges) {
             loungesDto.getLoungesForms().add(new LoungesForm(l.getId(), l.getUser().getNickname(), l.getFilename(),
-                    l.getCreatedDt(), l.getLikeCount(), l.getView()));
+                    l.getCreatedDt(), l.getLikes().size(), l.getComments().size()));
         }
         return loungesDto;
     }

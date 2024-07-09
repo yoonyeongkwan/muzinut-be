@@ -18,7 +18,6 @@ public class DetailLoungeDto extends DetailBaseDto {
     private Long id;
     private String writer;
     private String profileImg;
-    private int view;
     private int commentSize;
     private String quillFilename;
     private int likeCount;
@@ -27,14 +26,18 @@ public class DetailLoungeDto extends DetailBaseDto {
 
     public DetailLoungeDto(String writer, int view) {
         this.writer = writer;
-        this.view = view;
     }
 
     public DetailLoungeDto(Long id, String writer, int view, String quillFilename, String profileImg) {
         this.id = id;
         this.writer = writer;
-        this.view = view;
         this.quillFilename = quillFilename;
         this.profileImg = profileImg;
+    }
+
+    // comments 리스트를 설정 & 댓글 갯수 설정하는 메서드
+    public void setComments(List<CommentDto> comments) {
+        this.comments = comments;
+        this.commentSize = comments != null ? comments.size() : 0;
     }
 }

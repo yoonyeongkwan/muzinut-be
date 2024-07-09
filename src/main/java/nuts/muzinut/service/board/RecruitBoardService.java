@@ -10,12 +10,10 @@ import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.recruit.*;
-import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.RecruitBoardGenreRepository;
 import nuts.muzinut.repository.board.RecruitBoardRepository;
-import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import nuts.muzinut.repository.board.query.RecruitBoardQueryRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.data.domain.Page;
@@ -31,8 +29,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
-import static nuts.muzinut.domain.board.QAdminBoard.adminBoard;
-import static nuts.muzinut.domain.board.QBoard.board;
+import static nuts.muzinut.domain.board.QBoard.*;
+import static nuts.muzinut.domain.board.QRecruitBoard.*;
 
 @Slf4j
 @Service
@@ -84,9 +82,9 @@ public class RecruitBoardService extends DetailCommon{
 
     // 특정 모집 게시판을 조회하는 서비스 메소드
     @Transactional
-    public DetailRecruitBoardDto getDetailBoard(Long id, User user) {
-        RecruitBoard recruitBoard = checkEntityExists(id);
-        recruitBoard.incrementView();
+    public DetailRecruitBoardDto getDetailRecruitBoard(Long id, User user) {
+//        RecruitBoard findRecruitBoard = checkEntityExists(id);
+//        findRecruitBoard.incrementView();
 
         List<Tuple> result = boardQueryRepository.getDetailRecruitBoard(id, user);
 
@@ -96,7 +94,8 @@ public class RecruitBoardService extends DetailCommon{
 
         Tuple first = result.getFirst();
         Board findBoard = first.get(board);
-        AdminBoard findAdminBoard = first.get(adminBoard);
+        RecruitBoard findRecruitBoard = first.get(recruitBoard);
+        findRecruitBoard.incrementView();
 
         if (findBoard == null) {
             return null;
@@ -104,17 +103,17 @@ public class RecruitBoardService extends DetailCommon{
 
 
         DetailRecruitBoardDto detailRecruitBoardDto = new DetailRecruitBoardDto(
-                recruitBoard.getTitle(),
-                recruitBoard.getContent(),
-                recruitBoard.getView(),
-                recruitBoard.getRecruitMember(),
-                recruitBoard.getStartDuration(),
-                recruitBoard.getEndDuration(),
-                recruitBoard.getStartWorkDuration(),
-                recruitBoard.getEndWorkDuration(),
-                recruitBoard.getGenres(),
-                user.getNickname(),
-                recruitBoard.getUser().getProfileImgFilename() // 프로필 이미지 파일명 추가
+                findRecruitBoard.getTitle(),
+                findRecruitBoard.getContent(),
+                findRecruitBoard.getView(),
+                findRecruitBoard.getRecruitMember(),
+                findRecruitBoard.getStartDuration(),
+                findRecruitBoard.getEndDuration(),
+                findRecruitBoard.getStartWorkDuration(),
+                findRecruitBoard.getEndWorkDuration(),
+                findRecruitBoard.getGenres(),
+                findRecruitBoard.getUser().getNickname(),
+                findRecruitBoard.getUser().getProfileImgFilename() // 프로필 이미지 파일명 추가
         );
 
         Long likeCount = first.get(2, Long.class);
@@ -122,6 +121,9 @@ public class RecruitBoardService extends DetailCommon{
         detailRecruitBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
         detailRecruitBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
         detailRecruitBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
+
+        //게시판 댓글 & 대댓글 셋팅
+        detailRecruitBoardDto.setComments(setCommentsAndReplies(user, findBoard));
 
         return detailRecruitBoardDto;
     }

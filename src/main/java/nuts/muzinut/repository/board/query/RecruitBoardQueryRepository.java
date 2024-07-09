@@ -49,7 +49,6 @@ public class RecruitBoardQueryRepository {
                 .leftJoin(recruitBoard).on(board.id.eq(recruitBoard.id))
                 .leftJoin(board.user, QUser.user) //추가
                 .leftJoin(board.comments, comment).fetchJoin()
-                .leftJoin(comment.replies, reply)
                 .where(board.id.eq(boardId))
                 .fetch();
     }

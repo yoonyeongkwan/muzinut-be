@@ -206,7 +206,17 @@ public class FileStore {
                 .map(this::getFullPath)
                 .toList();
 
+        log.info("Setting profile image: " + profileImage);
+        log.info("Setting banner image: " + bannerImage);
+
         formData.add("profileImage", new FileSystemResource(imagePaths.get(0)));
         formData.add("bannerImage", new FileSystemResource(imagePaths.get(1)));
+    }
+
+    // 앨범 이미지를 폼 데이터에 넣어주는 메서드
+    public void setAlbumImages(String albumImgName, MultiValueMap<String, Object> formData, String key) {
+        FileSystemResource albumImgResource = new FileSystemResource(fileDir + "/albumImg/" + albumImgName);
+        log.info("Setting albumImage: " + albumImgResource);
+        formData.add(key, albumImgResource);
     }
 }

@@ -30,12 +30,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
@@ -51,8 +53,6 @@ public class ProfileController {
     private final UserService userService;
     private final FileStore fileStore;
     private final ObjectMapper objectMapper;
-
-    private final RestTemplate restTemplate;
 
     // 프로필 페이지 - 앨범 탭(기본)
     @GetMapping
@@ -207,43 +207,32 @@ public class ProfileController {
     }
 
     // 게시물 제목 클릭 시 특정 게시물 조회로 넘어가는 메소드
-    @GetMapping(value = "/community/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getBoardDetails(@PathVariable Long id) {
+    @GetMapping("/community/{id}")
+    public String getBoardDetails(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Map<String, Object> boardDetails = profileService.getBoardDetails(id);
         String boardType = (String) boardDetails.get("boardType");
-        ResponseEntity<MultiValueMap<String, Object>> responseEntity;
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> entity;
-
-        switch (boardType) {
-            case "AdminBoard":
-            case "FreeBoard":
-            case "EventBoard":
-                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-                entity = new HttpEntity<>(headers);
-                responseEntity = restTemplate.exchange(
-                        "http://localhost:8080/community/" + boardType.toLowerCase() + "-boards/" + id,
-                        HttpMethod.GET,
-                        entity,
-                        new ParameterizedTypeReference<MultiValueMap<String, Object>>() {}
-                );
-                break;
-            case "RecruitBoard":
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                entity = new HttpEntity<>(headers);
-                responseEntity = restTemplate.exchange(
-                        "http://localhost:8080/community/recruit-boards/" + id,
-                        HttpMethod.GET,
-                        entity,
-                        new ParameterizedTypeReference<MultiValueMap<String, Object>>() {}
-                );
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid board type: " + boardType);
+        String url = buildUrl(boardType, id);
+        if (url == null) {
+            throw new IllegalArgumentException("Invalid board type: " + boardType);
         }
 
-        return responseEntity;
+        redirectAttributes.addAttribute("id", id);
+        return "redirect:" + url;
     }
 
+    private String buildUrl(String boardType, Long id) {
+        switch (boardType) {
+            case "AdminBoard":
+                return "/community/admin-boards/" + id;
+            case "FreeBoard":
+                return "/community/free-boards/" + id;
+            case "EventBoard":
+                return "/community/event-boards/" + id;
+            case "RecruitBoard":
+                return "/community/recruit-boards/" + id;
+            default:
+                return null;
+        }
+    }
 }

@@ -9,7 +9,7 @@ import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungesDto;
+import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
@@ -28,10 +28,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
@@ -111,7 +109,7 @@ public class LoungeController {
             @RequestParam(value = "page", defaultValue = "0") int page) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        LoungesDto loungesDto = loungeService.getLounges(page);
+        LoungeDto loungesDto = loungeService.getLounges(page);
         String jsonString = objectMapper.writeValueAsString(loungesDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가

@@ -1,4 +1,4 @@
-package nuts.muzinut.dto.member.profile;
+package nuts.muzinut.dto.member.profile.Album;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,14 +1,12 @@
-package nuts.muzinut.dto.member.profile;
+package nuts.muzinut.dto.member.profile.Album;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import nuts.muzinut.domain.music.Album;
+import nuts.muzinut.dto.member.profile.ProfileDto;
 
 import java.util.List;
 
 @Data
-public class ProfileSongDto extends ProfileDto{
+public class ProfileSongDto extends ProfileDto {
 
     // 좋아요 높은 곡
     private String songTitle;

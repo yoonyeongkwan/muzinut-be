@@ -10,10 +10,12 @@ import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungesDto;
+import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
-import nuts.muzinut.dto.member.profile.ProfileDto;
-import nuts.muzinut.dto.member.profile.ProfileSongDto;
+import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
+import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
+import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
+import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
 import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.*;
@@ -74,7 +76,7 @@ public class ProfileController {
             case "lounge":
                 // 모든 라운지 조회 메서드
                 MultiValueMap<String, Object> loungeData = new LinkedMultiValueMap<String, Object>();
-                LoungesDto loungesDto = loungeService.getLoungesByUserId(userId, 0);
+                LoungeDto loungesDto = loungeService.getLoungesByUserId(userId, 0);
                 if (loungesDto == null || loungesDto.getLoungesForms().isEmpty()) {
                     addJsonMessageToFormData(formData, "No Lounge");
                 } else {
@@ -122,20 +124,28 @@ public class ProfileController {
     }
 
     // 프로필 페이지 - 앨범 탭(기본)
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<?> getUserProfileAlbum(@RequestParam("userId") Long userId,
-                                            @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
-        // 메인 곡 데이터 가져오기
+                                                 @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
         ProfileSongDto albumTab = profileService.getAlbumTab(userId);
         return new ResponseEntity<ProfileSongDto>(albumTab, HttpStatus.OK);
     }
 
     // 프로필 페이지 - 라운지 탭
-    @GetMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId,
-                                            @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = getProfileInfo(userId, tab);
-        log.info("formData = {}", formData);
+    @GetMapping(value = "lounge", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+        ProfileLoungeDto profileLoungeDto = profileService.getLoungeTab(userId, 0);
+
+        addJsonEntityToFormData(formData, profileLoungeDto);
+        // 해당 게시판의 quill 파일 추가
+        HttpHeaders fileHeaders = new HttpHeaders();
+        for (ProfileLoungesForm l : profileLoungeDto.getLoungesForms()) {
+            String fullPath = fileStore.getFullPath(l.getFilename());
+            fileHeaders.setContentType(MediaType.TEXT_HTML); // quill 파일이므로 html
+            formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
+        }
+
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
 
@@ -194,24 +204,19 @@ public class ProfileController {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
         User findUser = userService.getUserWithUsername().orElse(null);
-        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id, findUser);
+        ProfileDetailLoungeDto profileDetailLoungeDto = profileService.detailLounge(id, findUser);
 
-        if (detailLoungeDto == null) {
+        if (profileDetailLoungeDto == null) {
             throw new BoardNotFoundException("해당 라운지가 존재하지 않습니다");
         }
 
         // JSON 데이터를 Multipart-form 데이터에 추가
-        addJsonEntityToFormData(formData, detailLoungeDto);
+        addJsonEntityToFormData(formData, profileDetailLoungeDto);
 
         // 해당 게시판의 quill 파일 추가
-        String quillFilename = detailLoungeDto.getQuillFilename();
+        String quillFilename = profileDetailLoungeDto.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
         formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
-
-//        // 댓글 및 대댓글 작성자의 프로필 이미지 추가
-//        Set<String> profileImages = loungeService.getProfileImages(detailLoungeDto.getProfileImg(),
-//                detailLoungeDto.getComments());
-//        fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
@@ -255,7 +260,7 @@ public class ProfileController {
             loungeService.deleteLounge(id); //라운지 게시판 삭제
 
             HttpHeaders header = new HttpHeaders();
-            String redirectUrl = String.format("/profile?userId=%d&tab=lounge", user.getId());
+            String redirectUrl = String.format("/profile/lounge?userId=%d", user.getId());
             header.setLocation(URI.create(redirectUrl)); // 라운지 탭으로 리다이렉트
 
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)

@@ -19,7 +19,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
      * 채팅창에 한명이 접속하는 경우 (다른 한명은 접속을 안한 상태일 때)
      * 한 채팅방에 a 와 b 라는 유저가 있다고 할때 a 가 채팅방에 입장하면 b 가 보낸 기존의 메시지를 읽음 처리한다.
      * @param chat: a, b의 채팅방
-     * @param user: 채팅방에 입장한 유저
+     * @param username: 채팅방에 입장한 유저
      */
     @Modifying
     @Query("update Message m set m.read = true where m.chat = :chat and m.user != :user")

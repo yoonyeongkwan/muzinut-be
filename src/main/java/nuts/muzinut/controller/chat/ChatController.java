@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.chat.ChatMessage;
 import nuts.muzinut.dto.chat.CreateChatDto;
 import nuts.muzinut.dto.chat.CreateChatForm;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Optional;
@@ -34,7 +36,7 @@ public class ChatController {
 
     @MessageMapping("/{roomId}")
     @SendTo("/room/{roomId}") //메시지 전송 (목적지)
-    public ChatMessage chat(@DestinationVariable Long roomId, ChatMessage message) {
+    public ChatMessage chat(@DestinationVariable Long roomId, @Validated ChatMessage message) {
         Message createMessage = messageService.createMessage(roomId, message.getSender(), message.getSendTo(), message.getMessage());
         return ChatMessage.builder()
                 .id(roomId)

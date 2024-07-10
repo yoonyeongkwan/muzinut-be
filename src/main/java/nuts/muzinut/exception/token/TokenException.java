@@ -1,4 +1,4 @@
-package nuts.muzinut.exception;
+package nuts.muzinut.exception.token;
 
 public class TokenException extends RuntimeException{
 

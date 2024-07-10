@@ -31,6 +31,7 @@ public class ChatService {
 
     private final ChatRepository chatRepository;
     private final ChatMemberRepository chatMemberRepository;
+    private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final RedisUtil redisUtil;
 
@@ -57,15 +58,19 @@ public class ChatService {
     public void connectChatRoom(String chatRoomNumber, String username) {
 //        log.info("chatService connectChatRoom");
         List<String> redisData = redisUtil.getMultiData(chatRoomNumber);
+        Chat chat = chatRepository.findById(Long.parseLong(chatRoomNumber)).orElseThrow(
+                () -> new NotFoundEntityException("없는 채팅방입니다"));
 
         //채팅방에 접속한 유저가 없는 경우
         if (redisData.isEmpty()) {
             log.info("채팅방 1명 접속");
             redisUtil.setMultiData(chatRoomNumber, username);
+
         } else if (redisData.size() == 1 && !redisData.getFirst().equals(username)){
             log.info("채팅방 2명 접속");
             log.info("이미 접속중인 사용자: {}", redisData.getFirst());
             redisUtil.setMultiData(chatRoomNumber, username);
+            messageRepository.updateAllRead(chat); //모든 메시지 읽음 처리
         }
     }
 

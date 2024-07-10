@@ -98,7 +98,6 @@ public class EventBoardController {
             throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
         }
 
-
         String jsonString = objectMapper.writeValueAsString(detailEventBoard);
 
         // JSON 데이터를 Multipart-form 데이터에 추가
@@ -111,11 +110,6 @@ public class EventBoardController {
         String quillFilename = detailEventBoard.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
         formData.add("quillFile", new FileSystemResource(fullPath));
-
-        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-        Set<String> profileImages = eventBoardService.getProfileImages(detailEventBoard.getProfileImg(),
-                detailEventBoard.getComments());
-        fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }

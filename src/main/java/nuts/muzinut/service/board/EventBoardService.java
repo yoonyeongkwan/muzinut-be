@@ -82,8 +82,8 @@ public class EventBoardService extends DetailCommon{
         }
 
         DetailEventBoardDto detailEventBoardDto =
-                new DetailEventBoardDto(eventBoard.getId() ,eventBoard.getTitle(),
-                        eventBoard.getUser().getNickname(), view, eventBoard.getFilename(), eventBoard.getUser().getProfileImgFilename());
+                new DetailEventBoardDto(eventBoard.getId() ,eventBoard.getTitle(), eventBoard.getUser().getNickname(), view,
+                        eventBoard.getFilename(), encodeFileToBase64(eventBoard.getUser().getProfileImgFilename()));
 
         DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
         detailEventBoardDto.setLikeCount(findBoard.getLikeCount()); //좋아요 수 셋팅

@@ -38,7 +38,7 @@ public class DataInit {
 
     @PostConstruct
     public void init() {
-        dataInitService.initializeData();
+//        dataInitService.initializeData();
         
         AuthorityDto authorityDto = new AuthorityDto("admin");
         UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");

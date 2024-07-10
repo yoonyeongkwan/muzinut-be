@@ -153,11 +153,11 @@ public class AdminBoardService extends DetailCommon{
 
         //첨부파일이 있는 경우 & 없는 경우
         if (files != null) {
-            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view,
-                    files, findAdminBoard.getFilename(), findAdminBoard.getUser().getProfileImgFilename()); //어드민 게시판 관련 파일 셋팅
+            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view, files, findAdminBoard.getFilename(),
+                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename())); //어드민 게시판 관련 파일 셋팅
         } else {
-            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view,
-                    findAdminBoard.getFilename(), findAdminBoard.getUser().getProfileImgFilename()); //어드민 게시판 관련 셋팅
+            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view, findAdminBoard.getFilename(),
+                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename())); //어드민 게시판 관련 셋팅
         }
 
         DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);

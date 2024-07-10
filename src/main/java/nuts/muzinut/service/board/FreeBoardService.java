@@ -114,7 +114,8 @@ public class FreeBoardService extends DetailCommon{
 
         DetailFreeBoardDto detailFreeBoardDto =
                 new DetailFreeBoardDto(findFreeBoard.getId() ,findFreeBoard.getTitle(),
-                        findFreeBoard.getUser().getNickname(), view, findFreeBoard.getFilename(), findFreeBoard.getUser().getProfileImgFilename());
+                        findFreeBoard.getUser().getNickname(), view, findFreeBoard.getFilename(),
+                        encodeFileToBase64(findFreeBoard.getUser().getProfileImgFilename()));
 
         DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
         detailFreeBoardDto.setLikeCount(findBoard.getLikeCount()); //좋아요 수 셋팅

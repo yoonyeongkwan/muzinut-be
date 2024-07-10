@@ -11,6 +11,7 @@ import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.*;
 import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
+import nuts.muzinut.dto.security.RefreshTokenDto;
 import nuts.muzinut.dto.security.TokenDto;
 import nuts.muzinut.exception.EmailVertFailException;
 import nuts.muzinut.exception.NotFoundMemberException;
@@ -20,6 +21,7 @@ import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.MailSendService;
 import nuts.muzinut.service.member.ProfileService;
 import nuts.muzinut.service.member.UserService;
+import nuts.muzinut.service.security.AuthService;
 import org.springframework.http.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -54,6 +56,7 @@ public class UserController {
     private final MailSendService mailService;
     private final ProfileService profileService;
     private final TokenProvider tokenProvider;
+    private final AuthService authService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final ObjectMapper objectMapper;
 
@@ -79,11 +82,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/login")
-    public String loginForm() {
-        return "/user/login";
-    }
-
     /**
      * 사실상 로그인 하는 로직
      * @param loginDto: username (email) & password 전송 필요
@@ -98,12 +96,20 @@ public class UserController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.createToken(authentication);
+        String token = tokenProvider.createToken(authentication);
+        String refreshToken = tokenProvider.createRefreshToken(authentication);
 
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + token);
 
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new TokenDto(token, refreshToken), httpHeaders, HttpStatus.OK);
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping("/re-authenticate")
+    public TokenDto reLogin(@RequestHeader("Authorization") String bearerToken) {
+        return authService.reissueToken(bearerToken.substring(7)); //bearer 제외한 실제 토큰 값만 반환
     }
 
     /**

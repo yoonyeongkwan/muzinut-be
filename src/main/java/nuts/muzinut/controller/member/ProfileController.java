@@ -121,18 +121,24 @@ public class ProfileController {
         return formData;
     }
 
-    // 프로필 페이지 보여주는 메소드
+    // 프로필 페이지 - 앨범 탭(기본)
     @GetMapping()
-    public ResponseEntity<?> getUserProfile(@RequestParam("userId") Long userId,
+    public ResponseEntity<?> getUserProfileAlbum(@RequestParam("userId") Long userId,
                                             @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
         // 메인 곡 데이터 가져오기
         ProfileSongDto albumTab = profileService.getAlbumTab(userId);
-
-        if (albumTab == null) {
-//            albumTab = profileService.getUserProfile(userId);
-        }
         return new ResponseEntity<ProfileSongDto>(albumTab, HttpStatus.OK);
     }
+
+    // 프로필 페이지 - 라운지 탭
+    @GetMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId,
+                                            @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
+        MultiValueMap<String, Object> formData = getProfileInfo(userId, tab);
+        log.info("formData = {}", formData);
+        return new ResponseEntity<>(formData, HttpStatus.OK);
+    }
+
 
 //    // 프로필 페이지 보여주는 메소드
 //    @GetMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)

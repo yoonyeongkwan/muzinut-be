@@ -80,6 +80,25 @@ public class DetailCommon {
         }
     }
 
+
+    //이미지 파일명을 가져와서 base64로 인코딩 하여 반환하는 메서드
+    public String encodeAlbumFileToBase64(String filename){
+        log.info("파일명: {}", filename);
+        try {
+            if (StringUtils.hasText(filename)) {
+                File file = new File(fileDir + "/albumImg/" + filename);
+                byte[] fileContent = Files.readAllBytes(file.toPath());
+                return Base64.getEncoder().encodeToString(fileContent);
+            }
+            return null;
+
+        } catch (IOException e) {
+            log.info("{} 파일 없음", filename);
+            return null;
+        }
+    }
+
+
     public List<CommentDto> setCommentsAndReplies(User user, Board board) {
         List<CommentDto> comments = new ArrayList<>();
 

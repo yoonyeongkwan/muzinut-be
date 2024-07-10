@@ -12,6 +12,7 @@ import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.board.BoardRepository;
+import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.AlbumRepository;
 import nuts.muzinut.repository.music.SongRepository;
@@ -30,18 +31,18 @@ import java.util.stream.Collectors;
 public class ProfileService extends DetailCommon {
 
     private final UserRepository userRepository;
-    private final FollowService followService;
     private final AlbumRepository albumRepository;
     private final SongRepository songRepository;
     private final BoardRepository boardRepository;
+    private final FollowRepository followRepository;
 
     // 프로필 페이지 보여주는 메소드
     public ProfileDto getUserProfile(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundMemberException("존재하지 않는 회원입니다."));
-
+        validateUser(user);
         // 팔로잉 수, 팔로워 수 가져오기
-        Long followingCount = followService.countFollowing(user);
-        Long followersCount = followService.countFollowers(userId);
+        Long followingCount = followRepository.countFollowingByUser(user);
+        Long followersCount = followRepository.countFollowerByFollowingMemberId(userId);
 
         // 현재 로그인한 사용자 확인
         String currentUsername = getCurrentUsername();
@@ -56,13 +57,13 @@ public class ProfileService extends DetailCommon {
         // 팔로잉 여부
         boolean isFollowing = false;
         if (currentUser != null) {
-            isFollowing = followService.isFollowing(currentUser, userId);
+            isFollowing = followRepository.existsByUserAndFollowingMemberId(user, userId);
             log.info("isFollowing = {}", isFollowing);
         }
 
         ProfileDto profileDto = new ProfileDto(
                 user.getProfileBannerImgFilename(),
-                encodeFileToBase64(user.getProfileImgFilename()),
+                user.getProfileImgFilename(),
                 user.getNickname(),
                 user.getIntro(),
                 followingCount,
@@ -128,7 +129,7 @@ public class ProfileService extends DetailCommon {
 
         List<ProfileAlbumDto> allAlbums = albumRepository.findAllByUserIdOrderByLatest(userId).stream()
                 .map(a -> new ProfileAlbumDto(
-                        encodeFileToBase64(a.getAlbumImg()),
+                        encodeAlbumFileToBase64(a.getAlbumImg()),
                         a.getName()
                 ))
                 .collect(Collectors.toList());
@@ -146,7 +147,7 @@ public class ProfileService extends DetailCommon {
                 mainSong.getLyricist(),
                 mainSong.getComposer(),
                 mainSong.getSongLikes().size(),
-                encodeFileToBase64(albumImg),
+                encodeAlbumFileToBase64(albumImg),
                 allAlbums
         );
     }
@@ -166,5 +167,11 @@ public class ProfileService extends DetailCommon {
 
         postDetails.put("boardType", boardType);
         return postDetails;
+    }
+
+    private void validateUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("유효하지 않은 유저 정보입니다.");
+        }
     }
 }

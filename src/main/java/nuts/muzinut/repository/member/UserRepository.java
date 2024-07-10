@@ -44,4 +44,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     //이미 지정된 닉네임인지 확인
     Boolean existsByNickname(String nickname);
+
+    // 유저가 북마크한 게시글 제목 조회
+    @Query("select b.title from Board b join b.bookmarks bm where bm.user.id = :userId")
+    List<String> findBookmarkTitlesByUserId(@Param("userId") Long userId);
 }

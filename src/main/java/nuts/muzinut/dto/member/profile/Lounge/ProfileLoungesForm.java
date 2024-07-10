@@ -1,4 +1,4 @@
-package nuts.muzinut.dto.board.lounge;
+package nuts.muzinut.dto.member.profile.Lounge;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-public class LoungesForm {
+public class ProfileLoungesForm {
     private Long id;
     private String writer;
     private String filename;

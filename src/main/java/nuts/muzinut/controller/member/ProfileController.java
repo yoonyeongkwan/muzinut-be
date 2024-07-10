@@ -9,17 +9,14 @@ import nuts.muzinut.controller.board.FileType;
 import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
-import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
-import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.event.DetailEventBoardDto;
-import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungesDto;
+import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
-import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
-import nuts.muzinut.dto.member.profile.ProfileSongDto;
-import nuts.muzinut.dto.member.profile.ProfileAlbumListDto;
-import nuts.muzinut.dto.member.profile.ProfileDto;
+import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
+import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
+import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
+import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
+import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
 import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.*;
@@ -33,14 +30,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
 
@@ -56,108 +54,44 @@ public class ProfileController {
     private final FileStore fileStore;
     private final ObjectMapper objectMapper;
 
-    private final RestTemplate restTemplate;
-
-    // 프로필 정보를 가져오는 메소드
-    private MultiValueMap<String, Object> getProfileInfo(Long userId, String tab) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-
-        ProfileDto profileDto = profileService.getUserProfile(userId);
-        addJsonEntityToFormData(formData, "profile-json-data", profileDto);
-
-        // 프로필 이미지와 배너 이미지를 폼 데이터에 추가
-        fileStore.setProfileAndBannerImage(profileDto.getProfileImgName(), profileDto.getProfileBannerImgName(), formData);
-
-        // 선택된 탭에 따라 데이터 추가
-        switch (tab) {
-            case "album":
-                MultiValueMap<String, Object> albumData = new LinkedMultiValueMap<>();
-
-                // 메인 곡 데이터 가져오기
-                ProfileSongDto mainSong = profileService.getMainSong(userId);
-                // 모든 앨범 목록 데이터 가져오기
-                List<ProfileAlbumListDto> allAlbums = profileService.getAllAlbums(userId);
-
-                if (mainSong == null && (allAlbums == null || allAlbums.isEmpty())) {
-                    addJsonMessageToFormData(albumData, "No Album");
-                } else {
-                    if (mainSong != null) {
-                        addJsonEntityToFormData(albumData, "mainSong-json-data", mainSong);
-                        if (mainSong.getAlbumImg() != null) {
-                            fileStore.setAlbumImages(mainSong.getAlbumImg(), albumData, "mainSongAlbumImage");
-                        }
-                    }
-                    if (allAlbums != null && !allAlbums.isEmpty()) {
-                        addJsonEntityToFormData(albumData, "allAlbums-json-data", allAlbums);
-                        for (int i = 0; i < allAlbums.size(); i++) {
-                            ProfileAlbumListDto album = allAlbums.get(i);
-                            if (album.getAlbumImg() != null) {
-                                fileStore.setAlbumImages(album.getAlbumImg(), albumData, "albumImage_" + i);
-                            }
-                        }
-                    }
-                }
-                formData.addAll(albumData);
-                break;
-
-            case "lounge":
-                // 모든 라운지 조회 메서드
-                MultiValueMap<String, Object> loungeData = new LinkedMultiValueMap<String, Object>();
-                LoungesDto loungesDto = loungeService.getLoungesByUserId(userId, 0);
-                if (loungesDto == null || loungesDto.getLoungesForms().isEmpty()) {
-                    addJsonMessageToFormData(formData, "No Lounge");
-                } else {
-                    addJsonEntityToFormData(formData, "posts-json-data", loungesDto);
-                    //해당 게시판의 quill 파일 추가
-                    HttpHeaders fileHeaders = new HttpHeaders();
-                    for (LoungesForm l : loungesDto.getLoungesForms()) {
-                        String fullPath = fileStore.getFullPath(l.getFilename());
-                        fileHeaders.setContentType(MediaType.TEXT_HTML); //quill 파일 이므로 html
-                        formData.add("quillFile", new FileSystemResource(fullPath)); //파일 가져와서 셋팅
-                    }
-                }
-
-                formData.addAll(loungeData);
-                break;
-
-            case "board":
-                // 현재 로그인한 사용자 정보 가져오기
-                String currentUsername = profileService.getCurrentUsername();
-                User currentUser = profileService.findUserByUsername(currentUsername);
-                // 로그인한 사용자와 프로필 사용자가 동일한지 확인
-                if (!currentUser.getId().equals(userId)) {
-                    throw new NotFoundMemberException("본인의 프로필만 접근 가능");
-                } else {
-                    // 게시글 데이터 추가 로직
-                    List<String> posts = profileService.getUserBoardTitles(userId);
-                    if (posts == null || posts.isEmpty()) {
-                        addJsonMessageToFormData(formData, "No Board");
-                    } else {
-                        addJsonEntityToFormData(formData, "posts-json-data", posts);
-                    }
-                }
-                break;
-
-            case "playNut":
-                // 플리넛 데이터 추가 로직
-                break;
-
-            case "nuts":
-                // 넛츠 데이터 추가 로직
-                break;
-        }
-
-        return formData;
+    // 프로필 페이지 - 앨범 탭(기본)
+    @GetMapping
+    public ResponseEntity<?> getUserProfileAlbum(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        ProfileSongDto albumTab = profileService.getAlbumTab(userId);
+        return new ResponseEntity<ProfileSongDto>(albumTab, HttpStatus.OK);
     }
 
-    // 프로필 페이지 보여주는 메소드
-    @GetMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> getUserProfile(@RequestParam("userId") Long userId,
-                                            @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = getProfileInfo(userId, tab);
-        log.info("formData = {}", formData);
+    // 프로필 페이지 - 라운지 탭
+    @GetMapping(value = "lounge", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+        ProfileLoungeDto profileLoungeDto = profileService.getLoungeTab(userId, 0);
+
+        addJsonEntityToFormData(formData, profileLoungeDto);
+        // 해당 게시판의 quill 파일 추가
+        HttpHeaders fileHeaders = new HttpHeaders();
+        for (ProfileLoungesForm l : profileLoungeDto.getLoungesForms()) {
+            String fullPath = fileStore.getFullPath(l.getFilename());
+            fileHeaders.setContentType(MediaType.TEXT_HTML); // quill 파일이므로 html
+            formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
+        }
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
+
+    // 프로필 페이지 - 게시글 탭(기본)
+    @GetMapping("/board")
+    public ResponseEntity<?> getUserProfileBoard(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        String currentUsername = profileService.getCurrentUsername();
+        User currentUser = profileService.findUserByUsername(currentUsername);
+
+        if (!currentUser.getId().equals(userId)) {
+            throw new NotFoundMemberException("본인의 프로필만 접근 가능");
+        } else {
+            ProfileBoardDto profileBoardDto = profileService.getBoardTab(userId);
+            return new ResponseEntity<>(profileBoardDto, HttpStatus.OK);
+        }
+    }
+
 
     // json 메세지를 form-data에 추가하는 메서드
     private void addJsonMessageToFormData(MultiValueMap<String, Object> formData, String message) throws JsonProcessingException {
@@ -169,12 +103,12 @@ public class ProfileController {
     }
 
     // 데이터를 json으로 변환하여 form-data에 추가하는 메서드
-    private void addJsonEntityToFormData(MultiValueMap<String, Object> formData, String key, Object value) throws JsonProcessingException {
+    private void addJsonEntityToFormData(MultiValueMap<String, Object> formData, Object value) throws JsonProcessingException {
         String jsonValue = objectMapper.writeValueAsString(value);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(jsonValue, headers);
-        formData.add(key, entity);
+        formData.add("json-data", entity);
     }
 
     // 라운지 생성 메소드
@@ -204,24 +138,19 @@ public class ProfileController {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
         User findUser = userService.getUserWithUsername().orElse(null);
-        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id, findUser);
+        ProfileDetailLoungeDto profileDetailLoungeDto = profileService.detailLounge(id, findUser);
 
-        if (detailLoungeDto == null) {
+        if (profileDetailLoungeDto == null) {
             throw new BoardNotFoundException("해당 라운지가 존재하지 않습니다");
         }
 
         // JSON 데이터를 Multipart-form 데이터에 추가
-        addJsonEntityToFormData(formData, "detailLoungeDto", detailLoungeDto);
+        addJsonEntityToFormData(formData, profileDetailLoungeDto);
 
         // 해당 게시판의 quill 파일 추가
-        String quillFilename = detailLoungeDto.getQuillFilename();
+        String quillFilename = profileDetailLoungeDto.getQuillFilename();
         String fullPath = fileStore.getFullPath(quillFilename);
         formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
-
-        // 댓글 및 대댓글 작성자의 프로필 이미지 추가
-        Set<String> profileImages = loungeService.getProfileImages(detailLoungeDto.getProfileImg(),
-                detailLoungeDto.getComments());
-        fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
@@ -265,7 +194,7 @@ public class ProfileController {
             loungeService.deleteLounge(id); //라운지 게시판 삭제
 
             HttpHeaders header = new HttpHeaders();
-            String redirectUrl = String.format("/profile?userId=%d&tab=lounge", user.getId());
+            String redirectUrl = String.format("/profile/lounge?userId=%d", user.getId());
             header.setLocation(URI.create(redirectUrl)); // 라운지 탭으로 리다이렉트
 
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
@@ -278,43 +207,32 @@ public class ProfileController {
     }
 
     // 게시물 제목 클릭 시 특정 게시물 조회로 넘어가는 메소드
-    @GetMapping(value = "/community/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getBoardDetails(@PathVariable Long id) {
+    @GetMapping("/community/{id}")
+    public String getBoardDetails(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Map<String, Object> boardDetails = profileService.getBoardDetails(id);
         String boardType = (String) boardDetails.get("boardType");
-        ResponseEntity<MultiValueMap<String, Object>> responseEntity;
 
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> entity;
-
-        switch (boardType) {
-            case "AdminBoard":
-            case "FreeBoard":
-            case "EventBoard":
-                headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-                entity = new HttpEntity<>(headers);
-                responseEntity = restTemplate.exchange(
-                        "http://localhost:8080/community/" + boardType.toLowerCase() + "-boards/" + id,
-                        HttpMethod.GET,
-                        entity,
-                        new ParameterizedTypeReference<MultiValueMap<String, Object>>() {}
-                );
-                break;
-            case "RecruitBoard":
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                entity = new HttpEntity<>(headers);
-                responseEntity = restTemplate.exchange(
-                        "http://localhost:8080/community/recruit-boards/" + id,
-                        HttpMethod.GET,
-                        entity,
-                        new ParameterizedTypeReference<MultiValueMap<String, Object>>() {}
-                );
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid board type: " + boardType);
+        String url = buildUrl(boardType, id);
+        if (url == null) {
+            throw new IllegalArgumentException("Invalid board type: " + boardType);
         }
 
-        return responseEntity;
+        redirectAttributes.addAttribute("id", id);
+        return "redirect:" + url;
     }
 
+    private String buildUrl(String boardType, Long id) {
+        switch (boardType) {
+            case "AdminBoard":
+                return "/community/admin-boards/" + id;
+            case "FreeBoard":
+                return "/community/free-boards/" + id;
+            case "EventBoard":
+                return "/community/event-boards/" + id;
+            case "RecruitBoard":
+                return "/community/recruit-boards/" + id;
+            default:
+                return null;
+        }
+    }
 }

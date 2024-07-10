@@ -19,7 +19,7 @@ public class ProfileSongDto extends ProfileDto {
     // 앨범 리스트
     private List<ProfileAlbumDto> profileAlbumDtos; // 추가
 
-    // 기존 생성자
+    // 기본 생성자
     public ProfileSongDto(String profileBannerImgName, String profileImgName, String nickname, String intro, Long followingCount, Long followersCount, boolean followStatus, String songTitle, String genre, String lyricist, String composer, int likeCount, String albumImage, List<ProfileAlbumDto> profileAlbumDtos) {
         super(profileBannerImgName, profileImgName, nickname, intro, followingCount, followersCount, followStatus);
         this.songTitle = songTitle;

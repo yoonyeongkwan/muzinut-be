@@ -13,6 +13,7 @@ import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
+import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
@@ -53,80 +54,9 @@ public class ProfileController {
 
     private final RestTemplate restTemplate;
 
-    // 프로필 정보를 가져오는 메소드
-    private MultiValueMap<String, Object> getProfileInfo(Long userId, String tab) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-
-        // 선택된 탭에 따라 데이터 추가
-        switch (tab) {
-            case "album":
-                MultiValueMap<String, Object> albumData = new LinkedMultiValueMap<>();
-
-                // 메인 곡 데이터 가져오기
-                ProfileSongDto albumTab = profileService.getAlbumTab(userId);
-
-                if (albumTab == null) {
-                    addJsonEntityToFormData(albumData, profileService.getUserProfile(userId));
-                } else {
-                    addJsonEntityToFormData(albumData,  albumTab);
-                }
-                formData.addAll(albumData);
-                break;
-
-            case "lounge":
-                // 모든 라운지 조회 메서드
-                MultiValueMap<String, Object> loungeData = new LinkedMultiValueMap<String, Object>();
-                LoungeDto loungesDto = loungeService.getLoungesByUserId(userId, 0);
-                if (loungesDto == null || loungesDto.getLoungesForms().isEmpty()) {
-                    addJsonMessageToFormData(formData, "No Lounge");
-                } else {
-                    addJsonEntityToFormData(formData, loungesDto);
-                    //해당 게시판의 quill 파일 추가
-                    HttpHeaders fileHeaders = new HttpHeaders();
-                    for (LoungesForm l : loungesDto.getLoungesForms()) {
-                        String fullPath = fileStore.getFullPath(l.getFilename());
-                        fileHeaders.setContentType(MediaType.TEXT_HTML); //quill 파일 이므로 html
-                        formData.add("quillFile", new FileSystemResource(fullPath)); //파일 가져와서 셋팅
-                    }
-                }
-
-                formData.addAll(loungeData);
-                break;
-
-            case "board":
-                // 현재 로그인한 사용자 정보 가져오기
-                String currentUsername = profileService.getCurrentUsername();
-                User currentUser = profileService.findUserByUsername(currentUsername);
-                // 로그인한 사용자와 프로필 사용자가 동일한지 확인
-                if (!currentUser.getId().equals(userId)) {
-                    throw new NotFoundMemberException("본인의 프로필만 접근 가능");
-                } else {
-                    // 게시글 데이터 추가 로직
-                    List<String> posts = profileService.getUserBoardTitles(userId);
-                    if (posts == null || posts.isEmpty()) {
-                        addJsonMessageToFormData(formData, "No Board");
-                    } else {
-                        addJsonEntityToFormData(formData, posts);
-                    }
-                }
-                break;
-
-            case "playNut":
-                // 플리넛 데이터 추가 로직
-                break;
-
-            case "nuts":
-                // 넛츠 데이터 추가 로직
-                break;
-        }
-
-        return formData;
-    }
-
     // 프로필 페이지 - 앨범 탭(기본)
     @GetMapping
-    public ResponseEntity<?> getUserProfileAlbum(@RequestParam("userId") Long userId,
-                                                 @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
+    public ResponseEntity<?> getUserProfileAlbum(@RequestParam("userId") Long userId) throws JsonProcessingException {
         ProfileSongDto albumTab = profileService.getAlbumTab(userId);
         return new ResponseEntity<ProfileSongDto>(albumTab, HttpStatus.OK);
     }
@@ -145,19 +75,23 @@ public class ProfileController {
             fileHeaders.setContentType(MediaType.TEXT_HTML); // quill 파일이므로 html
             formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
         }
-
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
 
+    // 프로필 페이지 - 게시글 탭(기본)
+    @GetMapping("/board")
+    public ResponseEntity<?> getUserProfileBoard(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        String currentUsername = profileService.getCurrentUsername();
+        User currentUser = profileService.findUserByUsername(currentUsername);
 
-//    // 프로필 페이지 보여주는 메소드
-//    @GetMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<?> getUserProfile(@RequestParam("userId") Long userId,
-//                                            @RequestParam(value = "tab", required = false, defaultValue = "album") String tab) throws JsonProcessingException {
-//        MultiValueMap<String, Object> formData = getProfileInfo(userId, tab);
-//        log.info("formData = {}", formData);
-//        return new ResponseEntity<>(formData, HttpStatus.OK);
-//    }
+        if (!currentUser.getId().equals(userId)) {
+            throw new NotFoundMemberException("본인의 프로필만 접근 가능");
+        } else {
+            ProfileBoardDto profileBoardDto = profileService.getBoardTab(userId);
+            return new ResponseEntity<>(profileBoardDto, HttpStatus.OK);
+        }
+    }
+
 
     // json 메세지를 form-data에 추가하는 메서드
     private void addJsonMessageToFormData(MultiValueMap<String, Object> formData, String message) throws JsonProcessingException {

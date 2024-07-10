@@ -165,34 +165,6 @@ public class UserController {
         return new MessageDto("파일 저장 성공");
     }
 
-    // 프로필 페이지 보여주는 메소드
-    @ResponseBody
-    @GetMapping(value = "/profile")
-    public ResponseEntity<ProfileDto> getUserProfile(@RequestParam("userId") Long userId) throws JsonProcessingException {
-
-        ProfileDto profileDto = profileService.getUserProfile(userId);
-
-        return new ResponseEntity<>(profileDto, HttpStatus.OK);
-    }
-
-    // 마이페이지 - 내가 작성한 게시글을 보여주는 메소드
-    @ResponseBody
-    @GetMapping("/profile-community")
-    public ResponseEntity<List<String>> getUserBoardTitles(@RequestParam("userId") Long userId) {
-        // 현재 로그인한 사용자의 ID 가져오기
-        String currentUsername = profileService.getCurrentUsername();
-        User currentUser = userService.getUserWithUsername()
-                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
-
-        // 요청한 userId가 현재 로그인한 사용자의 ID와 일치하는지 확인
-        if (!currentUser.getId().equals(userId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        // 유저가 작성한 게시글 제목 리스트 가져오기
-        List<String> boardTitles = profileService.getUserBoardTitles(userId);
-        return new ResponseEntity<>(boardTitles, HttpStatus.OK);
-    }
     //비밀번호 수정
     @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")

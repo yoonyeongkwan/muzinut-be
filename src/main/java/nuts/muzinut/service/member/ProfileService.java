@@ -14,6 +14,7 @@ import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.Album.ProfileAlbumDto;
+import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
@@ -94,17 +95,6 @@ public class ProfileService extends DetailCommon {
         );
 
         return profileDto;
-    }
-
-    // 사용자가 작성한 게시글 제목을 가져오는 메소드
-    public List<String> getUserBoardTitles(Long userId) {
-        // 인증된 사용자 정보 가져오기
-        String username = getCurrentUsername();
-        User user = userRepository.findOneWithAuthoritiesByUsername(username)
-                .orElseThrow(() -> new NotFoundEntityException("Invalid user"));
-
-        // 유저가 작성한 게시글 제목 리스트 반환
-        return userRepository.findBoardTitlesByUserId(userId);
     }
 
     // 현재 인증된 사용자의 이름을 반환하는 메소드
@@ -266,6 +256,25 @@ public class ProfileService extends DetailCommon {
         return profileDetailLoungeDto;
     }
 
+    // 게시글 탭을 보여주는 메소드
+    public ProfileBoardDto getBoardTab(Long userId) {
+        List<String> boardsTitle = userRepository.findBoardTitlesByUserId(userId);
+        List<String> bookmarkTitle = userRepository.findBookmarkTitlesByUserId(userId);
+        ProfileDto profileDto = getUserProfile(userId);
+
+        return new ProfileBoardDto(
+                encodeFileToBase64(profileDto.getProfileBannerImgName()),
+                encodeFileToBase64(profileDto.getProfileImgName()),
+                profileDto.getNickname(),
+                profileDto.getIntro(),
+                profileDto.getFollowingCount(),
+                profileDto.getFollowersCount(),
+                profileDto.isFollowStatus(),
+                boardsTitle,
+                bookmarkTitle
+        );
+    }
+    
     // 게시물 상세 정보를 가져오는 메소드
     public Map<String, Object> getBoardDetails(Long id) {
         Map<String, Object> postDetails = new HashMap<>();

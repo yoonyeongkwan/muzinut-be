@@ -4,12 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.ChatMember;
-import nuts.muzinut.domain.chat.ChatStatus;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
-import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.repository.chat.ChatMemberRepository;
 import nuts.muzinut.repository.chat.ChatRepository;
 import nuts.muzinut.repository.chat.MessageRepository;
@@ -24,8 +22,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static nuts.muzinut.domain.chat.ChatStatus.*;
 
 @Slf4j
 @Transactional
@@ -69,10 +65,6 @@ public class ChatService {
         Chat chat = chatRepository.findById(Long.parseLong(chatRoomNumber)).orElseThrow(
                 () -> new NotFoundEntityException("없는 채팅방입니다"));
 
-        if (chat.getChatStatus() == INVALID) {
-            throw new InvalidChatRoomException("유효하지 않는 채팅방입니다");
-        }
-
         //채팅방에 접속한 유저가 없는 경우
         if (redisData.isEmpty()) {
             log.info("채팅방 1명 접속");
@@ -105,15 +97,5 @@ public class ChatService {
         } else {
             log.info("채팅방에 접속중인 사용자가 없었음");
         }
-    }
-
-    //채팅방 얼리기
-    public Chat freezeChatRoom(Chat chat) {
-        return chat.freezeChatRoom();
-    }
-
-    //채팅방 녹이기
-    public Chat meltChatRoom(Chat chat) {
-        return chat.meltChatRoom();
     }
 }

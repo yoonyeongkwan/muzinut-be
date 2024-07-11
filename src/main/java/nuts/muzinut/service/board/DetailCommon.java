@@ -21,6 +21,12 @@ public class DetailCommon {
     @Value("${spring.file.dir}")
     private String fileDir;
 
+    @Value("${spring.file.profile-base-img}")
+    private String profileBaseImg;
+
+    @Value("${spring.file.banner-base-img}")
+    private String bannerBaseImg;
+
     /**
      * 게시판에 사용자가 좋아요를 눌렀는지 확인
      * @param user: 좋아요를 눌렀는지 확인하고 싶은 유저
@@ -80,6 +86,30 @@ public class DetailCommon {
         }
     }
 
+    // 이미지 파일명을 가져와서 base64로 인코딩 하여 반환하는 메서드(프로필, 배너 기본이미지 코드 추가)
+    public String encodeFileToBase64(String filename, boolean isBanner) {
+        log.info("파일명: {}", filename);
+        try {
+            File file;
+            if (StringUtils.hasText(filename)) {
+                file = new File(fileDir + filename);
+                if (!file.exists()) {
+                    // 파일이 없을 경우 기본 이미지 사용
+                    file = new File(isBanner ? bannerBaseImg : profileBaseImg);
+                }
+            } else {
+                // 파일명이 null이거나 공백일 경우 기본 이미지 사용
+                file = new File(isBanner ? bannerBaseImg : profileBaseImg);
+            }
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            log.info("인코딩 된 파일명 : {}", Base64.getEncoder().encodeToString(fileContent));
+            return Base64.getEncoder().encodeToString(fileContent);
+        } catch (IOException e) {
+            log.info("{} 파일 없음", filename);
+            return null;
+        }
+    }
+
 
     //이미지 파일명을 가져와서 base64로 인코딩 하여 반환하는 메서드
     public String encodeAlbumFileToBase64(String filename){
@@ -110,13 +140,13 @@ public class DetailCommon {
                 // 회원인 경우
                 commentDto = new CommentDto(
                         c.getId(), c.getContent(), c.getUser().getNickname(),
-                        c.getCreatedDt(), encodeFileToBase64(c.getUser().getProfileImgFilename()),
+                        c.getCreatedDt(), encodeFileToBase64(c.getUser().getProfileImgFilename(), false),
                         isLike(user, c), c.getCommentLikes().size()); //isLike 추가 (댓글에 대한 좋아요를 했는지 확인)
             } else {
                 // 비회원인 경우
                 commentDto = new CommentDto(
                         c.getId(), c.getContent(), c.getUser().getNickname(),
-                        c.getCreatedDt(), encodeFileToBase64(c.getUser().getProfileImgFilename()),
+                        c.getCreatedDt(), encodeFileToBase64(c.getUser().getProfileImgFilename(), false),
                         c.getCommentLikes().size());
             }
 
@@ -124,7 +154,7 @@ public class DetailCommon {
             for (Reply r : c.getReplies()) {
                 replies.add(new ReplyDto(
                         r.getId(), r.getContent(), r.getUser().getNickname(),
-                        r.getCreatedDt(), encodeFileToBase64(r.getUser().getProfileImgFilename())));
+                        r.getCreatedDt(), encodeFileToBase64(r.getUser().getProfileImgFilename(), false)));
             }
             commentDto.setReplies(replies);
             comments.add(commentDto);

@@ -9,9 +9,6 @@ import nuts.muzinut.controller.board.FileType;
 import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
-import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
@@ -22,7 +19,6 @@ import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.*;
 import nuts.muzinut.service.member.ProfileService;
 import nuts.muzinut.service.member.UserService;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,14 +26,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
 import java.util.Map;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
@@ -78,7 +71,7 @@ public class ProfileController {
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
 
-    // 프로필 페이지 - 게시글 탭(기본)
+    // 프로필 페이지 - 게시글 탭
     @GetMapping("/board")
     public ResponseEntity<?> getUserProfileBoard(@RequestParam("userId") Long userId) throws JsonProcessingException {
         String currentUsername = profileService.getCurrentUsername();
@@ -90,16 +83,6 @@ public class ProfileController {
             ProfileBoardDto profileBoardDto = profileService.getBoardTab(userId);
             return new ResponseEntity<>(profileBoardDto, HttpStatus.OK);
         }
-    }
-
-
-    // json 메세지를 form-data에 추가하는 메서드
-    private void addJsonMessageToFormData(MultiValueMap<String, Object> formData, String message) throws JsonProcessingException {
-        String jsonMessage = objectMapper.writeValueAsString(Map.of("message", message));
-        HttpHeaders messageHeaders = new HttpHeaders();
-        messageHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> messageEntity = new HttpEntity<>(jsonMessage, messageHeaders);
-        formData.add("message", messageEntity);
     }
 
     // 데이터를 json으로 변환하여 form-data에 추가하는 메서드
@@ -208,7 +191,7 @@ public class ProfileController {
 
     // 게시물 제목 클릭 시 특정 게시물 조회로 넘어가는 메소드
     @GetMapping("/community/{id}")
-    public String getBoardDetails(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public ResponseEntity<Void> getBoardDetails(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         Map<String, Object> boardDetails = profileService.getBoardDetails(id);
         String boardType = (String) boardDetails.get("boardType");
 
@@ -216,9 +199,12 @@ public class ProfileController {
         if (url == null) {
             throw new IllegalArgumentException("Invalid board type: " + boardType);
         }
+        HttpHeaders header = new HttpHeaders();
+        header.setLocation(URI.create(url));
 
-        redirectAttributes.addAttribute("id", id);
-        return "redirect:" + url;
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                .headers(header)
+                .build();
     }
 
     private String buildUrl(String boardType, Long id) {

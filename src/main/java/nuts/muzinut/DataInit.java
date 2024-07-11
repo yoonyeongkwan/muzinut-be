@@ -38,15 +38,15 @@ public class DataInit {
 
     @PostConstruct
     public void init() {
-        dataInitService.initializeData();
+//        dataInitService.initializeData();
 //
 //        AuthorityDto authorityDto = new AuthorityDto("admin");
-//        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
-//        userService.adminSignup(userDto);
-//        UserDto userDto2 = new UserDto("user1@naver.com", "user1", "user1!");
-//        userService.signup(userDto2);
-//        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
-//        userService.signup(userDto3);
+        UserDto userDto = new UserDto("admin@naver.com", "admin", "add!");
+        userService.adminSignup(userDto);
+        UserDto userDto2 = new UserDto("user1@naver.com", "user1", "user1!");
+        userService.signup(userDto2);
+        UserDto userDto3 = new UserDto("user2@naver.com", "user2", "user2!");
+        userService.signup(userDto3);
     }
 
 //    @PostConstruct

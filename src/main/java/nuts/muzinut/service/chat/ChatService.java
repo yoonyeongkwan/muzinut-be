@@ -35,6 +35,10 @@ public class ChatService {
     private final UserRepository userRepository;
     private final RedisUtil redisUtil;
 
+    public Chat findChatRoom(Long id) {
+        return chatRepository.findById(id).orElseThrow(() -> new NotFoundEntityException("없는 채팅방입니다"));
+    }
+
     /**
      * @param user1: 채팅방 첫번째 참가 유저 (닉네임)
      * @param user2: 채팅방 두번째 참가 유저 (닉네임)
@@ -80,9 +84,12 @@ public class ChatService {
 
         //기존에 두명의 채팅방 참가자가 있는 경우
         if (redisData.size() == 2 && redisData.contains(username)) {
-            log.info("채팅방 2명중 한명 퇴장");
-            String user = redisData.stream().filter(Predicate.not(r -> r.equals(username))).toString(); //채팅방을 나가지 않은 사용자
-            redisUtil.setMultiData(chatRoomNumber, user); //덮어쓰기
+            //채팅방을 나가지 않은 사용자
+            String notExitUser = redisData.stream().filter(Predicate.not(r -> r.equals(username))).findFirst()
+                    .orElseThrow(() -> new NotFoundMemberException("잘못된 회원이 채팅방을 나가려고 합니다"));
+            log.info("{} 채팅방 2명중 한명 퇴장: {}", chatRoomNumber, notExitUser);
+            redisUtil.deleteData(chatRoomNumber); //삭제 후 생성
+            redisUtil.setMultiData(chatRoomNumber, notExitUser); //덮어쓰기
 
         } else if (redisData.size() == 1 && redisData.getFirst().equals(username)) {
             log.info("채팅방 모두 퇴장");

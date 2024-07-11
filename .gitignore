@@ -4,7 +4,8 @@ HELP.md
 
 build/
 src/main/java/nuts/muzinut/file/**
-DataInit.class
+DataInit.java
+DataInitService.java
 src/test/**
 application.yml
 !gradle/wrapper/gradle-wrapper.jar

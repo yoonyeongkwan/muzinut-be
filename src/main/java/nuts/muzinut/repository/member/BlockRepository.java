@@ -17,6 +17,7 @@ public interface BlockRepository extends JpaRepository<Block, Long> {
 
     Optional<Block> findByBlockUser(User blockUser);
 
+    //user 의 차단한 사용자 목록들을 모두 가져온다.
     @Query("select b from Block b join fetch b.user where b.user = :user")
     List<Block> findBlocksByUser(@Param("user") User user);
 }

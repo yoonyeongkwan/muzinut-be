@@ -12,6 +12,7 @@ import nuts.muzinut.repository.chat.ChatMemberRepository;
 import nuts.muzinut.repository.chat.ChatRepository;
 import nuts.muzinut.repository.chat.MessageRepository;
 import nuts.muzinut.repository.chat.ReadMessageRepository;
+import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.member.RedisUtil;
 import org.springframework.stereotype.Service;
@@ -33,6 +34,7 @@ public class ChatService {
     private final ChatMemberRepository chatMemberRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
     private final RedisUtil redisUtil;
 
     public Chat findChatRoom(Long id) {
@@ -97,5 +99,15 @@ public class ChatService {
         } else {
             log.info("채팅방에 접속중인 사용자가 없었음");
         }
+    }
+
+    // 맞팔되어 있는 사용자 목록을 가져오는 메서드
+    /**
+     * @param userId: 현재 사용자 ID
+     * @return 맞팔 되어 있는 사용자 리스트
+     */
+    public List<User> getMutualFollowUsers(Long userId) {
+        List<Long> mutualFollowIds = followRepository.findMutualFollowIds(userId);
+        return userRepository.findAllById(mutualFollowIds);
     }
 }

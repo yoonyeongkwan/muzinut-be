@@ -1,6 +1,5 @@
 package nuts.muzinut.controller.chat;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.Message;
@@ -9,11 +8,11 @@ import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.chat.ChatMessage;
 import nuts.muzinut.dto.chat.CreateChatDto;
 import nuts.muzinut.dto.chat.CreateChatForm;
+import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.chat.ChatService;
 import nuts.muzinut.service.chat.MessageService;
 import nuts.muzinut.service.member.UserService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -22,7 +21,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -66,5 +66,18 @@ public class ChatController {
         User user = userService.getUserWithUsername().orElseThrow(() -> new NotFoundMemberException("채팅방을 만들 수 없습니다"));
         chatService.disconnectChatRoom(id, user.getUsername());
         return new MessageDto(user.getNickname() + "님이 " + id + "채팅방을 퇴장하였습니다");
+    }
+
+    // 맞팔된 사용자 목록을 가져오는 메서드
+    @ResponseBody
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/mutual-follows")
+    public List<UserDto> getMutualFollows() {
+        User user = userService.getUserWithUsername().orElseThrow(() -> new NotFoundMemberException("사용자를 찾을 수 없습니다"));
+        List<User> mutualFollowUsers = chatService.getMutualFollowUsers(user.getId());
+
+        return mutualFollowUsers.stream()
+                .map(UserDto::from)
+                .collect(Collectors.toList());
     }
 }

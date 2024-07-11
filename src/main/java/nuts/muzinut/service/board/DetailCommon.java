@@ -21,6 +21,12 @@ public class DetailCommon {
     @Value("${spring.file.dir}")
     private String fileDir;
 
+    @Value("${spring.file.profile-base-img}")
+    private String profileBaseImg;
+
+    @Value("${spring.file.banner-base-img}")
+    private String bannerBaseImg;
+
     /**
      * 게시판에 사용자가 좋아요를 눌렀는지 확인
      * @param user: 좋아요를 눌렀는지 확인하고 싶은 유저
@@ -74,6 +80,30 @@ public class DetailCommon {
             }
             return null;
 
+        } catch (IOException e) {
+            log.info("{} 파일 없음", filename);
+            return null;
+        }
+    }
+
+    // 이미지 파일명을 가져와서 base64로 인코딩 하여 반환하는 메서드
+    public String encodeFileToBase64(String filename, boolean isBanner) {
+        log.info("파일명: {}", filename);
+        try {
+            File file;
+            if (StringUtils.hasText(filename)) {
+                file = new File(fileDir + filename);
+                if (!file.exists()) {
+                    // 파일이 없을 경우 기본 이미지 사용
+                    file = new File(isBanner ? bannerBaseImg : profileBaseImg);
+                }
+            } else {
+                // 파일명이 null이거나 공백일 경우 기본 이미지 사용
+                file = new File(isBanner ? bannerBaseImg : profileBaseImg);
+            }
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            log.info("인코딩 된 파일명 : {}", Base64.getEncoder().encodeToString(fileContent));
+            return Base64.getEncoder().encodeToString(fileContent);
         } catch (IOException e) {
             log.info("{} 파일 없음", filename);
             return null;

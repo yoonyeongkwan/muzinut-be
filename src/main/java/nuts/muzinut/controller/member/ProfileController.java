@@ -78,7 +78,7 @@ public class ProfileController {
         return new ResponseEntity<>(formData, HttpStatus.OK);
     }
 
-    // 프로필 페이지 - 게시글 탭(기본)
+    // 프로필 페이지 - 게시글 탭
     @GetMapping("/board")
     public ResponseEntity<?> getUserProfileBoard(@RequestParam("userId") Long userId) throws JsonProcessingException {
         String currentUsername = profileService.getCurrentUsername();
@@ -90,16 +90,6 @@ public class ProfileController {
             ProfileBoardDto profileBoardDto = profileService.getBoardTab(userId);
             return new ResponseEntity<>(profileBoardDto, HttpStatus.OK);
         }
-    }
-
-
-    // json 메세지를 form-data에 추가하는 메서드
-    private void addJsonMessageToFormData(MultiValueMap<String, Object> formData, String message) throws JsonProcessingException {
-        String jsonMessage = objectMapper.writeValueAsString(Map.of("message", message));
-        HttpHeaders messageHeaders = new HttpHeaders();
-        messageHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> messageEntity = new HttpEntity<>(jsonMessage, messageHeaders);
-        formData.add("message", messageEntity);
     }
 
     // 데이터를 json으로 변환하여 form-data에 추가하는 메서드

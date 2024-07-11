@@ -121,8 +121,8 @@ public class ProfileService extends DetailCommon {
 
         if (songs.isEmpty()) {
             return new ProfileSongDto(
-                    encodeFileToBase64(profileDto.getProfileBannerImgName()),
-                    encodeFileToBase64(profileDto.getProfileImgName()),
+                    encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
+                    encodeFileToBase64(profileDto.getProfileImgName(), false),
                     profileDto.getNickname(),
                     profileDto.getIntro(),
                     profileDto.getFollowingCount(),
@@ -147,8 +147,8 @@ public class ProfileService extends DetailCommon {
                 .collect(Collectors.toList());
 
         return new ProfileSongDto(
-                encodeFileToBase64(profileDto.getProfileBannerImgName()),
-                encodeFileToBase64(profileDto.getProfileImgName()),
+                encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
+                encodeFileToBase64(profileDto.getProfileImgName(), false),
                 profileDto.getNickname(),
                 profileDto.getIntro(),
                 profileDto.getFollowingCount(),
@@ -177,8 +177,8 @@ public class ProfileService extends DetailCommon {
 
         if (lounges.isEmpty()){
             return new ProfileLoungeDto(
-                    encodeFileToBase64(profileDto.getProfileBannerImgName()),
-                    encodeFileToBase64(profileDto.getProfileImgName()),
+                    encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
+                    encodeFileToBase64(profileDto.getProfileImgName(), false),
                     profileDto.getNickname(),
                     profileDto.getIntro(),
                     profileDto.getFollowingCount(),
@@ -198,8 +198,8 @@ public class ProfileService extends DetailCommon {
                 .collect(Collectors.toList());
 
         return new ProfileLoungeDto(
-                encodeFileToBase64(profileDto.getProfileBannerImgName()),
-                encodeFileToBase64(profileDto.getProfileImgName()),
+                encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
+                encodeFileToBase64(profileDto.getProfileImgName(), false),
                 profileDto.getNickname(),
                 profileDto.getIntro(),
                 profileDto.getFollowingCount(),
@@ -236,8 +236,8 @@ public class ProfileService extends DetailCommon {
                 findLounge.getId(),
                 findLounge.getUser().getNickname(),
                 findLounge.getFilename(),
-                encodeFileToBase64(profileDto.getProfileBannerImgName()),
-                encodeFileToBase64(profileDto.getProfileImgName()),
+                encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
+                encodeFileToBase64(profileDto.getProfileImgName(), false),
                 profileDto.getNickname(),
                 profileDto.getIntro(),
                 profileDto.getFollowingCount(),
@@ -263,8 +263,8 @@ public class ProfileService extends DetailCommon {
         ProfileDto profileDto = getUserProfile(userId);
 
         return new ProfileBoardDto(
-                encodeFileToBase64(profileDto.getProfileBannerImgName()),
-                encodeFileToBase64(profileDto.getProfileImgName()),
+                encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
+                encodeFileToBase64(profileDto.getProfileImgName(), false),
                 profileDto.getNickname(),
                 profileDto.getIntro(),
                 profileDto.getFollowingCount(),

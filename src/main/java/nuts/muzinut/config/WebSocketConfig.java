@@ -25,8 +25,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws") //SocketJs 연결 주소
-                .setAllowedOrigins("*");
-//                .withSockJS(); //버전 낮은 브라우저에서도 적용 가능
+//                .setAllowedOrigins("*");
+                .setAllowedOriginPatterns("*");
+//                .withSockJS(); //Todo 프론트와 채팅 통신할 때 주석 해제
         // 주소 : ws://localhost:8080/ws
     }
 

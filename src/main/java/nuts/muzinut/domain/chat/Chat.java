@@ -21,6 +21,9 @@ public class Chat {
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created_dt = LocalDateTime.now();
 
+    @Enumerated(EnumType.STRING)
+    private ChatStatus chatStatus = ChatStatus.VALID;
+
     //연관 관계
     @OneToMany(mappedBy = "chat")
     List<ChatMember> chatMembers = new ArrayList<>();

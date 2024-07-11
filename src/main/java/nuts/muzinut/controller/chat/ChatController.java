@@ -13,16 +13,14 @@ import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.chat.ChatService;
 import nuts.muzinut.service.chat.MessageService;
 import nuts.muzinut.service.member.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -59,5 +57,14 @@ public class ChatController {
                     .user1(user.getNickname())
                     .user2(form.getSendTo())
                     .chatRoomId(chat.getId()).build();
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping("/room-out")
+    public MessageDto outRoom(@RequestParam("roomId") String id) {
+        User user = userService.getUserWithUsername().orElseThrow(() -> new NotFoundMemberException("채팅방을 만들 수 없습니다"));
+        chatService.disconnectChatRoom(id, user.getUsername());
+        return new MessageDto(user.getNickname() + "님이 " + id + "채팅방을 퇴장하였습니다");
     }
 }

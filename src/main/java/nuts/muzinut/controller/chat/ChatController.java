@@ -8,14 +8,11 @@ import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.chat.ChatMessage;
 import nuts.muzinut.dto.chat.CreateChatDto;
 import nuts.muzinut.dto.chat.CreateChatForm;
-import nuts.muzinut.dto.chat.MutualFollow;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.chat.ChatService;
 import nuts.muzinut.service.chat.MessageService;
 import nuts.muzinut.service.member.UserService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -75,14 +72,12 @@ public class ChatController {
     @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/mutual-follows")
-    public ResponseEntity<?> getMutualFollows() {
+    public List<UserDto> getMutualFollows() {
         User user = userService.getUserWithUsername().orElseThrow(() -> new NotFoundMemberException("사용자를 찾을 수 없습니다"));
-        List<MutualFollow> mutualFollows = chatService.getMutualFollowUsers(user.getId());
+        List<User> mutualFollowUsers = chatService.getMutualFollowUsers(user.getId());
 
-        if (mutualFollows.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        } else {
-            return ResponseEntity.ok(mutualFollows);
-        }
+        return mutualFollowUsers.stream()
+                .map(UserDto::from)
+                .collect(Collectors.toList());
     }
 }

@@ -98,4 +98,17 @@ public class ChatService {
             log.info("채팅방에 접속중인 사용자가 없었음");
         }
     }
+<<<<<<< HEAD
+=======
+
+    // 맞팔되어 있는 사용자 목록을 가져오는 메서드
+    /**
+     * @param userId: 현재 사용자 ID
+     * @return 맞팔 되어 있는 사용자 리스트
+     */
+    public List<User> getMutualFollowUsers(Long userId) {
+        List<Long> mutualFollowIds = followRepository.findMutualFollowIds(userId);
+        return userRepository.findAllById(mutualFollowIds);
+    }
+>>>>>>> parent of f8fb2fc (맞팔 목록 불러오는 메소드 개발 완료)
 }

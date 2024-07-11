@@ -1,4 +1,4 @@
-package nuts.muzinut.dto.member.profile;
+package nuts.muzinut.dto.member.follow;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

@@ -4,19 +4,25 @@ package nuts.muzinut.service.mainpage;
 import lombok.RequiredArgsConstructor;
 
 import nuts.muzinut.dto.mainpage.*;
+import nuts.muzinut.exception.NoDataFoundException;
+import nuts.muzinut.exception.NotDtypeBoardException;
+import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.mainpage.MainPageRepository;
+import nuts.muzinut.service.encoding.EncodeFiile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
+import java.util.Base64;
 import java.util.List;
 
 
@@ -26,77 +32,86 @@ import java.util.List;
 public class MainPageService {
 
     private final MainPageRepository mainPageRepository;
+    private final EncodeFiile encodeFiile;
 
     @Value("${spring.file.dir}")
     private String fileDir;
 
-    public MultiValueMap<String, Object> findMainTotalData(){
+    // 메인페이지 메인 메소드
+    public ResponseEntity<MainTotalDto> findMainTotalData(){
         List<HotSongDto> top10Songs = mainPageRepository.findTOP10Song();
         List<NewSongDto> newSongs = mainPageRepository.findNewSong();
         List<HotArtistDto> top5Artists = mainPageRepository.findTOP5Artist();
-        List<HotBoardDto> hotBoards = findMainHotBoard();
-        NewBoardDto newBoard = findMainNewBoard();
-        MainTotalDto mainTotalDto = new MainTotalDto(top10Songs, newSongs ,top5Artists, hotBoards, newBoard);
-        List<FileSystemResource> top10Imgs = top10Img(top10Songs);
-        List<FileSystemResource> newSongImgs = newSongImg(newSongs);
-        List<FileSystemResource> top5ArtistImgs = top5ArtistImg(top5Artists);
-
-        return saveMultipartFormData(mainTotalDto, top10Imgs, newSongImgs, top5ArtistImgs);
-    }
-    public MultiValueMap<String, Object> saveMultipartFormData(MainTotalDto mainTotalDto, List<FileSystemResource> top10Imgs,
-                                      List<FileSystemResource> newSongImgs, List<FileSystemResource> top5ArtistImgs){
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<String, Object>();
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<MainTotalDto> mainTotalDtoEntity = new HttpEntity<>(mainTotalDto, jsonHeaders);
-
-        body.add("totalData", mainTotalDtoEntity);
-        for (int i = 0; i < top10Imgs.size(); i++) {
-            body.add("top10Img" + i, top10Imgs.get(i));
+        try {
+            List<HotSongDto> HotSongList = top10Img(top10Songs);
+            List<NewSongDto> newSongList = newSongImg(newSongs);
+            List<HotArtistDto> hotArtistList = top5ArtistImg(top5Artists);
+            List<HotBoardDto> hotBoards = findMainHotBoard();
+            NewBoardDto newBoard = findMainNewBoard();
+            // 데이터가 없는 경우 예외 처리
+            if (top10Songs.isEmpty() && newSongs.isEmpty() && top5Artists.isEmpty() && hotBoards.isEmpty() && newBoard.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            }
+            MainTotalDto totalData = new MainTotalDto(HotSongList, newSongList, hotArtistList, hotBoards, newBoard);
+            return new ResponseEntity<MainTotalDto>(totalData,HttpStatus.OK);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        for (int i = 0; i < newSongImgs.size(); i++) {
-            body.add("newSongImg" + i, newSongImgs.get(i));
-        }
-        for (int i = 0; i < top5ArtistImgs.size(); i++) {
-            body.add("top5ArtistImg" + i, top5ArtistImgs.get(i));
-        }
-        return body;
     }
 
-    public List<FileSystemResource> top10Img(List<HotSongDto> top10Songs) {
-        List<FileSystemResource> top10Imgs = new ArrayList<>();
+    // top10Img 인코딩 및 DTO 저장 메소드
+    public List<HotSongDto> top10Img(List<HotSongDto> top10Songs) throws IOException {
+        List<HotSongDto> top10List = new ArrayList<>();
         for (HotSongDto top10Song : top10Songs) {
-            FileSystemResource top10SongImg = new FileSystemResource
-                    (fileDir + "/albumImg/" + top10Song.getAlbumImg() + ".png");
-            top10Imgs.add(top10SongImg);
+            File file = new File(fileDir + "/albumImg/" + top10Song.getAlbumImg());
+            // 파일이 없는 경우 예외 처리
+            if (!file.exists() || !file.isFile()) {
+                throw new NoDataFoundException("파일이 존재 하지 않습니다");
+            }
+            String encodedFile = encodeFiile.encodeFileToBase64(file);
+            top10Song.setAlbumImg(encodedFile);
+            top10List.add(top10Song);
         }
-        return top10Imgs;
+        return top10List;
     }
-
-    public List<FileSystemResource> newSongImg(List<NewSongDto> newSongs) {
-        List<FileSystemResource> newSongImgs = new ArrayList<>();
+    // newSongImg 인코딩 및 DTO 저장 메소드
+    public List<NewSongDto> newSongImg(List<NewSongDto> newSongs) throws IOException {
+        List<NewSongDto> newSongList = new ArrayList<>();
         for (NewSongDto newSong : newSongs) {
-            FileSystemResource newSongImg = new FileSystemResource
-                    (fileDir + "/albumImg/" + newSong.getAlbumImg() + ".png");
-            newSongImgs.add(newSongImg);
+            File file = new File(fileDir + "/albumImg/" + newSong.getAlbumImg());
+            // 파일이 없는 경우 예외 처리
+            if (!file.exists() || !file.isFile()) {
+                throw new NoDataFoundException("파일이 존재 하지 않습니다");
+            }
+            String encodedFile = encodeFiile.encodeFileToBase64(file);
+            newSong.setAlbumImg(encodedFile);
+            newSongList.add(newSong);
         }
-        return newSongImgs;
+        return newSongList;
     }
-    public List<FileSystemResource> top5ArtistImg(List<HotArtistDto> top5Artists) {
-        List<FileSystemResource> top5ArtistImgs = new ArrayList<>();
+    // top5ArtistImg 인코딩 및 DTO 저장 메소드
+    public List<HotArtistDto> top5ArtistImg(List<HotArtistDto> top5Artists) throws IOException {
+        List<HotArtistDto> top5ArtistList = new ArrayList<>();
         for (HotArtistDto top5Artist : top5Artists) {
-            FileSystemResource top5ArtistImg = new FileSystemResource(fileDir + top5Artist.getProfileImg());
-            top5ArtistImgs.add(top5ArtistImg);
+            File file = new File(fileDir + top5Artist.getProfileImg());
+            // 파일이 없는 경우 예외 처리
+            if (!file.exists() || !file.isFile()) {
+                throw new NoDataFoundException("파일이 존재 하지 않습니다");
+            }
+            String encodedFile = encodeFiile.encodeFileToBase64(file);
+            top5Artist.setProfileImg(encodedFile);
+            top5ArtistList.add(top5Artist);
         }
 
-        return top5ArtistImgs;
+        return top5ArtistList;
     }
 
+    // 인기 게시판 검색 및 DTO 변환 메소드
     public List<HotBoardDto> findMainHotBoard(){
         List<Object[]> resultList = mainPageRepository.findHotBoard();
+
         List<HotBoardDto> hotBoardDtos = new ArrayList<>();
         for (Object[] objects : resultList) {
-
             Long boardId = (Long) objects[0];
             String title = (String) objects[1];
             String nickname = (String) objects[2];
@@ -108,6 +123,7 @@ public class MainPageService {
         return hotBoardDtos;
     }
 
+    // 최신 게시판 검색 및 DTO 변환 메소드
     public NewBoardDto findMainNewBoard() {
         List<Object[]> results = mainPageRepository.findNewBoard();
 
@@ -119,14 +135,15 @@ public class MainPageService {
             String title = (String) objects[1];
             String nickname = (String) objects[2];
             String dtype = (String) objects[3];
-            if (dtype.equals("FreeBoard")){
+            if (dtype.equalsIgnoreCase("FreeBoard")){
                 NewFreeBoardDto newFreeBoardDto = new NewFreeBoardDto(boardId, title, nickname);
                 freeBoardDtos.add(newFreeBoardDto);
-            } else if (dtype.equals("RecruitBoard")) {
+            } else if (dtype.equalsIgnoreCase("RecruitBoard")) {
                 NewRecruitBoardDto newRecruitBoardDto = new NewRecruitBoardDto(boardId, title, nickname);
                 recruitBoardDtos.add(newRecruitBoardDto);
             }
         }
         return new NewBoardDto(freeBoardDtos,recruitBoardDtos);
     }
+
 }

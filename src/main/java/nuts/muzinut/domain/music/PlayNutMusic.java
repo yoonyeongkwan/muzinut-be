@@ -12,8 +12,8 @@ public class PlayNutMusic {
     @Column(name = "playnut_music_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "playlist_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "playnut_id")
     private PlayNut playNut;
 
     @Column(name = "music_id")

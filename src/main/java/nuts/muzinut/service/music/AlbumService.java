@@ -4,16 +4,24 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.*;
-import nuts.muzinut.dto.music.AlbumDto;
-import nuts.muzinut.dto.music.SongDto;
+import nuts.muzinut.dto.music.*;
+import nuts.muzinut.exception.AlbumHaveNoAuthorizationException;
+import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.NoDataFoundException;
+import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.AlbumRepository;
 import nuts.muzinut.repository.music.SongGenreRepository;
 import nuts.muzinut.repository.music.SongRepository;
+import nuts.muzinut.service.encoding.EncodeFiile;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -34,6 +42,8 @@ public class AlbumService {
     private final SongRepository songRepository;
 
     private final SongGenreRepository songGenreRepository;
+
+    private final EncodeFiile encodeFiile;
 
     @Value("${spring.file.dir}")
     private String fileDir;
@@ -57,7 +67,7 @@ public class AlbumService {
         }
 
         // 랜덤 파일 이름 + 확장명 이름으로 설정
-        randomFileName += randomFileName + "." + fileType;
+        randomFileName = randomFileName + "." + fileType;
 
         return randomFileName;
     }
@@ -179,6 +189,87 @@ public class AlbumService {
     public String getFileType(MultipartFile file) {
         String fileName = file.getOriginalFilename();
         return fileName.substring(fileName.lastIndexOf(".") + 1);
+    }
+
+    // 앨범 이미지 파일 삭제 메소드
+    public void albumImgDelete(String albumImgName) {
+        File file = new File(fileDir + "/albumImg/" + albumImgName);
+        file.delete();
+    }
+
+    // 앨범 수정 메소드
+    public void updateAlbum(Long albumId, MultipartFile albumImg, AlbumUpdateDto albumUpdateDto) {
+        Long userId = getCurrentUsername();
+        albumRepository.findByUser(albumId, userId).orElseThrow(() -> new AlbumHaveNoAuthorizationException("이 유저는 수정 권한이 없습니다"));
+
+        Optional<Album> optional = albumRepository.findById(albumId);
+        Album album = optional.get();
+        String albumImgName = album.getAlbumImg();
+        albumImgDelete(albumImgName);
+        String updateAlbumImg = saveAlbumImg(albumImg);
+        albumRepository.updateById(albumUpdateDto.getAlbumName(), albumUpdateDto.getAlbumBio(),
+                updateAlbumImg, albumId);
+    }
+
+    // 앨범 삭제 메소드
+    public void albumDelete(Long albumId) {
+        Long userId = getCurrentUsername();
+        albumRepository.findByUser(albumId, userId).orElseThrow(() -> new AlbumHaveNoAuthorizationException("이 유저는 삭제 권한이 없습니다"));
+
+        Optional<Album> optional = albumRepository.findById(albumId);
+        Album album = optional.get();
+        String albumImgName = album.getAlbumImg();
+        albumImgDelete(albumImgName);
+        albumRepository.deleteById(albumId);
+    }
+
+    // 현재 인증된 사용자의 이름을 반환하는 메소드
+    private User getUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof UserDetails) {
+            String Username =  ((UserDetails) principal).getUsername();
+            Optional<User> finduser = userRepository.findOneWithAuthoritiesByUsername(Username);
+            User user = finduser.get();
+            return user;
+        } else {
+            return null;
+        }
+    }
+
+    // 앨범상세페이지
+    public ResponseEntity<AlbumDetaillResultDto> getAlbumDetail(Long id) {
+
+        List<AlbumDetaillDto> albumDetaillDtos = albumRepository.albumDetail(id);
+        List<AlbumSongDetaillDto> albumSongDetaillDtos = albumRepository.albumSongDetail(id);
+
+        // 데이터가 없는 경우 예외 처리
+        if (albumDetaillDtos.isEmpty() || albumSongDetaillDtos.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+
+        List<AlbumSongDetaillDto> songs = new ArrayList<>();
+        for (AlbumSongDetaillDto albumSongDetaillDto : albumSongDetaillDtos) {
+            songs.add(albumSongDetaillDto);
+        }
+        AlbumDetaillDto result = albumDetaillDtos.get(0);
+        File file = new File(fileDir + "/albumImg/" + result.getAlbumImg());
+        // 파일이 없는 경우 예외 처리
+        if (!file.exists() || !file.isFile()) {
+            throw new NoDataFoundException("파일이 존재 하지 않습니다");
+        }
+        try {
+            String en = encodeFiile.encodeFileToBase64(file);
+            result.setAlbumImg(en);
+            AlbumDetaillResultDto totalData = new AlbumDetaillResultDto(
+                    result.getName(), result.getAlbumImg(),
+                    result.getNickname(), result.getIntro(),
+                    songs
+            );
+            return new ResponseEntity<AlbumDetaillResultDto>(totalData, HttpStatus.OK);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 }
 

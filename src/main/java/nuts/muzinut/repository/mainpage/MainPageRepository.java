@@ -85,10 +85,6 @@ public class MainPageRepository {
                 .fetch();
     }
 
-    public void findMainPageSongData(){
-
-
-    }
 
     public List<Object[]> findHotBoard(){
          String sql = "SELECT " +
@@ -99,6 +95,7 @@ public class MainPageRepository {
                 "b.dtype " +
                 "FROM board b " +
                 "JOIN users u ON b.user_id = u.user_id " +
+                 "WHERE b.dtype = 'FreeBoard' OR b.dtype = 'RecruitBoard'" +
                 "ORDER BY b.view DESC " +
                 "LIMIT 5 ";
         Query nativeQuery = em.createNativeQuery(sql);

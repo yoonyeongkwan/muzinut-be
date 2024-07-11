@@ -57,4 +57,19 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     private ErrorDto handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
+
+    @ResponseStatus(NOT_FOUND)
+    @ExceptionHandler(value = { NoDataFoundException.class })
+    @ResponseBody
+    private ErrorDto notFound(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(NOT_FOUND.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(value = { AlbumHaveNoAuthorizationException.class })
+    @ResponseBody
+    private ErrorDto HaveNoAuthorization(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(UNAUTHORIZED.value(), ex.getMessage());
+    }
+
 }

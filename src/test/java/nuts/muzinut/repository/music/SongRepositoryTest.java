@@ -5,7 +5,7 @@
 //import jakarta.persistence.EntityManager;
 //import nuts.muzinut.domain.member.User;
 //import nuts.muzinut.domain.music.*;
-//import nuts.muzinut.dto.music.SongDetaillDto;
+//import nuts.muzinut.dto.music.SongDetailDto;
 //import nuts.muzinut.dto.music.SongDetaillResultDto;
 //import nuts.muzinut.dto.music.SongGenreDto;
 //import nuts.muzinut.dto.music.SongPageDto;
@@ -398,9 +398,9 @@
 //        em.clear();
 //
 //
-//        List<SongDetaillDto> songDetaillDtos = musicRepository.songDetaill(10L);
+//        List<SongDetailDto> songDetaillDtos = musicRepository.songDetaill(10L);
 //        List<SongGenreDto> songGenreDtos = musicRepository.songDetaillGenre(10L);
-//        for (SongDetaillDto songDetaillDto : songDetaillDtos) {
+//        for (SongDetailDto songDetaillDto : songDetaillDtos) {
 //            System.out.println("songDetaillDto = " + songDetaillDto);
 //
 //        }
@@ -409,7 +409,7 @@
 //            System.out.println("songGenreDto = " + songGenreDto);
 //            genres.add(songGenreDto.getGenre());
 //        }
-//        SongDetaillDto result = songDetaillDtos.get(0);
+//        SongDetailDto result = songDetaillDtos.get(0);
 //        SongDetaillResultDto songDetaillResultDto = new SongDetaillResultDto(
 //                result.getAlbumImg(), result.getTitle(),
 //                result.getNickname(), result.getLikeCount(),

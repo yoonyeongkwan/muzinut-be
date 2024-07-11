@@ -1,37 +1,40 @@
 package nuts.muzinut;
 
-import io.jsonwebtoken.io.IOException;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import nuts.muzinut.domain.board.FreeBoard;
+import nuts.muzinut.domain.board.RecruitBoard;
+import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.dto.security.AuthorityDto;
-import nuts.muzinut.repository.member.UserRepository;
-import nuts.muzinut.repository.music.AlbumRepository;
-import nuts.muzinut.repository.music.SongRepository;
+import nuts.muzinut.repository.board.CommentRepository;
+import nuts.muzinut.repository.board.LikeRepository;
+import nuts.muzinut.repository.board.ReplyRepository;
+import nuts.muzinut.repository.board.*;
+import nuts.muzinut.service.DataInitService;
 import nuts.muzinut.service.member.UserService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 
 @Component
 @RequiredArgsConstructor
 public class DataInit {
 
-
+    private final AdminBoardRepository adminBoardRepository;
+    private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
+    private final ReplyRepository replyRepository;
+    private final DataInitService dataInitService;
+    private final FreeBoardRepository freeBoardRepository;
     private final UserService userService;
-    private final UserRepository userRepository;
-    private final AlbumRepository albumRepository;
-    private final SongRepository songRepository;
-    @Value("${spring.file.dir}")
-    private String fileDir;
 
     @PersistenceContext
     EntityManager em;
 
+
     @PostConstruct
-    public void init() throws IOException {
+    public void init() {
         AuthorityDto authorityDto = new AuthorityDto("admin");
         UserDto userDto = new UserDto("admin@naver.com", "admin", "아이유");
         userService.adminSignup(userDto);
@@ -59,22 +62,10 @@ public class DataInit {
         userService.signup(userDto12);
 
 
-
-
+//        dataInitService.recruitBoardBoardScenario();
+//        dataInitService.commentScenario();
     }
-//    @PostConstruct
-//    public void albuminit() throws FileNotFoundException {
-//        Optional<User> userId = userRepository.findById(1L);
-//        User user = userId.get();
-//        Album album = new Album(user,"안녕","이렇게좋은날","testImage1.png");
-//        albumRepository.save(album);
-//        for (int j = 0; j < 4; j++){
-//            String songFilename = "song" + (j+1) + ".mp3";
-//            // User user, String title, String lyrics, String lyricist, String composer, String Filename, Album album
-//            Song song = new Song(user,"좋은날","가사입니다","아이유","아이유", songFilename,album);
-//            songRepository.save(song);
-//        }
-//    }
+
 
 
 }

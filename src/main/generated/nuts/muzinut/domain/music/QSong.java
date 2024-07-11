@@ -46,6 +46,8 @@ public class QSong extends EntityPathBase<Song> {
 
     public final ListPath<SongGenre, QSongGenre> songGenres = this.<SongGenre, QSongGenre>createList("songGenres", SongGenre.class, QSongGenre.class, PathInits.DIRECT2);
 
+    public final ListPath<SongLike, QSongLike> songLikes = this.<SongLike, QSongLike>createList("songLikes", SongLike.class, QSongLike.class, PathInits.DIRECT2);
+
     public final StringPath title = createString("title");
 
     public final nuts.muzinut.domain.member.QUser user;

@@ -11,7 +11,6 @@ import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
-import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
 import nuts.muzinut.exception.NotFoundMemberException;

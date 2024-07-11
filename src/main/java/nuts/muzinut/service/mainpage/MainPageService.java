@@ -59,6 +59,7 @@ public class MainPageService {
         }
     }
 
+    
     // top10Img 인코딩 및 DTO 저장 메소드
     public List<HotSongDto> top10Img(List<HotSongDto> top10Songs) throws IOException {
         List<HotSongDto> top10List = new ArrayList<>();

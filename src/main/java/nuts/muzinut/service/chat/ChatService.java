@@ -6,13 +6,16 @@ import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.ChatMember;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.chat.MutualFollow;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.chat.ChatMemberRepository;
 import nuts.muzinut.repository.chat.ChatRepository;
 import nuts.muzinut.repository.chat.MessageRepository;
 import nuts.muzinut.repository.chat.ReadMessageRepository;
+import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
+import nuts.muzinut.service.board.DetailCommon;
 import nuts.muzinut.service.member.RedisUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +30,13 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class ChatService {
+public class ChatService extends DetailCommon {
 
     private final ChatRepository chatRepository;
     private final ChatMemberRepository chatMemberRepository;
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
+    private final FollowRepository followRepository;
     private final RedisUtil redisUtil;
 
     public Chat findChatRoom(Long id) {
@@ -98,17 +102,25 @@ public class ChatService {
             log.info("채팅방에 접속중인 사용자가 없었음");
         }
     }
-<<<<<<< HEAD
-=======
 
     // 맞팔되어 있는 사용자 목록을 가져오는 메서드
     /**
      * @param userId: 현재 사용자 ID
      * @return 맞팔 되어 있는 사용자 리스트
      */
-    public List<User> getMutualFollowUsers(Long userId) {
+    public List<MutualFollow> getMutualFollowUsers(Long userId) {
         List<Long> mutualFollowIds = followRepository.findMutualFollowIds(userId);
-        return userRepository.findAllById(mutualFollowIds);
+        List<User> mutualFollowUsers = userRepository.findAllById(mutualFollowIds);
+
+        return mutualFollowUsers.stream()
+                .map(user -> {
+                    MutualFollow dto = new MutualFollow();
+                    dto.setId(user.getId());
+                    dto.setUsername(user.getUsername());
+                    dto.setNickname(user.getNickname());
+                    dto.setProfileImgFilename(encodeFileToBase64(user.getProfileImgFilename(), false));
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
->>>>>>> parent of f8fb2fc (맞팔 목록 불러오는 메소드 개발 완료)
 }

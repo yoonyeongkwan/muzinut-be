@@ -58,29 +58,8 @@ public class BlockController {
     @ResponseBody
     @GetMapping(value = "/my-blocks", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    public ResponseEntity<MultiValueMap<String, Object>> getBlockList() throws JsonProcessingException {
+    public MyBlocksDto getBlockList() throws JsonProcessingException {
         User user = userService.getUserWithUsername().orElseThrow(() -> new NotFoundMemberException("차단 목록을 조회할 수 없습니다"));
-        MyBlocksDto blockUsers = blockService.findBlockUsers(user);
-
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
-        String jsonString = objectMapper.writeValueAsString(blockUsers);
-
-        // JSON 데이터를 Multipart-form 데이터에 추가
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> jsonEntity = new HttpEntity<>(jsonString, jsonHeaders);
-        formData.add("block_data", jsonEntity);
-
-        //차단한 사용자들의 프로필 이미지 추가
-        for (MyBlockUsersInfo info : blockUsers.getBlockUsersInfo()) {
-            String profileImg = info.getProfileImg();
-
-            if (StringUtils.hasText(profileImg)) {
-            String fullPath = fileStore.getFullPath(profileImg);
-            formData.add("block_users_profile", new FileSystemResource(fullPath));
-            }
-        }
-
-        return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
+        return blockService.findBlockUsers(user);
     }
 }

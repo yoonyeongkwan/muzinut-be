@@ -3,10 +3,12 @@ package nuts.muzinut.service.chat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.chat.Chat;
+import nuts.muzinut.domain.chat.ChatStatus;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
+import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.repository.chat.ChatMemberRepository;
 import nuts.muzinut.repository.chat.ChatRepository;
 import nuts.muzinut.repository.chat.MessageRepository;
@@ -55,6 +57,10 @@ public class MessageService {
         List<String> chatParticipants = redisUtil.getMultiData(roomId.toString());
         List<User> users = userRepository.findUsersByNickname(sender, sendTo);
         Optional<User> sendUser = users.stream().filter(u -> u.getNickname().equals(sender)).findFirst();
+
+        if (findChatRoom.getChatStatus() == ChatStatus.INVALID) {
+            throw new InvalidChatRoomException("얼려진 채팅방에서는 메시지를 보낼 수 없습니다");
+        }
 
         //채팅방에는 반드시 두명의 회원이 있어야지 메시지를 보낼 수 있음
         if (users.size() == 2 && sendUser.isPresent()) {

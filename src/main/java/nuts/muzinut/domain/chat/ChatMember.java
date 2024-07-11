@@ -2,11 +2,13 @@ package nuts.muzinut.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nuts.muzinut.domain.member.User;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor
 @Table(name = "chat_member")
 public class ChatMember {
 

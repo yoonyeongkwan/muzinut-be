@@ -32,4 +32,13 @@ public class Chat {
     List<Message> messages = new ArrayList<>();
 
     //비지니스 로직
+    public Chat freezeChatRoom() {
+        this.chatStatus = ChatStatus.INVALID;
+        return this;
+    }
+
+    public Chat meltChatRoom() {
+        this.chatStatus = ChatStatus.VALID;
+        return this;
+    }
 }

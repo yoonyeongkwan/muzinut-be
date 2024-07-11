@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.exception.token.ExpiredTokenException;
 import nuts.muzinut.exception.token.IllegalTokenException;
 import nuts.muzinut.exception.token.TokenException;
@@ -47,9 +48,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
-    //만료된 토큰에 대한 예외처리 추가
+    //채팅방에 대한 예외처리 추가
     @ResponseStatus(NOT_ACCEPTABLE)
-    @ExceptionHandler(value = { ExpiredTokenException.class })
+    @ExceptionHandler(value = { ExpiredTokenException.class, InvalidChatRoomException.class })
     @ResponseBody
     private ErrorDto NOT_ACCEPTABLE(RuntimeException ex, WebRequest request){
         return new ErrorDto(NOT_ACCEPTABLE.value(), ex.getMessage());

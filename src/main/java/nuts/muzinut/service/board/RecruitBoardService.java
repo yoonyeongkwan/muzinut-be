@@ -113,7 +113,7 @@ public class RecruitBoardService extends DetailCommon{
                 findRecruitBoard.getEndWorkDuration(),
                 findRecruitBoard.getGenres(),
                 findRecruitBoard.getUser().getNickname(),
-                encodeFileToBase64(findRecruitBoard.getUser().getProfileImgFilename()) // 프로필 이미지 파일명 추가
+                encodeFileToBase64(findRecruitBoard.getUser().getProfileImgFilename(), false) // 프로필 이미지 파일명 추가
         );
 
         Long likeCount = first.get(2, Long.class);

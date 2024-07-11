@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
+import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.*;
@@ -32,6 +33,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -207,4 +209,19 @@ public class UserController {
         throw new EmailVertFailException("인증 번호가 일치하지 않습니다");
     }
 
+    // 닉네임, 자기소개 수정 폼을 보여주는 메소드
+    @GetMapping("/profile/{id}/modify")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public String editProfileForm(@PathVariable Long id, Model model) {
+        User user = userService.findUserById(id);
+        if (user == null) {
+            throw new NotFoundMemberException("회원이 아닙니다.");
+        }
+        // 사용자 정보를 로그로 출력하여 확인
+        log.info("User ID: {}", user.getId());
+        log.info("Nickname: {}", user.getNickname());
+        log.info("Intro: {}", user.getIntro());
+        model.addAttribute("user", user);
+        return "user/profile-nickname-intro-form";
+    }
 }

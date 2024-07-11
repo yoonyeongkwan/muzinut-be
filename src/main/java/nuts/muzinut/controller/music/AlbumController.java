@@ -35,7 +35,8 @@ public class AlbumController {
         // 엔티티 저장
         albumService.saveAlbumData(storeAlbumData, storeAlbumImg);
 
-        return ResponseEntity.status(HttpStatus.OK).body("Files uploaded successfully!");
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Files uploaded successfully!");
     }
 
     // 앱범 수정

@@ -44,10 +44,12 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ExceptionHandler({BoardNotExistException.class})
-    private ErrorResult NO_CONTENT(BoardNotExistException ex) {
-        return new ErrorResult(NO_CONTENT.value(), "no content!");
+    @ResponseStatus(NO_CONTENT)
+    @ExceptionHandler(value = {BoardNotExistException.class, NotFoundFileException.class})
+    @ResponseBody
+    private ErrorDto NO_CONTENT(RuntimeException ex, WebRequest request) {
+        log.info("NotFoundFileException 호출");
+        return new ErrorDto(NO_CONTENT.value(), ex.getMessage());
     }
 
     // 새로운 예외 핸들러 추가

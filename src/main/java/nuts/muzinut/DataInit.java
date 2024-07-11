@@ -7,18 +7,13 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.board.AdminBoard;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.member.UserDto;
-import nuts.muzinut.dto.security.AuthorityDto;
 import nuts.muzinut.repository.board.CommentRepository;
 import nuts.muzinut.repository.board.LikeRepository;
 import nuts.muzinut.repository.board.ReplyRepository;
 import nuts.muzinut.repository.board.*;
 import nuts.muzinut.service.DataInitService;
-import nuts.muzinut.repository.board.query.BoardQueryRepository;
-import nuts.muzinut.repository.member.AuthorityRepository;
-import nuts.muzinut.repository.member.UserRepository;
-import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.member.UserService;
+import nuts.muzinut.service.music.PlaylistInitServcie;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -33,12 +28,16 @@ public class DataInit {
     private final FreeBoardRepository freeBoardRepository;
     private final UserService userService;
 
+    private final PlaylistInitServcie playlistInitServcie;
+
     @PersistenceContext
     EntityManager em;
 
     @PostConstruct
     public void init() {
 //        dataInitService.initializeData();
+//        playlistInitServcie.playListInit();
+//        playlistInitServcie.hotArtistInit();
     }
 
 //    @PostConstruct

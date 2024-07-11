@@ -7,7 +7,6 @@ import nuts.muzinut.repository.music.SongRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -20,8 +19,9 @@ public class SongService {
         return new PageDto<>(
                 page.getContent(),
                 page.getNumber(),
-                page.getSize(),
-                page.getTotalElements()
+                page.getContent().size(),
+                page.getTotalElements(),
+                page.getTotalPages()
         );
     }
 }

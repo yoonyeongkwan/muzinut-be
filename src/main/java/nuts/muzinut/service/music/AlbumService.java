@@ -10,7 +10,6 @@ import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.AlbumRepository;
 import nuts.muzinut.repository.music.SongGenreRepository;
 import nuts.muzinut.repository.music.SongRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -58,7 +57,7 @@ public class AlbumService {
         }
 
         // 랜덤 파일 이름 + 확장명 이름으로 설정
-        randomFileName += randomFileName + "." + fileType;
+        randomFileName = randomFileName + "." + fileType;
 
         return randomFileName;
     }

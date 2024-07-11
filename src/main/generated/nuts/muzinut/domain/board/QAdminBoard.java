@@ -27,6 +27,9 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
     public final ListPath<AdminUploadFile, QAdminUploadFile> adminUploadFiles = this.<AdminUploadFile, QAdminUploadFile>createList("adminUploadFiles", AdminUploadFile.class, QAdminUploadFile.class, PathInits.DIRECT2);
 
     //inherited
+    public final ListPath<Bookmark, QBookmark> bookmarks;
+
+    //inherited
     public final ListPath<Comment, QComment> comments;
 
     //inherited
@@ -71,6 +74,7 @@ public class QAdminBoard extends EntityPathBase<AdminBoard> {
     public QAdminBoard(Class<? extends AdminBoard> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new QBoard(type, metadata, inits);
+        this.bookmarks = _super.bookmarks;
         this.comments = _super.comments;
         this.createdDt = _super.createdDt;
         this.id = _super.id;

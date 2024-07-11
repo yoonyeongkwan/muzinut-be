@@ -25,6 +25,9 @@ public class QLounge extends EntityPathBase<Lounge> {
     public final QBoard _super;
 
     //inherited
+    public final ListPath<Bookmark, QBookmark> bookmarks;
+
+    //inherited
     public final ListPath<Comment, QComment> comments;
 
     //inherited
@@ -69,6 +72,7 @@ public class QLounge extends EntityPathBase<Lounge> {
     public QLounge(Class<? extends Lounge> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this._super = new QBoard(type, metadata, inits);
+        this.bookmarks = _super.bookmarks;
         this.comments = _super.comments;
         this.createdDt = _super.createdDt;
         this.id = _super.id;

@@ -36,7 +36,18 @@ public class ArtistRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        long total = 50;
+        List<Long> userIds = queryFactory
+                .select(
+                        user.id
+                        )
+                .from(follow)
+                .join(user).on(user.id.eq(follow.followingMemberId))
+                .groupBy(user.id)
+                .orderBy(follow.count().desc())
+                .limit(50)
+                .fetch();
+
+        long total = userIds.size();
 
         return new PageImpl<>(content, pageable, total);
     }

@@ -28,6 +28,12 @@ public class FollowService {
     public ResponseEntity<MessageDto> toggleFollow(User user, Long followingUserId) {
         validateUser(user);
         validateUserId(followingUserId);
+
+        // 자기 자신을 팔로우하려는 경우 예외 처리
+        if (user.getId().equals(followingUserId)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageDto("자기 자신을 팔로우할 수 없습니다."));
+        }
+
         User followingUser = userService.findUserById(followingUserId);
         validateUser(followingUser);
 

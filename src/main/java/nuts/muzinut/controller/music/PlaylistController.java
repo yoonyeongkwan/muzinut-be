@@ -53,4 +53,13 @@ public class PlaylistController {
         return ResponseEntity.ok()
                 .body("delete success");
     }
+
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @DeleteMapping("/delete/all")
+    public ResponseEntity<String> deleteAllPlaylistMusic() {
+        playlistService.deleteAllPlaylistMusics();
+
+        return ResponseEntity.ok()
+                .body("delete all success");
+    }
 }

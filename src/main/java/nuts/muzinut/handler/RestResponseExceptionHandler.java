@@ -59,4 +59,12 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     private ErrorDto handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
+
+    // 앨범 Entity 생성 실패 핸들러 추가
+    @ResponseStatus(SERVICE_UNAVAILABLE)
+    @ExceptionHandler(value = { AlbumCreateFailException.class })
+    @ResponseBody
+    private ErrorDto INTERNAL_SERVER_ERROR(AlbumCreateFailException ex, WebRequest request) {
+        return new ErrorDto(SERVICE_UNAVAILABLE.value(), ex.getMessage());
+    }
 }

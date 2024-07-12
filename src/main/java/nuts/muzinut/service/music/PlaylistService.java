@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Playlist;
 import nuts.muzinut.domain.music.PlaylistMusic;
-import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.dto.music.playlist.PlaylistMusicsDto;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.member.UserRepository;
@@ -54,7 +53,7 @@ public class PlaylistService {
     }
 
     // 현재 인증된 사용자의 userId를 반환하는 메소드
-    private Long getCurrentUserId() {
+    public Long getCurrentUserId() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof UserDetails) {
             String Username =  ((UserDetails) principal).getUsername();
@@ -94,5 +93,11 @@ public class PlaylistService {
         for (Long l : deleteList) {
             playlistMusicRepository.deleteById(l);
         }
+    }
+
+    public void deleteAllPlaylistMusics() {
+        Long userId = getCurrentUserId();
+        Playlist playlist = playlistRepository.findByUserId(userId).get();
+        playlistMusicRepository.deleteAllPlaylistMusic(playlist);
     }
 }

@@ -3,11 +3,16 @@ package nuts.muzinut.handler;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
-import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.chat.AlreadyExistRequestException;
+import nuts.muzinut.exception.chat.BlockUserException;
+import nuts.muzinut.exception.chat.InvalidChatRoomException;
+import nuts.muzinut.exception.token.ExpiredTokenException;
+import nuts.muzinut.exception.token.IllegalTokenException;
+import nuts.muzinut.exception.token.TokenException;
+import nuts.muzinut.exception.token.UnsupportedTokenException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -29,21 +34,31 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ResponseStatus(FORBIDDEN)
-    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class, InvalidPasswordException.class })
+    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class,
+            InvalidPasswordException.class, BlockUserException.class})
     @ResponseBody
     private ErrorDto forbidden(RuntimeException ex, WebRequest request) {
         return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
     }
 
+    //토큰에 대한 예외처리 추가
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class,
-            BoardNotFoundException.class, NoUploadFileException.class })
+            BoardNotFoundException.class, NoUploadFileException.class, TokenException.class,
+            UnsupportedTokenException.class, IllegalTokenException.class})
     @ResponseBody
     private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
-        log.info("BoardNotFoundException 호출");
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
+    @ResponseStatus(NOT_ACCEPTABLE)
+    @ExceptionHandler(value = { ExpiredTokenException.class, AlreadyExistRequestException.class})
+    @ResponseBody
+    private ErrorDto NOT_ACCEPTABLE(RuntimeException ex, WebRequest request){
+        return new ErrorDto(NOT_ACCEPTABLE.value(), ex.getMessage());
+    }
+
+    
     @ResponseStatus(NO_CONTENT)
     @ExceptionHandler(value = {BoardNotExistException.class, NotFoundFileException.class})
     @ResponseBody

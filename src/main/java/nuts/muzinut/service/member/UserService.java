@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.member.Authority;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.member.ProfileDto;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.exception.InvalidPasswordException;
@@ -17,7 +16,6 @@ import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.security.SecurityRole;
 import nuts.muzinut.service.security.SecurityUtil;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,12 +37,21 @@ public class UserService {
     // 프로필 닉네임, 자기소개 설정
     @Transactional
     public void updateNicknameAndIntro(Long userId, String nickname, String intro) {
+        Boolean exists = userRepository.existsByNickname(nickname);
+        if (exists) {
+            throw new DuplicateMemberException("이미 사용중인 닉네임 입니다");
+        }
         userRepository.updateNicknameAndIntro(userId, nickname, intro);
     }
 
     // 프로필 배너 이미지 설정
     public void setProfileBannerName(String filename, User user){
         userRepository.updateProfileBannerImg(filename, user);
+    }
+
+    //닉네임으로 유저 찾기
+    public Optional<User> findByNickname(String nickname) {
+        return userRepository.findByNickname(nickname);
     }
 
 

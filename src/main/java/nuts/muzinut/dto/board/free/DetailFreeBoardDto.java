@@ -27,7 +27,7 @@ public class DetailFreeBoardDto extends DetailBaseDto {
     private String profileImg;
 
     private List<CommentDto> comments = new ArrayList<>();
-    private Long likeCount;
+    private int likeCount;
 
     public DetailFreeBoardDto(String title, String writer, int view) {
         this.title = title;

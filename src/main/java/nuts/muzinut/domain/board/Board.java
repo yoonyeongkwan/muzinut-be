@@ -37,4 +37,13 @@ public class Board extends BaseBoardEntity {
         this.user = user;
         user.getBoards().add(this);
     }
+
+    //비지니스 메서드
+    public int upLike() {
+        return ++this.likeCount;
+    }
+
+    public int downLike() {
+        return --this.likeCount;
+    }
 }

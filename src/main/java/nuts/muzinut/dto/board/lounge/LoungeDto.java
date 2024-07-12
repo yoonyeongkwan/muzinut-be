@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class LoungesDto {
+public class LoungeDto {
     private List<LoungesForm> loungesForms = new ArrayList<>();
     private int currentPage;
     private int totalPage;

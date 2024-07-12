@@ -1,8 +1,7 @@
-package nuts.muzinut.dto.member;
+package nuts.muzinut.dto.member.profile;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import nuts.muzinut.domain.member.User;
 
 @Data
 @AllArgsConstructor

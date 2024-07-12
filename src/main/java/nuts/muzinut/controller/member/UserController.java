@@ -6,10 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
+import nuts.muzinut.domain.board.RecruitBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.*;
 import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
+import nuts.muzinut.dto.member.profile.ProfileDto;
+import nuts.muzinut.dto.security.RefreshTokenDto;
 import nuts.muzinut.dto.security.TokenDto;
 import nuts.muzinut.exception.EmailVertFailException;
 import nuts.muzinut.exception.NotFoundMemberException;
@@ -19,6 +22,7 @@ import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.MailSendService;
 import nuts.muzinut.service.member.ProfileService;
 import nuts.muzinut.service.member.UserService;
+import nuts.muzinut.service.security.AuthService;
 import org.springframework.http.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -29,6 +33,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -37,6 +42,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +59,7 @@ public class UserController {
     private final MailSendService mailService;
     private final ProfileService profileService;
     private final TokenProvider tokenProvider;
+    private final AuthService authService;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final ObjectMapper objectMapper;
 
@@ -78,11 +85,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/login")
-    public String loginForm() {
-        return "/user/login";
-    }
-
     /**
      * 사실상 로그인 하는 로직
      * @param loginDto: username (email) & password 전송 필요
@@ -97,24 +99,31 @@ public class UserController {
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String jwt = tokenProvider.createToken(authentication);
+        String token = tokenProvider.createToken(authentication);
+        String refreshToken = tokenProvider.createRefreshToken(authentication);
 
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
+        httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + token);
 
-        return new ResponseEntity<>(new TokenDto(jwt), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new TokenDto(token, refreshToken), httpHeaders, HttpStatus.OK);
+    }
+
+    @ResponseBody
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping("/re-authenticate")
+    public TokenDto reLogin(@RequestHeader("Authorization") String bearerToken) {
+        return authService.reissueToken(bearerToken.substring(7)); //bearer 제외한 실제 토큰 값만 반환
     }
 
     /**
      * 사용자의 프로필을 설정하는 메서드
      * @param profileImg: 사용자가 설정하고 싶은 프로필 이미지
      * @throws IOException
-     * @return: 리다이랙트 필요
      */
-    @ResponseBody //Todo 리다이렉트 설정 필요
+    @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(value = "/set-profile")
-    public MessageDto setProfile(@RequestPart("profileImg") MultipartFile profileImg) throws IOException {
+    public ResponseEntity<MessageDto> setProfile(@RequestPart("profileImg") MultipartFile profileImg) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
@@ -127,82 +136,53 @@ public class UserController {
             Map<FileType, String> filenames = fileStore.storeFile(profileImg);
             userService.setProfileName(filenames.get(STORE_FILENAME), user);
         }
-
-        return new MessageDto("파일 저장 성공");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/profile?userId=" + user.getId()));
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                .headers(headers)
+                .body(new MessageDto("파일 저장 성공"));
     }
 
     //프로필 닉네임, 자기소개 설정
     @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/set-profile-nickname-intro")
-    public MessageDto setProfileNicknameIntro(@Validated @RequestBody ProfileUpdateDto profileUpdateDto) {
+    public ResponseEntity<MessageDto>  setProfileNicknameIntro(@Validated @RequestBody ProfileUpdateDto profileUpdateDto) {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
         userService.updateNicknameAndIntro(user.getId(), profileUpdateDto.getNickname(), profileUpdateDto.getIntro());
-        return new MessageDto("프로필 업데이트가 성공되었습니다. ");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/profile?userId=" + user.getId()));
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                .headers(headers)
+                .body(new MessageDto("프로필 업데이트가 성공되었습니다."));
     }
 
     // 프로필 배너 이미지 설정
     @ResponseBody //Todo 리다이렉트 설정 필요
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(value = "/set-profile-bannerImage")
-    public MessageDto setProfileBannerImage(@RequestParam("profileBannerImg") MultipartFile profileBannerImg) throws IOException {
+    public ResponseEntity<MessageDto>  setProfileBannerImage(@RequestParam("bannerImg") MultipartFile bannerImg) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
         if (StringUtils.hasText(user.getProfileBannerImgFilename())) {
             //프로필 배너 바꾸기
-            String changeImgName = fileStore.updateFile(profileBannerImg, user.getProfileBannerImgFilename());
+            String changeImgName = fileStore.updateFile(bannerImg, user.getProfileBannerImgFilename());
             userService.setProfileBannerName(changeImgName, user);
         } else {
             //프로필 배너 처음 설정
-            Map<FileType, String> filenames = fileStore.storeFile(profileBannerImg);
+            Map<FileType, String> filenames = fileStore.storeFile(bannerImg);
             userService.setProfileBannerName(filenames.get(STORE_FILENAME), user);
         }
-
-        return new MessageDto("파일 저장 성공");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create("/profile?userId=" + user.getId()));
+        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                .headers(headers)
+                .body(new MessageDto("파일 저장 성공"));
     }
 
-    // 프로필 페이지 보여주는 메소드
-    @ResponseBody
-    @GetMapping(value = "/profile", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getUserProfile(@RequestParam("userId") Long userId) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
-
-        ProfileDto profileDto = profileService.getUserProfile(userId);
-        String jsonString = objectMapper.writeValueAsString(profileDto);
-
-        // JSON 데이터를 Multipart-form 데이터에 추가
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> jsonEntity = new HttpEntity<>(jsonString, jsonHeaders);
-        formData.add("json_data", jsonEntity);
-
-        // 프로필 이미지와 배너 이미지를 폼 데이터에 추가
-        fileStore.setProfileAndBannerImage(profileDto.getProfileImgName(), profileDto.getProfileBannerImgName(), formData);
-
-        return new ResponseEntity<>(formData, HttpStatus.OK);
-    }
-
-    // 마이페이지 - 내가 작성한 게시글을 보여주는 메소드
-    @ResponseBody
-    @GetMapping("/profile-community")
-    public ResponseEntity<List<String>> getUserBoardTitles(@RequestParam("userId") Long userId) {
-        // 현재 로그인한 사용자의 ID 가져오기
-        String currentUsername = profileService.getCurrentUsername();
-        User currentUser = userService.getUserWithUsername()
-                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
-
-        // 요청한 userId가 현재 로그인한 사용자의 ID와 일치하는지 확인
-        if (!currentUser.getId().equals(userId)) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        // 유저가 작성한 게시글 제목 리스트 가져오기
-        List<String> boardTitles = profileService.getUserBoardTitles(userId);
-        return new ResponseEntity<>(boardTitles, HttpStatus.OK);
-    }
     //비밀번호 수정
     @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
@@ -239,4 +219,19 @@ public class UserController {
         throw new EmailVertFailException("인증 번호가 일치하지 않습니다");
     }
 
+    // 닉네임, 자기소개 수정 폼을 보여주는 메소드
+    @GetMapping("/profile/{id}/modify")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    public String editProfileForm(@PathVariable Long id, Model model) {
+        User user = userService.findUserById(id);
+        if (user == null) {
+            throw new NotFoundMemberException("회원이 아닙니다.");
+        }
+        // 사용자 정보를 로그로 출력하여 확인
+        log.info("User ID: {}", user.getId());
+        log.info("Nickname: {}", user.getNickname());
+        log.info("Intro: {}", user.getIntro());
+        model.addAttribute("user", user);
+        return "user/profile-nickname-intro-form";
+    }
 }

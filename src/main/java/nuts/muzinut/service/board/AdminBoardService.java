@@ -4,6 +4,7 @@ import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.FileType;
+import nuts.muzinut.controller.board.SortType;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.DetailBaseDto;
@@ -21,6 +22,7 @@ import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
 import nuts.muzinut.repository.member.MailboxRepository;
 import nuts.muzinut.repository.member.UserRepository;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -31,6 +33,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 import static nuts.muzinut.controller.board.FileType.*;
+import static nuts.muzinut.controller.board.SortType.*;
 import static nuts.muzinut.domain.board.QAdminBoard.*;
 import static nuts.muzinut.domain.board.QBoard.*;
 
@@ -42,7 +45,6 @@ public class AdminBoardService extends DetailCommon{
 
     private final AdminBoardRepository adminBoardRepository;
     private final BoardRepository boardRepository;
-//    private final BoardQueryRepository boardQueryRepository;
     private final AdminBoardQueryRepository queryRepository;
     private final AdminUploadFileRepository uploadFileRepository;
     private final UserRepository userRepository;
@@ -80,8 +82,17 @@ public class AdminBoardService extends DetailCommon{
      * @param startPage: 시작 페이지를 넘겨주면 그에 해당하는 데이터들을 가져온다.
      * @return
      */
-    public AdminBoardsDto getAdminBoards(int startPage){
-        PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt")); //Todo 한 페이지에 가져올 게시판 수를 정하기
+    public AdminBoardsDto getAdminBoards(int startPage, SortType sortType){
+
+        String sortColumn = "createdDt"; //default 값
+
+        if (sortType == LIKE) {
+            sortColumn = "likeCount";
+        } else if (sortType == VIEW) {
+            sortColumn = "view";
+        }
+
+        PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, sortColumn)); //Todo 한 페이지에 가져올 게시판 수를 정하기
         Page<AdminBoard> page = adminBoardRepository.findAll(pageRequest);
         List<AdminBoard> adminBoards = page.getContent();
 
@@ -93,7 +104,7 @@ public class AdminBoardService extends DetailCommon{
         boardsDto.setPaging(page.getNumber(), page.getTotalPages(), page.getTotalElements());
         for (AdminBoard adminBoard : adminBoards) {
             boardsDto.getAdminBoardsForms().add(new AdminBoardsForm(adminBoard.getId(), adminBoard.getTitle(), "muzi",
-                    adminBoard.getView(), adminBoard.getLikes().size(), adminBoard.getCreatedDt()));
+                    adminBoard.getView(), adminBoard.getLikeCount(), adminBoard.getCreatedDt()));
         }
         return boardsDto;
     }
@@ -137,21 +148,20 @@ public class AdminBoardService extends DetailCommon{
         }
 
         List<AdminUploadFile> files = findAdminBoard.getAdminUploadFiles(); //can be null
-
         DetailAdminBoardDto detailAdminBoardDto = new DetailAdminBoardDto();
+        int view = findAdminBoard.addView();
 
         //첨부파일이 있는 경우 & 없는 경우
         if (files != null) {
-            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getView(),
-                    files, findAdminBoard.getFilename(), findAdminBoard.getUser().getProfileImgFilename()); //어드민 게시판 관련 파일 셋팅
+            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view, files, findAdminBoard.getFilename(),
+                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename())); //어드민 게시판 관련 파일 셋팅
         } else {
-            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), findAdminBoard.getView(),
-                    findAdminBoard.getFilename(), findAdminBoard.getUser().getProfileImgFilename()); //어드민 게시판 관련 셋팅
+            detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view, findAdminBoard.getFilename(),
+                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename())); //어드민 게시판 관련 셋팅
         }
 
-        Long likeCount = first.get(2, Long.class);
-        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
-        detailAdminBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
+        detailAdminBoardDto.setLikeCount(findAdminBoard.getLikeCount()); //좋아요 수 셋팅
         detailAdminBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
         detailAdminBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 

@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.chat.ChatMember;
+import nuts.muzinut.domain.chat.ChatRequest;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.music.Playlist;
@@ -63,6 +64,9 @@ public class User {
     private int vote; //투표권
     private int declaration; //신고 횟수~
 
+    @Lob
+    private byte[] base64Data;
+
     @ManyToMany
     @JoinTable(
             name = "user_authority",
@@ -115,6 +119,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Friend> friends = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Block> blocks = new ArrayList<>();
 
     //음악 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
@@ -171,5 +178,11 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Message> messages = new ArrayList<>();
 
+/*
+    @OneToMany(mappedBy = "requestUser", cascade = CascadeType.ALL)
+    private List<ChatRequest> requestUsers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "receiveUser", cascade = CascadeType.ALL)
+    private List<ChatRequest> receiveUsers = new ArrayList<>();
+*/
 }

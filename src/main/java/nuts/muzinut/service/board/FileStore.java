@@ -10,7 +10,6 @@ import nuts.muzinut.repository.board.AdminUploadFileRepository;
 import nuts.muzinut.repository.board.FreeBoardRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 
 import static nuts.muzinut.controller.board.FileType.*;
@@ -130,7 +130,7 @@ public class FileStore {
      */
     public String updateFile(MultipartFile multipartFile, String deleteFilename) throws IOException, NoUploadFileException {
         if (multipartFile.isEmpty()) {
-            throw new NoUploadFileException("자유게시판의 업로드 파일이 존재하지 않음");
+            throw new NoUploadFileException("업로드 파일이 존재하지 않음");
         }
 
         deleteFile(deleteFilename); //기존 파일 삭제
@@ -192,6 +192,10 @@ public class FileStore {
                 .map(this::getFullPath)
                 .toList();
 
+        for (String p : imagesFullPath) {
+        }
+
+
         imagesFullPath.forEach(i -> formData.add("profileImg", new FileSystemResource(i)));
     }
 
@@ -202,7 +206,17 @@ public class FileStore {
                 .map(this::getFullPath)
                 .toList();
 
+        log.info("Setting profile image: " + profileImage);
+        log.info("Setting banner image: " + bannerImage);
+
         formData.add("profileImage", new FileSystemResource(imagePaths.get(0)));
         formData.add("bannerImage", new FileSystemResource(imagePaths.get(1)));
+    }
+
+    // 앨범 이미지를 폼 데이터에 넣어주는 메서드
+    public void setAlbumImages(String albumImgName, MultiValueMap<String, Object> formData, String key) {
+        FileSystemResource albumImgResource = new FileSystemResource(fileDir + "/albumImg/" + albumImgName);
+        log.info("Setting albumImage: " + albumImgResource);
+        formData.add(key, albumImgResource);
     }
 }

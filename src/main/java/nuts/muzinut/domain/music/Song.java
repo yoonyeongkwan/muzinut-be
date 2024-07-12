@@ -36,12 +36,13 @@ public class Song extends BaseTimeEntity {
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
     private List<PlayView> playViews = new ArrayList<>();
 
+    // 추가
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    private List<SongLike> songLikes = new ArrayList<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "album_id")
     private Album album;
-
-    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
-    private List<SongLike> songLikes = new ArrayList<>();
 
     //연관 관계 편의 메서드
     public void createMusic(User user) {

@@ -40,10 +40,12 @@ public class LikeService {
             Like like = new Like();
             like.addLike(user, board);
             likeRepository.save(like);
+            board.upLike(); //게시판 좋아요 수 증가
             return ResponseEntity.ok().body(new MessageDto("좋아요가 완료되었습니다."));
         } else {
             // 좋아요가 이미 눌려 있으면 좋아요 삭제
             likeRepository.deleteByUserAndBoard(user, board);
+            board.downLike(); //게시판 좋아요 수 감소
             return ResponseEntity.status(HttpStatus.CREATED).body(new MessageDto("좋아요가 취소되었습니다."));
             }
     }

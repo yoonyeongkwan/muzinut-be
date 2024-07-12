@@ -31,7 +31,7 @@ public class Message {
     private Boolean read;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime send_time;
+    private LocalDateTime sendTime;
 
     @OneToMany(mappedBy = "message")
     List<ReadMessage> readMessages = new ArrayList<>();
@@ -47,7 +47,7 @@ public class Message {
         this.user = user;
         this.chat = chat;
         this.message = message;
-        this.send_time = LocalDateTime.now();
+        this.sendTime = LocalDateTime.now();
         user.getMessages().add(this);
         chat.getMessages().add(this);
     }
@@ -57,7 +57,7 @@ public class Message {
         this.user = user;
         this.chat = chat;
         this.message = message;
-        this.send_time = LocalDateTime.now();
+        this.sendTime = LocalDateTime.now();
         this.read = false; //메시지를 상대방이 읽지 않음
         user.getMessages().add(this);
         chat.getMessages().add(this);
@@ -68,7 +68,7 @@ public class Message {
         this.user = user;
         this.chat = chat;
         this.message = message;
-        this.send_time = LocalDateTime.now();
+        this.sendTime = LocalDateTime.now();
         this.read = true; //메시지를 상대방이 읽음
         user.getMessages().add(this);
         chat.getMessages().add(this);

@@ -69,16 +69,17 @@ public class DetailCommon {
         return false;
     }
 
-    //이미지 파일명을 가져와서 base64로 인코딩 하여 반환하는 메서드
+    //사용자 프로필 이미지명을 가져와서 base64로 인코딩 하여 반환하는 메서드
     public String encodeFileToBase64(String filename){
-        log.info("파일명: {}", filename);
+        File file;
         try {
             if (StringUtils.hasText(filename)) {
-                File file = new File(fileDir + filename);
-                byte[] fileContent = Files.readAllBytes(file.toPath());
-                return Base64.getEncoder().encodeToString(fileContent);
+                file = new File(fileDir + filename); //설정된 프로필 이미지
+            } else {
+                file = new File(profileBaseImg); //기본 프로필 이미지
             }
-            return null;
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            return Base64.getEncoder().encodeToString(fileContent);
 
         } catch (IOException e) {
             log.info("{} 파일 없음", filename);

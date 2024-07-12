@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.ChatMember;
+import nuts.muzinut.domain.chat.ChatStatus;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.chat.MutualFollow;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
+import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.repository.chat.ChatMemberRepository;
 import nuts.muzinut.repository.chat.ChatRepository;
 import nuts.muzinut.repository.chat.MessageRepository;
@@ -63,11 +65,28 @@ public class ChatService extends DetailCommon {
         return chat;
     }
 
+    /**
+     * @param user1: 채팅방 첫번째 참가 유저 (닉네임)
+     * @param user2: 채팅방 두번째 참가 유저 (닉네임)
+     * @return
+     */
+    public Chat createRoom(User user1, User user2) {
+
+        Chat chat = chatRepository.save(new Chat()); //새로운 채팅방 생성
+        chatMemberRepository.save(new ChatMember(user1, chat));
+        chatMemberRepository.save(new ChatMember(user2, chat));
+        return chat;
+    }
+
     public void connectChatRoom(String chatRoomNumber, String username) {
 //        log.info("chatService connectChatRoom");
         List<String> redisData = redisUtil.getMultiData(chatRoomNumber);
         Chat chat = chatRepository.findById(Long.parseLong(chatRoomNumber)).orElseThrow(
-                () -> new NotFoundEntityException("없는 채팅방입니다"));
+                () -> new InvalidChatRoomException("없는 채팅방입니다"));
+
+        if (chat.getChatStatus() == ChatStatus.INVALID) {
+            throw new InvalidChatRoomException("얼린 채팅방에 입장할 수 없습니다");
+        }
 
         //채팅방에 접속한 유저가 없는 경우
         if (redisData.isEmpty()) {
@@ -122,5 +141,17 @@ public class ChatService extends DetailCommon {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    //채팅방이 유효한지 확인하는 메서드
+    public boolean isValidChatRoom(Long chatId) {
+        Chat chat = chatRepository.findById(chatId).orElse(null);
+        if (chat == null) {
+            return false; //유효하지 않는 채팅방
+        }
+        if (chat.getChatStatus() == ChatStatus.VALID) {
+            return true; //유효한 채팅방
+        }
+        return false; //유효하지 않는 채팅방
     }
 }

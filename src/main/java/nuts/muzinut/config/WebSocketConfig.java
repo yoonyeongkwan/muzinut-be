@@ -2,6 +2,7 @@ package nuts.muzinut.config;
 
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.handler.ChatPreHandler;
+import nuts.muzinut.handler.StompExceptionHandler;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -15,6 +16,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final ChatPreHandler chatPreHandler;
+    private final StompExceptionHandler stompExceptionHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
@@ -29,6 +31,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*");
 //                .withSockJS(); //Todo 프론트와 채팅 통신할 때 주석 해제
         // 주소 : ws://localhost:8080/ws
+        registry.setErrorHandler(stompExceptionHandler); //stomp 에러 핸들러 설정
     }
 
     @Override

@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.chat.AlreadyExistRequestException;
+import nuts.muzinut.exception.chat.BlockUserException;
 import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.exception.token.ExpiredTokenException;
 import nuts.muzinut.exception.token.IllegalTokenException;
@@ -32,7 +34,8 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ResponseStatus(FORBIDDEN)
-    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class, InvalidPasswordException.class })
+    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class,
+            InvalidPasswordException.class, BlockUserException.class})
     @ResponseBody
     private ErrorDto forbidden(RuntimeException ex, WebRequest request) {
         return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
@@ -48,9 +51,8 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
-    //채팅방에 대한 예외처리 추가
     @ResponseStatus(NOT_ACCEPTABLE)
-    @ExceptionHandler(value = { ExpiredTokenException.class, InvalidChatRoomException.class })
+    @ExceptionHandler(value = { ExpiredTokenException.class, AlreadyExistRequestException.class})
     @ResponseBody
     private ErrorDto NOT_ACCEPTABLE(RuntimeException ex, WebRequest request){
         return new ErrorDto(NOT_ACCEPTABLE.value(), ex.getMessage());

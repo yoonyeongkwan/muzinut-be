@@ -60,6 +60,26 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
+    @ResponseStatus(NOT_FOUND)
+    @ExceptionHandler(value = { NoDataFoundException.class })
+    @ResponseBody
+    private ErrorDto notFound(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(NOT_FOUND.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(value = { AlbumHaveNoAuthorizationException.class })
+    @ResponseBody
+    private ErrorDto HaveNoAuthorization(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(UNAUTHORIZED.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(value = { LimitPlayNutException.class })
+    @ResponseBody
+    private ErrorDto limitPlayNut(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
+    }
     // 앨범 Entity 생성 실패 핸들러 추가
     @ResponseStatus(SERVICE_UNAVAILABLE)
     @ExceptionHandler(value = { AlbumCreateFailException.class })

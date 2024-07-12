@@ -5,6 +5,7 @@ HELP.md
 build/
 file/**
 src/main/java/nuts/muzinut/file/**
+TestAlbumService.java
 DataInit.Java
 src/test/**
 application.yml

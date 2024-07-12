@@ -24,9 +24,9 @@ public class QPlayNutMusic extends EntityPathBase<PlayNutMusic> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final NumberPath<Long> musicId = createNumber("musicId", Long.class);
-
     public final QPlayNut playNut;
+
+    public final NumberPath<Long> songId = createNumber("songId", Long.class);
 
     public QPlayNutMusic(String variable) {
         this(PlayNutMusic.class, forVariable(variable), INITS);

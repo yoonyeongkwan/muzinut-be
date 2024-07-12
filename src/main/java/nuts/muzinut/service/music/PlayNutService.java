@@ -4,19 +4,25 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.music.PlayNutMusic;
-import nuts.muzinut.dto.music.PlayNutDto;
-import nuts.muzinut.dto.music.PlayNutMusicDto;
-import nuts.muzinut.dto.music.PlaynutTitleDto;
+import nuts.muzinut.dto.music.*;
 import nuts.muzinut.exception.LimitPlayNutException;
+import nuts.muzinut.exception.NoDataFoundException;
+import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.PlayNutMusicRepository;
 import nuts.muzinut.repository.music.PlayNutRepository;
+import nuts.muzinut.service.encoding.EncodeFiile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +33,10 @@ public class PlayNutService {
     private final UserRepository userRepository;
     private final PlayNutRepository playNutRepository;
     private final PlayNutMusicRepository playNutMusicRepository;
+    private final EncodeFiile encodeFiile;
+
+    @Value("${spring.file.dir}")
+    private String fileDir;
 
     // 플리넛 디렉토리 생성
     public void savePlayNut(PlaynutTitleDto data) {
@@ -43,9 +53,14 @@ public class PlayNutService {
 
     // 플리넛의 곡 추가
     public void saveMusic(Long playNutId, Long songId) {
+        User user = getUser();
+        Optional<PlayNut> optional = playNutRepository.findById(playNutId);
+        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        if (!optional.get().getUser().equals(user)) {
+            throw new AccessDeniedException("플리넛 곡 추가 권한이 없습니다");
+        }
         List<PlayNutMusicDto> findMusicCount = playNutMusicRepository.findPlayNutMusic(playNutId);
         if (findMusicCount.size() < 1000){
-            Optional<PlayNut> optional = playNutRepository.findById(playNutId);
             PlayNut playNut = optional.get();
             PlayNutMusic playNutMusic = new PlayNutMusic(playNut, songId);
             playNutMusicRepository.save(playNutMusic);
@@ -57,6 +72,12 @@ public class PlayNutService {
 
     // 플리넛 디렉토리 이름 변경
     public void updatePlayNut(Long playNutId, PlaynutTitleDto data) {
+        User user = getUser();
+        Optional<PlayNut> optional = playNutRepository.findById(playNutId);
+        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        if (!optional.get().getUser().equals(user)) {
+            throw new AccessDeniedException("플리넛 이름 변경 권한이 없습니다");
+        }
         playNutRepository.updateByTitle(data.getTitle(), playNutId);
     }
 
@@ -71,22 +92,45 @@ public class PlayNutService {
     }
 
     // 플리넛 디렉토리 조회
-    public ResponseEntity<List<PlayNutDto>> findPlayNutDir() {
+    public ResponseEntity<PlayNutListDto> findPlayNutDir() {
         User user = getUser();
         List<PlayNutDto> playNutDir = playNutRepository.findByPlayNut(user);
         if (playNutDir.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<PlayNutDto>>(playNutDir, HttpStatus.OK);
+
+        return new ResponseEntity<PlayNutListDto>(new PlayNutListDto(playNutDir), HttpStatus.OK);
     }
 
     // 플리넛 곡 조회
-    public ResponseEntity<List<PlayNutMusicDto>> findPlayNutMusic(Long playNutId) {
+    public ResponseEntity<PlayNutMusicListDto> findPlayNutMusic(Long playNutId) {
+        Optional<PlayNut> optional = playNutRepository.findById(playNutId);
+        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        User user = getUser();
+        if (!optional.get().getUser().equals(user)){
+            throw new AccessDeniedException("해당 플리넛 조회 권한이 없습니다");
+        }
         List<PlayNutMusicDto> totalData = playNutMusicRepository.findPlayNutMusic(playNutId);
         if (totalData.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
-        return new ResponseEntity<List<PlayNutMusicDto>>(totalData, HttpStatus.OK);
+        List<PlayNutMusicDto> playNutMusicDtos = new ArrayList<>();
+        for (PlayNutMusicDto totalDatum : totalData) {
+            File file = new File(fileDir + "/albumImg/" + totalDatum.getAlbumImg());
+            // 파일이 없는 경우 예외 처리
+            if (!file.exists() || !file.isFile()) {
+                throw new NoDataFoundException("파일이 존재 하지 않습니다");
+            }
+            try {
+                String encodedFile = encodeFiile.encodeFileToBase64(file);
+                totalDatum.setAlbumImg(encodedFile);
+                playNutMusicDtos.add(totalDatum);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return new ResponseEntity<PlayNutMusicListDto>(new PlayNutMusicListDto(playNutMusicDtos), HttpStatus.OK);
     }
 
     // 현재 인증된 사용자의 이름을 반환하는 메소드
@@ -95,6 +139,7 @@ public class PlayNutService {
         if (principal instanceof UserDetails) {
             String Username =  ((UserDetails) principal).getUsername();
             Optional<User> finduser = userRepository.findOneWithAuthoritiesByUsername(Username);
+            finduser.orElseThrow(() -> new NotFoundMemberException("로그인을 해주세요"));
             User user = finduser.get();
             return user;
         } else {

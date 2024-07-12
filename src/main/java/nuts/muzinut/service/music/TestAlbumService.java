@@ -38,18 +38,18 @@ public class TestAlbumService {
         Optional<User> optional2 = userRepository.findById(2L);
         Optional<User> optional3 = userRepository.findById(3L);
         User user1 = optional1.get();
-        User user2 = optional1.get();
-        User user3 = optional1.get();
+        User user2 = optional2.get();
+        User user3 = optional3.get();
         Album album1 = new Album();
-        album1.setAlbumImg("aaa");
+        album1.setAlbumImg("aaa.png");
         album1.setUser(user1);
         em.persist(album1);
         Album album2 = new Album();
-        album2.setAlbumImg("bbb");
+        album2.setAlbumImg("bbb.png");
         album2.setUser(user2);
         em.persist(album2);
         Album album3 = new Album();
-        album3.setAlbumImg("ccc");
+        album3.setAlbumImg("ccc.png");
         album3.setUser(user3);
         em.persist(album3);
 
@@ -121,14 +121,14 @@ public class TestAlbumService {
         }
 
 
-//        PlayNut playNut = new PlayNut("케이팝", user1);
-//        playNutRepository.save(playNut);
-//
-//        for (int i=101; i <= 200; i++){
-//
-//            long id = i;
-//            PlayNutMusic playNutMusic = new PlayNutMusic(playNut, id);
-//            playNutMusicRepository.save(playNutMusic);
-//        }
+        PlayNut playNut = new PlayNut("케이팝", user1);
+        playNutRepository.save(playNut);
+
+        for (int i=41; i <= 60; i++){
+
+            long id = i;
+            PlayNutMusic playNutMusic = new PlayNutMusic(playNut, id);
+            playNutMusicRepository.save(playNutMusic);
+        }
     }
 }

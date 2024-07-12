@@ -7,7 +7,6 @@ import nuts.muzinut.dto.music.SongPageDto;
 import nuts.muzinut.dto.music.SongUpdateDto;
 import nuts.muzinut.dto.page.PageDto;
 import nuts.muzinut.service.music.SongService;
-import nuts.muzinut.service.music.TestPlayViewService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,12 +24,6 @@ import java.net.URI;
 public class SongController {
 
     private final SongService songService;
-    private final TestPlayViewService testPlayViewService;
-    @PostMapping("/test/{id}")
-    public ResponseEntity<String> testPlayView(@PathVariable("id") Long id){
-        testPlayViewService.TestPlayView(id);
-        return ResponseEntity.ok("성공");
-    }
 
     /**
      * 최신 노래 목록을 가져오는 엔드포인트.

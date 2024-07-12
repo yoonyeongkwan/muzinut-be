@@ -5,24 +5,17 @@ import lombok.RequiredArgsConstructor;
 
 import nuts.muzinut.dto.mainpage.*;
 import nuts.muzinut.exception.NoDataFoundException;
-import nuts.muzinut.exception.NotDtypeBoardException;
-import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.mainpage.MainPageRepository;
 import nuts.muzinut.service.encoding.EncodeFiile;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
-import java.util.Base64;
 import java.util.List;
 
 
@@ -59,7 +52,7 @@ public class MainPageService {
         }
     }
 
-    
+
     // top10Img 인코딩 및 DTO 저장 메소드
     public List<HotSongDto> top10Img(List<HotSongDto> top10Songs) throws IOException {
         List<HotSongDto> top10List = new ArrayList<>();

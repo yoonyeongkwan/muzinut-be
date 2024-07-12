@@ -2,21 +2,15 @@ package nuts.muzinut.service.mainpage;
 
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.dto.mainpage.*;
-import nuts.muzinut.dto.music.SongPageDto;
 import nuts.muzinut.dto.page.PageDto;
 import nuts.muzinut.exception.NoDataFoundException;
-import nuts.muzinut.exception.NoSearchWordException;
 import nuts.muzinut.repository.mainpage.MainSearchRepository;
 import nuts.muzinut.service.encoding.EncodeFiile;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
 import java.io.File;
 import java.io.IOException;

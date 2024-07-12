@@ -1,13 +1,10 @@
 package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.music.AlbumDto;
-import nuts.muzinut.dto.music.ModifyAlbumDto;
 
 import java.util.ArrayList;
 import java.util.List;

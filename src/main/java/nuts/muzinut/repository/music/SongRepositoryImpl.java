@@ -27,6 +27,7 @@ public class SongRepositoryImpl implements SongRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    // 인기 TOP100 곡 불러오는 쿼리
     @Override
     public Page<SongPageDto> hotTOP100Song(Pageable pageable) {
         List<SongPageDto> content = queryFactory
@@ -61,8 +62,7 @@ public class SongRepositoryImpl implements SongRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
-
-
+    // 최신음악 불러오는 쿼리
     @Override
     public Page<SongPageDto> new100Song(Pageable pageable) {
 
@@ -96,6 +96,7 @@ public class SongRepositoryImpl implements SongRepositoryCustom {
         return new PageImpl<>(content, pageable, total);
     }
 
+    // 장르별음악 불러오는 쿼리
     @Override
     public Page<SongPageDto> genreSong(String genre, Pageable pageable) {
         List<SongPageDto> content = queryFactory
@@ -141,6 +142,7 @@ public class SongRepositoryImpl implements SongRepositoryCustom {
     }
     // Genre( KPOP, BALLAD, POP, HIPHOP, RNB, INDIE, TROT, VIRTUBER, ETC )
 
+    // 곡 상세 페이지 불러오는 쿼리
     public List<SongDetailDto> songDetail(Long id){
 
 
@@ -161,6 +163,7 @@ public class SongRepositoryImpl implements SongRepositoryCustom {
                 .fetch();
     }
 
+    // 곡 상세페이지에 장르를 불러오는 쿼리
     public List<SongGenreDto> songDetailGenre(Long id){
 
         return queryFactory

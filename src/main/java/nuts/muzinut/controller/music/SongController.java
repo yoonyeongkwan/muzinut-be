@@ -8,20 +8,16 @@ import nuts.muzinut.dto.music.SongUpdateDto;
 import nuts.muzinut.dto.page.PageDto;
 import nuts.muzinut.service.music.SongService;
 import nuts.muzinut.service.music.TestPlayViewService;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/music")
@@ -87,6 +83,13 @@ public class SongController {
         return songService.getSongDetail(songId);
     }
 
+    /**
+     * 곡 정보를 수정하는 엔드포인트.
+     *
+     * @param songId 노래의 ID
+     * @param songFile  
+     * @return 노래 상세 정보와 HTTP 상태 코드
+     */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<String> updateSong(
@@ -102,6 +105,12 @@ public class SongController {
                 .body("음원 수정 완료 되었습니다");
     }
 
+    /**
+     * 곡 삭제를 가져오는 엔드포인트.
+     *
+     * @param songId 노래의 ID
+     * @return 노래 상세 정보와 HTTP 상태 코드
+     */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteSong(@Validated @PathVariable("id") @NotNull Long songId) {

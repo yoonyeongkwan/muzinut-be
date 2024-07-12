@@ -2,14 +2,11 @@ package nuts.muzinut.controller.mainpage;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import nuts.muzinut.dto.mainpage.SearchArtistDto;
 import nuts.muzinut.dto.mainpage.SearchTotalDto;
-import nuts.muzinut.dto.mainpage.TapSearchDto;
 import nuts.muzinut.service.mainpage.MainSearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

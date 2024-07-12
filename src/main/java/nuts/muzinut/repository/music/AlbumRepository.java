@@ -1,7 +1,5 @@
 package nuts.muzinut.repository.music;
 
-import jakarta.persistence.Column;
-import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Album;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

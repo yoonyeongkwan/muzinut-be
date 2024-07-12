@@ -72,4 +72,10 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(UNAUTHORIZED.value(), ex.getMessage());
     }
 
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(value = { LimitPlayNutException.class })
+    @ResponseBody
+    private ErrorDto limitPlayNut(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
+    }
 }

@@ -1,15 +1,11 @@
 package nuts.muzinut.controller.mainpage;
 
 import lombok.RequiredArgsConstructor;
-import nuts.muzinut.dto.mainpage.HotSongDto;
 import nuts.muzinut.dto.mainpage.MainTotalDto;
 import nuts.muzinut.service.mainpage.MainPageService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,6 +1,5 @@
 package nuts.muzinut.repository.mainpage;
 
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,14 +10,8 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.dto.mainpage.*;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static nuts.muzinut.domain.board.QBoard.board;
-import static nuts.muzinut.domain.board.QFreeBoard.freeBoard;
-import static nuts.muzinut.domain.board.QRecruitBoard.recruitBoard;
 import static nuts.muzinut.domain.member.QUser.*;
 import static nuts.muzinut.domain.music.QAlbum.*;
 import static nuts.muzinut.domain.music.QSong.*;
@@ -34,6 +27,7 @@ public class MainPageRepository {
     @PersistenceContext
     EntityManager em;
 
+    // 메인페이지 TOP10 곡을 불러오는 쿼리
     public List<HotSongDto> findTOP10Song() {
         return queryFactory
                 .select(Projections.constructor(HotSongDto.class,
@@ -51,6 +45,7 @@ public class MainPageRepository {
                 .fetch();
     }
 
+    // 메인페이지 TOP5 아티스트를 불러오는 쿼리
     public List<HotArtistDto> findTOP5Artist() {
         return queryFactory
                 .select(Projections.constructor(HotArtistDto.class,
@@ -66,6 +61,7 @@ public class MainPageRepository {
                 .fetch();
     }
 
+    // 메인페이지 최신음악을 불러오는 쿼리
     public List<NewSongDto> findNewSong() {
         return queryFactory
                 .select(Projections.constructor(NewSongDto.class,
@@ -85,7 +81,7 @@ public class MainPageRepository {
                 .fetch();
     }
 
-
+    // 메인페이지 인기게시판을 불러오는 쿼리
     public List<Object[]> findHotBoard(){
          String sql = "SELECT " +
                 "b.board_id, " +
@@ -102,6 +98,7 @@ public class MainPageRepository {
         return nativeQuery.getResultList();
     }
 
+    // 메인페이지 최신게시판을 불러오는 쿼리
     public List<Object[]> findNewBoard(){
         String sql = "(SELECT " +
                     "b.board_id, " +

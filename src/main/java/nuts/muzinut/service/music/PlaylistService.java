@@ -5,6 +5,7 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Playlist;
 import nuts.muzinut.domain.music.PlaylistMusic;
 import nuts.muzinut.dto.music.playlist.PlaylistMusicsDto;
+import nuts.muzinut.exception.EntityOversizeException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.PlaylistMusicRepository;
@@ -37,8 +38,7 @@ public class PlaylistService {
     @Value("${spring.file.dir}")
     private String fileDir;
 
-    public List<PlaylistMusicsDto> getPlaylistMusics() throws IOException {
-        Long userId = getCurrentUserId();
+    public List<PlaylistMusicsDto> getPlaylistMusics(Long userId) throws IOException {
         List<PlaylistMusicsDto> playlistMusics = playlistQueryRepository.getPlaylistMusics(userId);
 
         for(PlaylistMusicsDto dto : playlistMusics) {
@@ -72,8 +72,7 @@ public class PlaylistService {
         }
     }
 
-    public void addPlaylistMusics(List<Long> addList) {
-        Long userId = getCurrentUserId();
+    public void addPlaylistMusics(List<Long> addList, Long userId) {
         Playlist playlist = playlistRepository.findByUserId(userId).get();
 
         for (Long l : addList) {
@@ -99,5 +98,12 @@ public class PlaylistService {
         Long userId = getCurrentUserId();
         Playlist playlist = playlistRepository.findByUserId(userId).get();
         playlistMusicRepository.deleteAllPlaylistMusic(playlist);
+    }
+
+    public void checkPlaylistMaxSize(int addSize, Long userId) {
+        Playlist playlist = playlistRepository.findByUserId(userId).get();
+        // 플레이리스트의 최대 저장 갯수 1000 개를 확인하는 메소드
+        List<Long> storePlaylistMusicsCount = playlistQueryRepository.getStorePlaylistMusicsCount(playlist);
+        if(storePlaylistMusicsCount.get(0) + addSize > 1000) throw new EntityOversizeException("플레이리스트의 최대 저장 갯수를 초과하였습니다. 현재 플레이리스트 갯수 : " + storePlaylistMusicsCount.get(0));
     }
 }

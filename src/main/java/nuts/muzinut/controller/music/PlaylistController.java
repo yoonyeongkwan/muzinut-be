@@ -22,7 +22,8 @@ public class PlaylistController {
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/get")
     public ResponseEntity<Map<String, List<PlaylistMusicsDto>>> getPlaylist() throws IOException {
-        List<PlaylistMusicsDto> playlistMusics = playlistService.getPlaylistMusics();
+        Long userId = playlistService.getCurrentUserId();
+        List<PlaylistMusicsDto> playlistMusics = playlistService.getPlaylistMusics(userId);
         Map<String, List<PlaylistMusicsDto>> body = new HashMap<>();
         body.put("data", playlistMusics);
 
@@ -34,9 +35,12 @@ public class PlaylistController {
     @PutMapping("/add")
     public ResponseEntity<String> addPlaylistMusic(@RequestBody PlaylistAddDto addListBody) {
         List<Long> addList = addListBody.getAddList();
+        Long userId = playlistService.getCurrentUserId();
         // 해당 음원 Entity 가 존재하는지 확인 -> 음원이 존재하지 않으면 exception 발생
         playlistService.addSongIsExist(addList);
-        playlistService.addPlaylistMusics(addList); // 음원 추가
+        // 플레이리스트의 수 > 1000 이면 exception
+        playlistService.checkPlaylistMaxSize(addList.size(), userId);
+        playlistService.addPlaylistMusics(addList, userId); // 음원 추가
 
         return ResponseEntity.ok()
                 .body("add success");
@@ -46,6 +50,7 @@ public class PlaylistController {
     @DeleteMapping("/delete")
     public ResponseEntity<String> deletePlaylistMusic(@RequestBody PlaylistDeleteDto deleteListBody) {
         List<Long> deleteList = deleteListBody.getDeleteList();
+        Long userId = playlistService.getCurrentUserId();
         // 삭제하려는 PlaylistMusic Entity 가 존재하는지 Id 값으로 확인 -> 해당 Entity 가 존재하지 않으면 exception 발생
         playlistService.deleteSongIsExist(deleteList);
         playlistService.deletePlaylistMusics(deleteList); // 플레이리스트에서 음원 삭제

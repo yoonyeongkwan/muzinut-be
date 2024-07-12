@@ -67,4 +67,12 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     private ErrorDto INTERNAL_SERVER_ERROR(AlbumCreateFailException ex, WebRequest request) {
         return new ErrorDto(SERVICE_UNAVAILABLE.value(), ex.getMessage());
     }
+
+    // 앨범 Entity 갯수 초과 핸들러 추가
+    @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
+    @ExceptionHandler(value = { EntityOversizeException.class })
+    @ResponseBody
+    private ErrorDto REQUEST_ENTITY_TOO_LARGE(EntityOversizeException ex, WebRequest request) {
+        return new ErrorDto(REQUEST_ENTITY_TOO_LARGE.value(), ex.getMessage());
+    }
 }

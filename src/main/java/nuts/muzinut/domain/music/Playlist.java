@@ -13,10 +13,11 @@ import java.util.List;
 public class Playlist {
 
     @Id @GeneratedValue
-    @Column(name = "playlist_record")
+    @Column(name = "playlist_id")
     private Long id;
 
-    @OneToOne(mappedBy = "playlist",fetch = FetchType.LAZY)
+
+    @OneToOne(mappedBy = "playlist", fetch = FetchType.LAZY)
     private User user;
 
     @OneToMany(mappedBy = "playlist", cascade = CascadeType.ALL)

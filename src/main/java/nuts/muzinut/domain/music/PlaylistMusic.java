@@ -13,9 +13,10 @@ public class PlaylistMusic {
     private Long id;
 
     @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
-    @Column(name = "music_id")
+    @Column(name = "song_id")
     private Long songId;
 
     //편의 메서드

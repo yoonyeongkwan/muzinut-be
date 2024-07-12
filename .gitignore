@@ -3,9 +3,10 @@ HELP.md
 
 
 build/
+file/**
 src/main/java/nuts/muzinut/file/**
-DataInit.java
 TestAlbumService.java
+DataInit.Java
 src/test/**
 application.yml
 !gradle/wrapper/gradle-wrapper.jar

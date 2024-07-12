@@ -1,5 +1,7 @@
 package nuts.muzinut.service.music;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import nuts.muzinut.domain.member.User;
@@ -17,6 +19,7 @@ import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -28,6 +31,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class AlbumService {
 
     private final AlbumRepository albumRepository;
@@ -39,6 +43,8 @@ public class AlbumService {
     private final SongGenreRepository songGenreRepository;
 
     private final EncodeFiile encodeFiile;
+    @PersistenceContext
+    EntityManager em;
 
     @Value("${spring.file.dir}")
     private String fileDir;
@@ -100,7 +106,7 @@ public class AlbumService {
         return albumData;
     }
 
-    public void saveAlbumData(AlbumDto storeAlbumData, String storeAlbumImg) {
+    public Long saveAlbumData(AlbumDto storeAlbumData, String storeAlbumImg) {
         // userId 토큰에서 꺼내오기
         Long userId = getCurrentUsername();
         if(userId >= 0) {
@@ -127,7 +133,10 @@ public class AlbumService {
                     songGenreRepository.save(songGenre);
                 }
             }
+            em.flush();
+            return album.getId();
         }
+        return null;
     }
 
     @SneakyThrows

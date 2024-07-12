@@ -1,13 +1,10 @@
 package nuts.muzinut.domain.music;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.music.AlbumDto;
-import nuts.muzinut.dto.music.ModifyAlbumDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +19,7 @@ public class Album {
     @Column(name = "album_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -32,7 +29,7 @@ public class Album {
     @Column(name = "album_img")
     private String albumImg; // 이미지 이름
 
-    @OneToMany(mappedBy = "album")
+    @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     private List<Song> songList = new ArrayList<>();
 
     //연관 관계 메서드
@@ -49,11 +46,4 @@ public class Album {
         this.albumImg = albumImg;
     }
 
-    public Album(String albumImg, String intro, String name, User user, Long id) {
-        this.albumImg = albumImg;
-        this.intro = intro;
-        this.name = name;
-        this.user = user;
-        this.id = id;
-    }
 }

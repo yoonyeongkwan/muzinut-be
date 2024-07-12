@@ -4,8 +4,8 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import nuts.muzinut.dto.mainsearch.SearchArtistDto;
-import nuts.muzinut.dto.mainsearch.SearchSongDto;
+import nuts.muzinut.dto.mainpage.SearchArtistDto;
+import nuts.muzinut.dto.mainpage.SearchSongDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,12 +14,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.querydsl.core.group.GroupBy.groupBy;
 import static nuts.muzinut.domain.member.QFollow.follow;
 import static nuts.muzinut.domain.member.QUser.user;
 import static nuts.muzinut.domain.music.QAlbum.album;
 import static nuts.muzinut.domain.music.QSong.song;
-import static com.querydsl.core.group.GroupBy.list;
 
 @RequiredArgsConstructor
 @Repository
@@ -28,7 +26,7 @@ public class MainSearchRepository {
     private final JPAQueryFactory queryFactory;
 
 
-
+    // 아티스트를 검색하는 쿼리
     public Page<SearchArtistDto> artistSearch(String searchWord, Pageable pageable){
         QueryResults<SearchArtistDto> results = queryFactory
                 .select(Projections.constructor(SearchArtistDto.class,
@@ -51,6 +49,8 @@ public class MainSearchRepository {
 
         return new PageImpl<>(content, pageable, total);
     }
+
+    // 곡을 검색하는 쿼리
     public Page<SearchSongDto> songSearch(String searchWord, Pageable pageable){
         QueryResults<SearchSongDto> results = queryFactory
                 .select(Projections.constructor(SearchSongDto.class,

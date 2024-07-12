@@ -15,10 +15,8 @@ public class SongLikeController {
     private final SongLikeService songLikeService;
 
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/songlike")
     public ResponseEntity<String> uploadAlbum(@PathVariable("id") Long id){
-        System.out.println("id = " + id);
-        songLikeService.getSongLike(id);
-        return ResponseEntity.status(HttpStatus.OK).body("successfully!");
+        return ResponseEntity.status(HttpStatus.OK).body(songLikeService.getSongLike(id));
     }
 }

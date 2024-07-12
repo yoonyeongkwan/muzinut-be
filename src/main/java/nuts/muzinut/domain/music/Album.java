@@ -48,12 +48,4 @@ public class Album {
         this.intro = bio;
         this.albumImg = albumImg;
     }
-
-    public Album(String albumImg, String intro, String name, User user, Long id) {
-        this.albumImg = albumImg;
-        this.intro = intro;
-        this.name = name;
-        this.user = user;
-        this.id = id;
-    }
 }

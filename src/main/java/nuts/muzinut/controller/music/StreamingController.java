@@ -1,5 +1,6 @@
 package nuts.muzinut.controller.music;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.service.music.StreamingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +10,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 @RestController
@@ -21,7 +24,8 @@ public class StreamingController {
     StreamingService streamingService;
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @GetMapping("/{songId}")
-    public ResponseEntity<Resource> streamingMusic(@PathVariable("songId") Long songId) {
+    public ResponseEntity<Resource> streamingMusic(
+            @Validated @PathVariable("songId") @NotNull Long songId) {
         UrlResource resource = streamingService.streamingSong(songId);
 
         HttpHeaders headers = new HttpHeaders();

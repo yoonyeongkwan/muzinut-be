@@ -12,10 +12,11 @@ public class PlaylistMusic {
     @Column(name = "playlist_music_id")
     private Long id;
 
-    @ManyToOne(fetch =  FetchType.LAZY, cascade =  CascadeType.ALL)
+    @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
-    @Column(name = "music_id")
+    @Column(name = "song_id")
     private Long songId;
 
     //편의 메서드

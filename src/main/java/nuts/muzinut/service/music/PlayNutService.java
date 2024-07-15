@@ -83,12 +83,24 @@ public class PlayNutService {
 
     // 플리넛 디렉토리 삭제
     public void playNutDelete(Long playNutId) {
+        User user = getUser();
+        Optional<PlayNut> optional = playNutRepository.findById(playNutId);
+        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        if (!optional.get().getUser().equals(user)) {
+            throw new AccessDeniedException("플리넛 삭제 권한이 없습니다");
+        }
         playNutRepository.deleteById(playNutId);
     }
 
     // 플리넛 곡 삭제
-    public void playNutMusicDelete(Long playNutMusicId) {
-        playNutMusicRepository.deleteById(playNutMusicId);
+    public void playNutMusicDelete(Long playNutId, Long playNutMusicId) {
+        User user = getUser();
+        Optional<PlayNut> optional = playNutRepository.findById(playNutId);
+        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        if (!optional.get().getUser().equals(user)) {
+            throw new AccessDeniedException("플리넛 곡 삭제에 대한 권한이 없습니다");
+        }
+        playNutMusicRepository.deleteByPlayNutIdANDPlayNutMusicId(playNutId, playNutMusicId);
     }
 
     // 플리넛 디렉토리 조회

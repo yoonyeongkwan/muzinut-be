@@ -102,10 +102,11 @@ public class PlayNutController {
      * @return 플리넛 곡 삭제 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @DeleteMapping("/playnut/music/{playnutMusicid}")
+    @DeleteMapping("/playnut/{playnutid}/{playnutMusicid}")
     public ResponseEntity<String> DeletePlayMusic
-            (@Validated @PathVariable("playnutMusicid") @NotNull Long playNutMusicId) {
-        playNutService.playNutMusicDelete(playNutMusicId);
+            (@Validated @PathVariable("playnutid") @NotNull Long playNutId,
+             @Validated @PathVariable("playnutMusicid") @NotNull Long playNutMusicId) {
+        playNutService.playNutMusicDelete(playNutId, playNutMusicId);
         return new ResponseEntity<String>("플리넛 곡 삭제 완료되었습니다", HttpStatus.OK);
     }
 }

@@ -26,6 +26,8 @@ public class QPlayNut extends EntityPathBase<PlayNut> {
 
     public final ListPath<PlayNutMusic, QPlayNutMusic> playNutMusics = this.<PlayNutMusic, QPlayNutMusic>createList("playNutMusics", PlayNutMusic.class, QPlayNutMusic.class, PathInits.DIRECT2);
 
+    public final StringPath title = createString("title");
+
     public final nuts.muzinut.domain.member.QUser user;
 
     public QPlayNut(String variable) {

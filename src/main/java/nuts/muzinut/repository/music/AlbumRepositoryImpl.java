@@ -17,6 +17,7 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
+    // 앨범 상세 페이지 불러오는 쿼리
     @Override
     public List<AlbumDetaillDto> albumDetail(Long id) {
         return queryFactory
@@ -32,6 +33,7 @@ public class AlbumRepositoryImpl implements AlbumRepositoryCustom{
                 .fetch();
     }
 
+    // 앨범에 수록된 곡들을 불러오는 쿼리
     @Override
     public List<AlbumSongDetaillDto> albumSongDetail(Long id) {
         return queryFactory

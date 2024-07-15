@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.chat.AlreadyExistRequestException;
+import nuts.muzinut.exception.chat.BlockUserException;
 import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.exception.token.ExpiredTokenException;
 import nuts.muzinut.exception.token.IllegalTokenException;
@@ -32,7 +34,8 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ResponseStatus(FORBIDDEN)
-    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class, InvalidPasswordException.class })
+    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class,
+            InvalidPasswordException.class, BlockUserException.class})
     @ResponseBody
     private ErrorDto forbidden(RuntimeException ex, WebRequest request) {
         return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
@@ -48,18 +51,20 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
-    //채팅방에 대한 예외처리 추가
     @ResponseStatus(NOT_ACCEPTABLE)
-    @ExceptionHandler(value = { ExpiredTokenException.class, InvalidChatRoomException.class })
+    @ExceptionHandler(value = { ExpiredTokenException.class, AlreadyExistRequestException.class})
     @ResponseBody
     private ErrorDto NOT_ACCEPTABLE(RuntimeException ex, WebRequest request){
         return new ErrorDto(NOT_ACCEPTABLE.value(), ex.getMessage());
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ExceptionHandler(value = {BoardNotExistException.class})
-    private ErrorResult NO_CONTENT(RuntimeException ex) {
-        return new ErrorResult(NO_CONTENT.value(), ex.getMessage());
+    
+    @ResponseStatus(NO_CONTENT)
+    @ExceptionHandler(value = {BoardNotExistException.class, NotFoundFileException.class})
+    @ResponseBody
+    private ErrorDto NO_CONTENT(RuntimeException ex, WebRequest request) {
+        log.info("NotFoundFileException 호출");
+        return new ErrorDto(NO_CONTENT.value(), ex.getMessage());
     }
 
     // 새로운 예외 핸들러 추가
@@ -68,5 +73,41 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ResponseBody
     private ErrorDto handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(NOT_FOUND)
+    @ExceptionHandler(value = { NoDataFoundException.class })
+    @ResponseBody
+    private ErrorDto notFound(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(NOT_FOUND.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(UNAUTHORIZED)
+    @ExceptionHandler(value = { AlbumHaveNoAuthorizationException.class })
+    @ResponseBody
+    private ErrorDto HaveNoAuthorization(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(UNAUTHORIZED.value(), ex.getMessage());
+    }
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(value = { LimitPlayNutException.class })
+    @ResponseBody
+    private ErrorDto limitPlayNut(RuntimeException ex, WebRequest request) {
+        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
+    }
+    // 앨범 Entity 생성 실패 핸들러 추가
+    @ResponseStatus(SERVICE_UNAVAILABLE)
+    @ExceptionHandler(value = { AlbumCreateFailException.class })
+    @ResponseBody
+    private ErrorDto INTERNAL_SERVER_ERROR(AlbumCreateFailException ex, WebRequest request) {
+        return new ErrorDto(SERVICE_UNAVAILABLE.value(), ex.getMessage());
+    }
+
+    // 앨범 Entity 갯수 초과 핸들러 추가
+    @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
+    @ExceptionHandler(value = { EntityOversizeException.class })
+    @ResponseBody
+    private ErrorDto REQUEST_ENTITY_TOO_LARGE(EntityOversizeException ex, WebRequest request) {
+        return new ErrorDto(REQUEST_ENTITY_TOO_LARGE.value(), ex.getMessage());
     }
 }

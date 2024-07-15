@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.chat.ChatMember;
+import nuts.muzinut.domain.chat.ChatRequest;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.music.Playlist;
@@ -177,5 +178,11 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Message> messages = new ArrayList<>();
 
+/*
+    @OneToMany(mappedBy = "requestUser", cascade = CascadeType.ALL)
+    private List<ChatRequest> requestUsers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "receiveUser", cascade = CascadeType.ALL)
+    private List<ChatRequest> receiveUsers = new ArrayList<>();
+*/
 }

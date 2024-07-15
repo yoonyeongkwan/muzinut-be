@@ -49,6 +49,11 @@ public class UserService {
         userRepository.updateProfileBannerImg(filename, user);
     }
 
+    //닉네임으로 유저 찾기
+    public Optional<User> findByNickname(String nickname) {
+        return userRepository.findByNickname(nickname);
+    }
+
 
     /**
      *

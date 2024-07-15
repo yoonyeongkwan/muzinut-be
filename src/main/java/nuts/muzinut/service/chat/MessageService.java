@@ -6,6 +6,8 @@ import nuts.muzinut.domain.chat.Chat;
 import nuts.muzinut.domain.chat.ChatStatus;
 import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.chat.Messages;
+import nuts.muzinut.dto.chat.MessagesDto;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.exception.chat.InvalidChatRoomException;
@@ -18,8 +20,10 @@ import nuts.muzinut.service.member.RedisUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Transactional
@@ -74,5 +78,43 @@ public class MessageService {
         }
 
         throw new NotFoundMemberException("없는 회원과 대화할 수 없습니다");
+    }
+
+    /**
+     * 검증된 사용자인 경우 메시지 생성 (메시지 요청을 수락했을 때 사용)
+     * @param roomId: 채팅방 pk
+     * @param sender: 메시지를 보내는 사람
+     * @param sendTo: 메시지를 받는 사람
+     * @param message: 보낼 메시지
+     */
+    public Message createMessage(Long roomId, User sender, User sendTo, String message) {
+        Chat findChatRoom = chatRepository.findById(roomId).orElseThrow(() -> new NotFoundEntityException("없는 채팅방입니다"));
+        List<String> chatParticipants = redisUtil.getMultiData(roomId.toString());
+
+        if (findChatRoom.getChatStatus() == ChatStatus.INVALID) {
+            throw new InvalidChatRoomException("얼려진 채팅방에서는 메시지를 보낼 수 없습니다");
+        }
+
+        Message msg = new Message();
+        msg.createReadMessage(sender, findChatRoom, message); //아닌 경우 메시지 안읽음 처리
+        return messageRepository.save(msg);
+    }
+
+
+    public MessagesDto getMessages(Long chatId) {
+        Chat chat = chatRepository.findChatWithMembers(chatId).orElseThrow(() -> new NotFoundEntityException("없는 채팅방입니다"));
+        List<Message> messageList = messageRepository.findChatRoomMessages(chat);
+        MessagesDto messagesDto = new MessagesDto();
+        List<Messages> messages = new ArrayList<>();
+        messageList.forEach(m -> messages.add(
+                Messages.builder()
+                        .id(m.getId())
+                        .message(m.getMessage())
+                        .sendTime(m.getSendTime())
+                        .nickname(m.getUser().getNickname())
+                        .build()
+        ));
+        messagesDto.setMessages(messages);
+        return messagesDto;
     }
 }

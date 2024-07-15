@@ -1,7 +1,7 @@
 package nuts.muzinut.repository.music;
 
 
-import nuts.muzinut.dto.music.SongDetaillDto;
+import nuts.muzinut.dto.music.SongDetailDto;
 import nuts.muzinut.dto.music.SongGenreDto;
 import nuts.muzinut.dto.music.SongPageDto;
 
@@ -18,7 +18,7 @@ public interface SongRepositoryCustom {
 
     Page<SongPageDto> genreSong(String genre, Pageable pageable);
 
-    List<SongDetaillDto> songDetail(Long id);
+    List<SongDetailDto> songDetail(Long id);
 
     List<SongGenreDto> songDetailGenre(Long id);
 

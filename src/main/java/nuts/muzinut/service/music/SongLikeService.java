@@ -21,15 +21,23 @@ public class SongLikeService {
     private final SongLikeRepository songLikeRepository;
     private final UserRepository userRepository;
 
-    public void getSongLike(Long songId){
+    // 음악 좋아요
+    public String getSongLike(Long songId){
         User user = getCurrentUsername();
         Optional<Song> songby = songRepository.findById(songId);
         Song song = songby.get();
-        SongLike songLike = new SongLike(user, song);
-        songLikeRepository.save(songLike);
+        Optional<SongLike> bySongLike = songLikeRepository.findBySongLike(song, user);
 
-        Long count = songLikeRepository.countLikesBySongId(songId);
-        System.out.println("count = " + count);
+        if(bySongLike.isPresent()){ // 사용자가 좋아요를 눌렀는지 확인 기능
+            SongLike songLikeDelete = bySongLike.get();
+            songLikeRepository.delete(songLikeDelete);
+            return "좋아요 취소됬습니다";
+        }else {
+            SongLike songLike = new SongLike(user, song);
+            songLikeRepository.save(songLike);
+            return "좋아요 성공했습니다";
+        }
+
     }
 
     // 현재 인증된 사용자의 이름을 반환하는 메소드

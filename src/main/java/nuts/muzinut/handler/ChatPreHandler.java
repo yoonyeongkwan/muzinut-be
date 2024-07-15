@@ -2,11 +2,14 @@ package nuts.muzinut.handler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.exception.NotFoundMemberException;
+import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.jwt.TokenProvider;
 import nuts.muzinut.service.chat.ChatService;
 import nuts.muzinut.service.chat.MessageService;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.MessageDeliveryException;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
@@ -22,20 +25,48 @@ public class ChatPreHandler implements ChannelInterceptor {
     private final TokenProvider tokenProvider;
     private final ChatService chatService;
     private final MessageService messageService;
+    private String username;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
+        //채팅방 연결
         if (StompCommand.CONNECT == accessor.getCommand()) {
+
             String jwtToken = accessor.getFirstNativeHeader("Authorization");
             log.info("connect: {}", jwtToken);
+            //권한 확인
             if (StringUtils.hasText(jwtToken)) {
                 String token = jwtToken.substring(7);
-                String username = tokenProvider.validateToken(token);//토큰 검증
-                handleMessage(accessor.getCommand(), accessor, username);
+                username = tokenProvider.validateToken(token);//토큰 검증
+            } else {
+                throw new MessageDeliveryException(message, new NotFoundMemberException("채팅방 입장 권한이 없습니다"));
+            }
+
+            //채팅방 연결
+            try {
+                connectToChatRoom(accessor, username);
+            } catch (AccessDeniedException | InvalidChatRoomException e) {
+                throw new MessageDeliveryException(message, e);
             }
         }
+
+        //메시지 보내기
+        if (StompCommand.SEND == accessor.getCommand()) {
+            log.info("메시지 전송!");
+            log.info("경로: {}", accessor.getDestination());
+            String roomNumber;
+            if (StringUtils.hasText(accessor.getDestination())) {
+                roomNumber = getRoomNumber(accessor.getDestination());
+            } else {
+                throw new MessageDeliveryException(message, new InvalidChatRoomException("메시지를 보낼 경로를 입력하세요"));
+            }
+            if (!chatService.isValidChatRoom(Long.parseLong(roomNumber))) {
+                throw new MessageDeliveryException(message, new InvalidChatRoomException("유효하지 않는 채팅방에 메시지를 보낼 수 없습니다"));
+            }
+        }
+
         return message;
     }
 
@@ -52,22 +83,6 @@ public class ChatPreHandler implements ChannelInterceptor {
                 String username = tokenProvider.validateToken(token);//토큰 검증
                 disconnectChatRoom(accessor, username);
             }
-        }
-    }
-
-    private void handleMessage(StompCommand stompCommand, StompHeaderAccessor accessor, String username) {
-        switch (stompCommand) {
-            case CONNECT:
-                log.info("handleMessage: 연결");
-                connectToChatRoom(accessor, username);
-                break;
-
-            case SUBSCRIBE:
-                log.info("handleMessage: 구독");
-
-            case SEND:
-                log.info("handleMessage: 메시지 전송");
-                break;
         }
     }
 

@@ -48,7 +48,7 @@ public class BlockService extends DetailCommon {
 
     public void cancelBlock(User user, String blockUserNickname) {
         User blockUser = userRepository.findByNickname(blockUserNickname).orElseThrow(
-                () -> new NotFoundMemberException("차단할 회원이 존재하지 않습니다."));
+                () -> new NotFoundMemberException("차단 해제할 회원이 존재하지 않습니다."));
         Block block = blockRepository.findByBlockUser(blockUser).orElseThrow(
                 () -> new NotFoundEntityException("차단 목록에 없는 사람을 차단 해제 할 수 없습니다"));
         blockRepository.delete(block); //차단 취소

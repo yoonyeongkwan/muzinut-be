@@ -14,6 +14,8 @@ import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
+import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutDto;
+import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongDto;
 import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.*;
@@ -31,6 +33,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
@@ -83,6 +86,27 @@ public class ProfileController {
             ProfileBoardDto profileBoardDto = profileService.getBoardTab(userId);
             return new ResponseEntity<>(profileBoardDto, HttpStatus.OK);
         }
+    }
+
+    // 프로필 페이지 - 플리넛 탭
+    @GetMapping("/playnut")
+    public ResponseEntity<?> getUserProfilePlayNuts(@RequestParam("userId") Long userId) throws JsonProcessingException {
+        String currentUsername = profileService.getCurrentUsername();
+        User currentUser = profileService.findUserByUsername(currentUsername);
+
+        if (!currentUser.getId().equals(userId)) {
+            throw new NotFoundMemberException("본인의 프로필만 접근 가능");
+        } else {
+            ProfilePlayNutDto profilePlayNutDto = profileService.getPlayNutTab(userId);
+            return new ResponseEntity<>(profilePlayNutDto, HttpStatus.OK);
+        }
+    }
+
+    // 플리넛 제목 클릭 시 해당 플리넛에 담긴 곡을 보여주는 메서드
+    @GetMapping("/playnut/{playNutId}")
+    public ResponseEntity<?> getUserProfilePlayNut(@PathVariable Long playNutId) throws JsonProcessingException {
+        ProfilePlayNutSongDto profilePlayNutDto = profileService.getPlayNutSongs(playNutId);
+        return new ResponseEntity<>(profilePlayNutDto, HttpStatus.OK);
     }
 
     // 데이터를 json으로 변환하여 form-data에 추가하는 메서드

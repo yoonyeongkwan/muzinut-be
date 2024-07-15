@@ -7,17 +7,19 @@ import nuts.muzinut.domain.board.Board;
 import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.Album;
+import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.dto.board.DetailBaseDto;
-import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.Album.ProfileAlbumDto;
 import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
+import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutDto;
+import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutForm;
+import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongDto;
+import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongsForm;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.exception.BoardNotExistException;
 import nuts.muzinut.exception.BoardNotFoundException;
@@ -29,6 +31,8 @@ import nuts.muzinut.repository.board.query.LoungeQueryRepository;
 import nuts.muzinut.repository.member.FollowRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.AlbumRepository;
+import nuts.muzinut.repository.music.PlayNutMusicRepository;
+import nuts.muzinut.repository.music.PlayNutRepository;
 import nuts.muzinut.repository.music.SongRepository;
 import nuts.muzinut.service.board.DetailCommon;
 import org.springframework.data.domain.Page;
@@ -57,6 +61,8 @@ public class ProfileService extends DetailCommon {
     private final FollowRepository followRepository;
     private final LoungeRepository loungeRepository;
     private final LoungeQueryRepository queryRepository;
+    private final PlayNutRepository playNutRepository;
+    private final PlayNutMusicRepository playNutMusicRepository;
 
 
     // 프로필 페이지 보여주는 메소드
@@ -296,5 +302,76 @@ public class ProfileService extends DetailCommon {
         if (user == null) {
             throw new IllegalArgumentException("유효하지 않은 유저 정보입니다.");
         }
+    }
+
+    // 플리넛 탭을 보여주는 메서드
+    public ProfilePlayNutDto getPlayNutTab(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 회원입니다."));
+        List<PlayNut> playNuts = playNutRepository.findByUserId(userId);
+        ProfileDto profileDto = getUserProfile(userId);
+
+        if (playNuts.isEmpty()) {
+            return new ProfilePlayNutDto(
+                    profileDto.getProfileBannerImgName(),
+                    profileDto.getProfileImgName(),
+                    profileDto.getNickname(),
+                    profileDto.getIntro(),
+                    profileDto.getFollowingCount(),
+                    profileDto.getFollowersCount(),
+                    profileDto.isFollowStatus()
+            );
+        } else {
+            List<ProfilePlayNutForm> playNutForms = playNuts.stream()
+                    .map(playNut -> new ProfilePlayNutForm(playNut.getId(), playNut.getTitle()))
+                    .collect(Collectors.toList());
+
+            return new ProfilePlayNutDto(
+                    profileDto.getProfileBannerImgName(),
+                    profileDto.getProfileImgName(),
+                    profileDto.getNickname(),
+                    profileDto.getIntro(),
+                    profileDto.getFollowingCount(),
+                    profileDto.getFollowersCount(),
+                    profileDto.isFollowStatus(),
+                    playNutForms
+            );
+        }
+    }
+
+    // 플리넛 제목 클릭 시 해당 플리넛에 담긴 곡을 보여주는 메서드
+    public ProfilePlayNutSongDto getPlayNutSongs(Long playNutId) {
+        PlayNut playNut = playNutRepository.findById(playNutId)
+                .orElseThrow(() -> new NotFoundEntityException("존재하지 않는 플리넛입니다."));
+
+        User user = playNut.getUser();
+        Long userId = user.getId();
+
+        ProfileDto profileDto = getUserProfile(userId);
+
+        List<ProfilePlayNutSongsForm> songDtos = playNut.getPlayNutMusics().stream()
+                .map(playNutMusic -> {
+                    Song song = songRepository.findById(playNutMusic.getSongId())
+                            .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 곡입니다."));
+                    return new ProfilePlayNutSongsForm(
+                            song.getAlbum().getName(),
+                            song.getUser().getNickname(),
+                            song.getTitle()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new ProfilePlayNutSongDto(
+                new ProfileDto(
+                        encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
+                        encodeFileToBase64(profileDto.getProfileImgName(), false),
+                        profileDto.getNickname(),
+                        profileDto.getIntro(),
+                        profileDto.getFollowingCount(),
+                        profileDto.getFollowersCount(),
+                        profileDto.isFollowStatus()
+                ),
+                songDtos
+        );
     }
 }

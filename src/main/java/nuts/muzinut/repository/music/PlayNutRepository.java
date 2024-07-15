@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PlayNutRepository extends JpaRepository<PlayNut, Long> {
 
@@ -20,4 +21,6 @@ public interface PlayNutRepository extends JpaRepository<PlayNut, Long> {
 
     @Query("select new nuts.muzinut.dto.music.PlayNutDto(pn.id, pn.title) from PlayNut pn where pn.user = :user")
     List<PlayNutDto> findByPlayNut(@Param("user")User user);
+
+    Optional<PlayNut> findByIdAndUser(Long id, User user);
 }

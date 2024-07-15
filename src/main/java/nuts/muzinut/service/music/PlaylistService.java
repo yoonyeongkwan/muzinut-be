@@ -2,15 +2,15 @@ package nuts.muzinut.service.music;
 
 import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.domain.music.PlayNut;
+import nuts.muzinut.domain.music.PlayNutMusic;
 import nuts.muzinut.domain.music.Playlist;
 import nuts.muzinut.domain.music.PlaylistMusic;
 import nuts.muzinut.dto.music.playlist.PlaylistMusicsDto;
 import nuts.muzinut.exception.EntityOversizeException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.member.UserRepository;
-import nuts.muzinut.repository.music.PlaylistMusicRepository;
-import nuts.muzinut.repository.music.PlaylistRepository;
-import nuts.muzinut.repository.music.SongRepository;
+import nuts.muzinut.repository.music.*;
 import nuts.muzinut.repository.music.query.PlaylistQueryRepository;
 import nuts.muzinut.service.encoding.EncodingService;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,8 @@ public class PlaylistService {
     private final SongRepository songRepository;
     private final PlaylistRepository playlistRepository;
     private final PlaylistMusicRepository playlistMusicRepository;
+    private final PlayNutRepository playNutRepository;
+    private final PlayNutMusicRepository playNutMusicRepository;
 
     @Value("${spring.file.dir}")
     private String fileDir;
@@ -105,5 +108,23 @@ public class PlaylistService {
         // 플레이리스트의 최대 저장 갯수 1000 개를 확인하는 메소드
         List<Long> storePlaylistMusicsCount = playlistQueryRepository.getStorePlaylistMusicsCount(playlist);
         if(storePlaylistMusicsCount.get(0) + addSize > 1000) throw new EntityOversizeException("플레이리스트의 최대 저장 갯수를 초과하였습니다. 현재 플레이리스트 갯수 : " + storePlaylistMusicsCount.get(0));
+    }
+
+    public PlayNut findPlaynut(Long changePlaynutId, Long userId) {
+        User user = userRepository.findById(userId).get();
+        playNutRepository.findByIdAndUser(changePlaynutId, user).orElseThrow(
+                () -> new NotFoundEntityException("해당 playnut 이 존재하지 않습니다.")
+        );
+        return playNutRepository.findByIdAndUser(changePlaynutId, user).get();
+    }
+
+    public List<Long> findAllPlaynutMusics(PlayNut playnut) {
+        List<PlayNutMusic> allPlayNut = playNutMusicRepository.findAllByPlayNut(playnut);
+        List<Long> playnutMusicList = new ArrayList<>();
+        for (PlayNutMusic playNutMusic : allPlayNut) {
+            playnutMusicList.add(playNutMusic.getSongId());
+        }
+
+        return playnutMusicList;
     }
 }

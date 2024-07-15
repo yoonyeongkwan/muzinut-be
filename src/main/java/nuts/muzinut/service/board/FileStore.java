@@ -109,7 +109,7 @@ public class FileStore {
      */
     public AdminBoard storeFile(MultipartFile multipartFile, AdminBoard adminBoard) throws IOException, NoUploadFileException {
         if (multipartFile.isEmpty()) {
-            throw new NoUploadFileException("자유게시판의 업로드 파일이 존재하지 않음");
+            throw new NoUploadFileException("업로드 파일이 존재하지 않음");
         }
 
         String originalFilename = multipartFile.getOriginalFilename();
@@ -130,7 +130,7 @@ public class FileStore {
      */
     public String updateFile(MultipartFile multipartFile, String deleteFilename) throws IOException, NoUploadFileException {
         if (multipartFile.isEmpty()) {
-            throw new NoUploadFileException("자유게시판의 업로드 파일이 존재하지 않음");
+            throw new NoUploadFileException("업로드 파일이 존재하지 않음");
         }
 
         deleteFile(deleteFilename); //기존 파일 삭제

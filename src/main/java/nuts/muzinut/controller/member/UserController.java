@@ -79,7 +79,7 @@ public class UserController {
     public MessageDto join(@Validated @RequestBody JoinDto joinDto) {
         Boolean Checked = mailService.CheckAuthNum(joinDto.getUsername(), joinDto.getAuthNum());
         if (Checked) {
-            userService.signup(new UserDto(joinDto.getUsername(), joinDto.getPassword()));
+            userService.signup(new UserDto(joinDto.getUsername(), joinDto.getPassword(), joinDto.getNickname()));
             return new MessageDto("회원 가입 성공");
         } else {
 
@@ -121,6 +121,14 @@ public class UserController {
         return new ResponseEntity<>(new TokenDto(token, refreshToken), httpHeaders, HttpStatus.OK);
     }
 
+    @ResponseBody
+    @PostMapping("/simple-authenticate")
+    public MessageDto simpleLogin() {
+
+        return new MessageDto("간편 로그인");
+    }
+
+    //리프레시 토큰 발급
     @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/re-authenticate")

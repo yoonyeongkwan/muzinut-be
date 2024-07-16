@@ -14,6 +14,7 @@ import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.dto.security.RefreshTokenDto;
 import nuts.muzinut.dto.security.TokenDto;
+import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.exception.EmailVertFailException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.jwt.JwtFilter;
@@ -151,12 +152,28 @@ public class UserController {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
 
-        userService.updateNicknameAndIntro(user.getId(), profileUpdateDto.getNickname(), profileUpdateDto.getIntro());
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(URI.create("/profile?userId=" + user.getId()));
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                .headers(headers)
-                .body(new MessageDto("프로필 업데이트가 성공되었습니다."));
+        // 기존 닉네임과 동일한 경우
+        if (user.getNickname().equals(profileUpdateDto.getNickname())) {
+            userService.updateNicknameAndIntro(user.getId(), profileUpdateDto.getNickname(), profileUpdateDto.getIntro());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create("/profile?userId=" + user.getId()));
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .headers(headers)
+                    .body(new MessageDto("프로필 업데이트가 성공되었습니다."));
+        }
+        // 기존 닉네임과 다른 경우
+        else {
+            // 중복 닉네임 확인
+            if (userService.isDuplicateNickname(profileUpdateDto.getNickname())) {
+                throw new DuplicateMemberException("이미 사용중인 닉네임입니다.");
+            }
+            userService.updateNicknameAndIntro(user.getId(), profileUpdateDto.getNickname(), profileUpdateDto.getIntro());
+            HttpHeaders headers = new HttpHeaders();
+            headers.setLocation(URI.create("/profile?userId=" + user.getId()));
+            return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
+                    .headers(headers)
+                    .body(new MessageDto("프로필 업데이트가 성공되었습니다."));
+        }
     }
 
     // 프로필 배너 이미지 설정

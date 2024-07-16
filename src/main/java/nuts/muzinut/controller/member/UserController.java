@@ -147,7 +147,7 @@ public class UserController {
     //프로필 닉네임, 자기소개 설정
     @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @PutMapping("/set-profile-nickname-intro")
+    @PostMapping("/set-profile-nickname-intro")
     public ResponseEntity<MessageDto>  setProfileNicknameIntro(@Validated @RequestBody ProfileUpdateDto profileUpdateDto) {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));

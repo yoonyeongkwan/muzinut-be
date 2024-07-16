@@ -37,7 +37,10 @@ public class UserService {
     // 프로필 닉네임, 자기소개 설정
     @Transactional
     public void updateNicknameAndIntro(Long userId, String nickname, String intro) {
-        userRepository.updateNicknameAndIntro(userId, nickname, intro);
+//        userRepository.updateNicknameAndIntro(userId, nickname, intro);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
+        user.updateNicknameAndIntro(nickname, intro);
     }
 
     // 중복 닉네임 확인

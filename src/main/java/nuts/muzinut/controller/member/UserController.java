@@ -89,7 +89,7 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/nickname-check")
-    public MessageDto checkNicknameDuplicate(String nickname) {
+    public MessageDto checkNicknameDuplicate(@RequestBody String nickname) {
         boolean isDuplicate = userService.checkDuplicateNickname(nickname);
         if (isDuplicate) {
             throw new DuplicateMemberException("이미 사용중인 닉네임입니다.");

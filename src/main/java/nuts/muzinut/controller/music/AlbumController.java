@@ -67,12 +67,8 @@ public class AlbumController {
             @RequestPart("albumData") AlbumUpdateDto albumData
     ) {
         albumService.updateAlbum(albumId, albumImg, albumData);
-        HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/album/" + albumId)); //수정한 앨범디테일패이지로 리다이렉트
 
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                .headers(header)
-                .body("앨범 수정 완료 되었습니다");
+        return new ResponseEntity<String>("앨범 수정 완료 되었습니다",HttpStatus.OK);
     }
 
     /**

@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @EntityListeners(AuditingEntityListener.class)
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 public class SongLike {
 

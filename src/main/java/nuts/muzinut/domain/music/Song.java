@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor
-@Getter @Setter
+@Getter
 public class Song extends BaseTimeEntity {
 
     @Id @GeneratedValue

@@ -19,6 +19,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PlayNutService {
 
     private final UserRepository userRepository;
@@ -104,6 +106,7 @@ public class PlayNutService {
     }
 
     // 플리넛 디렉토리 조회
+    @Transactional(readOnly = true)
     public ResponseEntity<PlayNutListDto> findPlayNutDir() {
         User user = getUser();
         List<PlayNutDto> playNutDir = playNutRepository.findByPlayNut(user);
@@ -115,6 +118,7 @@ public class PlayNutService {
     }
 
     // 플리넛 곡 조회
+    @Transactional(readOnly = true)
     public ResponseEntity<PlayNutMusicListDto> findPlayNutMusic(Long playNutId) {
         Optional<PlayNut> optional = playNutRepository.findById(playNutId);
         optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));

@@ -90,12 +90,7 @@ public class SongController {
             @RequestPart("songFile")MultipartFile songFile,
             @RequestPart("songData")SongUpdateDto songData){
         songService.updateSong(songId, songData, songFile);
-        HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/music/" + songId)); //수정한 음원디테일패이지로 리다이렉트
-
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                .headers(header)
-                .body("음원 수정 완료 되었습니다");
+        return new ResponseEntity<String>("음원 수정 완료 되었습니다", HttpStatus.OK);
     }
 
     /**

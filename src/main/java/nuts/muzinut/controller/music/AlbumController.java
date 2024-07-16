@@ -57,7 +57,7 @@ public class AlbumController {
      * @param albumId 앨범의 ID
      * @param albumImg 앨범 이미지 파일
      * @param albumData 앨범의 정보
-     * @return 앨범 상세 정보와 HTTP 상태 코드
+     * @return 앨범 수정 완료 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
@@ -87,7 +87,7 @@ public class AlbumController {
      * 앨범 삭제를 가져오는 엔드포인트
      *
      * @param albumId 앨범의 ID
-     * @return 앨범 상세 정보와 HTTP 상태 코드
+     * @return 앨범 삭제 완료 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping(value = "/{id}")

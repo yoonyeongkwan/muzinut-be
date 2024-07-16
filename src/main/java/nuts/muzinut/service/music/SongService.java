@@ -35,7 +35,6 @@ public class SongService {
     private final AlbumService albumService;
     private final EncodeFiile encodeFiile;
 
-    
     //최신음악페이지
     public ResponseEntity<PageDto<SongPageDto>> getNewSongs(int pageable) {
         // 페이지 넘버가 0이하 인 경우 0으로 저장, 1이상인 경우 1을 뺌 값을 저장

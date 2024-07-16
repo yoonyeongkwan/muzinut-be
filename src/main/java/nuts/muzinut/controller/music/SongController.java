@@ -81,7 +81,7 @@ public class SongController {
      *
      * @param songId 노래의 ID
      * @param songFile  
-     * @return 노래 상세 정보와 HTTP 상태 코드
+     * @return 노래 수정 완료 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
@@ -97,7 +97,7 @@ public class SongController {
      * 곡 삭제를 가져오는 엔드포인트.
      *
      * @param songId 노래의 ID
-     * @return 노래 상세 정보와 HTTP 상태 코드
+     * @return 노래 삭제 완료 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/{id}")

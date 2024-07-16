@@ -6,6 +6,7 @@ build/
 file/**
 src/main/java/nuts/muzinut/file/**
 AlbumDataInit.java
+BoardDataInit.java
 DataInit.Java
 src/test/**
 application.yml

@@ -11,6 +11,7 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.*;
 import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
+import nuts.muzinut.dto.member.login.LoginSuccessDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.dto.security.RefreshTokenDto;
 import nuts.muzinut.dto.security.TokenDto;
@@ -105,7 +106,7 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/authenticate")
-    public ResponseEntity<TokenDto> login(@Validated @RequestBody LoginDto loginDto) {
+    public ResponseEntity<LoginSuccessDto> login(@Validated @RequestBody LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
@@ -118,7 +119,11 @@ public class UserController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + token);
 
-        return new ResponseEntity<>(new TokenDto(token, refreshToken), httpHeaders, HttpStatus.OK);
+        User findUser = userService.findByUsername(loginDto.getUsername());
+
+        return new ResponseEntity<>(new LoginSuccessDto(token, refreshToken,
+                userService.findProfileImage(findUser.getProfileImgFilename()),
+                findUser.getNickname()), httpHeaders, HttpStatus.OK);
     }
 
     @ResponseBody

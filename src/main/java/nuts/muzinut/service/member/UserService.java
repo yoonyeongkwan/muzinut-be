@@ -6,11 +6,13 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.common.Base64Encoding;
 import nuts.muzinut.domain.member.Authority;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.exception.InvalidPasswordException;
+import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
@@ -24,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService extends Base64Encoding {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
@@ -32,6 +34,11 @@ public class UserService {
     // 프로필 이미지 설정
     public void setProfileName(String filename, User user) {
         userRepository.updateFilename(filename, user);
+    }
+
+    //username 으로 회원 찾기
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundEntityException("없는 회원입니다"));
     }
 
     // 프로필 닉네임, 자기소개 설정
@@ -62,6 +69,9 @@ public class UserService {
         return userRepository.findByNickname(nickname);
     }
 
+    public String findProfileImage(String profileImg) {
+        return encodeFileToBase64(profileImg);
+    }
 
     /**
      *

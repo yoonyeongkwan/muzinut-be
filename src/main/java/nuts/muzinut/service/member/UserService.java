@@ -44,6 +44,14 @@ public class UserService {
         userRepository.updateNicknameAndIntro(userId, nickname, intro);
     }
 
+    public boolean checkDuplicateNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+
+    public boolean checkAlreadyExistUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
     // 프로필 배너 이미지 설정
     public void setProfileBannerName(String filename, User user){
         userRepository.updateProfileBannerImg(filename, user);

@@ -16,6 +16,7 @@ import nuts.muzinut.repository.chat.ChatRepository;
 import nuts.muzinut.repository.chat.MessageRepository;
 import nuts.muzinut.repository.chat.ReadMessageRepository;
 import nuts.muzinut.repository.member.UserRepository;
+import nuts.muzinut.service.board.DetailCommon;
 import nuts.muzinut.service.member.RedisUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ import java.util.Set;
 @Transactional
 @Service
 @RequiredArgsConstructor
-public class MessageService {
+public class MessageService extends DetailCommon {
 
     private final ChatRepository chatRepository;
     private final UserRepository userRepository;
@@ -106,15 +107,17 @@ public class MessageService {
         List<Message> messageList = messageRepository.findChatRoomMessages(chat);
         MessagesDto messagesDto = new MessagesDto();
         List<Messages> messages = new ArrayList<>();
+
         messageList.forEach(m -> messages.add(
                 Messages.builder()
                         .id(m.getId())
                         .message(m.getMessage())
                         .sendTime(m.getSendTime())
                         .nickname(m.getUser().getNickname())
-                        .build()
-        ));
+                        .profileImg(encodeFileToBase64(m.getUser().getProfileImgFilename()))
+                        .build()));
         messagesDto.setMessages(messages);
+
         return messagesDto;
     }
 }

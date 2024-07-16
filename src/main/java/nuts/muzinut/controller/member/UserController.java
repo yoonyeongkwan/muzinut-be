@@ -14,6 +14,7 @@ import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.dto.security.RefreshTokenDto;
 import nuts.muzinut.dto.security.TokenDto;
+import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.exception.EmailVertFailException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.jwt.JwtFilter;
@@ -81,8 +82,19 @@ public class UserController {
             userService.signup(new UserDto(joinDto.getUsername(), joinDto.getPassword()));
             return new MessageDto("회원 가입 성공");
         } else {
+
             throw new EmailVertFailException("인증 번호가 일치하지 않습니다");
         }
+    }
+
+    @ResponseBody
+    @PostMapping("/nickname-check")
+    public MessageDto checkNicknameDuplicate(String nickname) {
+        boolean isDuplicate = userService.checkDuplicateNickname(nickname);
+        if (isDuplicate) {
+            throw new DuplicateMemberException("이미 사용중인 닉네임입니다.");
+        }
+        return new MessageDto("사용 가능한 닉네임입니다");
     }
 
     /**

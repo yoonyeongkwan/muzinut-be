@@ -10,5 +10,4 @@ import java.util.Map;
 @Data
 public class MessagesDto {
     private List<Messages> messages = new ArrayList<>();
-    private Map<String, String> test = new HashMap<>();
 }

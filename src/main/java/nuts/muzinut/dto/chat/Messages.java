@@ -12,4 +12,5 @@ public class Messages {
     private String nickname;
     private LocalDateTime sendTime;
     private String message;
+    private String profileImg;
 }

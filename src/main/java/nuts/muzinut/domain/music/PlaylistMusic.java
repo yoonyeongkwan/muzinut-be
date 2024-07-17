@@ -16,13 +16,15 @@ public class PlaylistMusic {
     @JoinColumn(name = "playlist_id")
     private Playlist playlist;
 
-    @Column(name = "song_id")
-    private Long songId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "song_id")
+    private Song song;
 
     //편의 메서드
-    public void addRecord(Playlist playlist, Long songId) {
+    public void addRecord(Playlist playlist, Song song) {
         this.playlist = playlist;
-        this.songId = songId;
+        this.song = song;
         playlist.getPlaylistMusics().add(this);
+        song.getPlaylistMusics().add(this);
     }
 }

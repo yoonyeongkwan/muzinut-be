@@ -28,9 +28,6 @@ public class NutsUsageHistory {
     @Column(name = "used_content")
     private String usedContent; //사용 내역 ex) 투표권 구매, 아티스트 후원
 
-    @Column(name = "used_channel")
-    private String usedChannel; //enum 으로 변환될 수 도 있음
-
     @Column(name = "support_msg")
     private String supportMsg; //후원 메시지
 

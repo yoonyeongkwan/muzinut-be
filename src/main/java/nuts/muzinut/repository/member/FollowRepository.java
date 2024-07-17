@@ -64,4 +64,14 @@ public interface FollowRepository extends JpaRepository<Follow, Long> {
 
     // 팔로우 관계를 확인하는 메서드
     Optional<Follow> findByUserAndFollowingMemberId(User user, Long followingMemberId);
+
+    /**
+     * @param userId: 유저 ID
+     * @return 맞팔 되어 있는 사용자 리스트
+     */
+    // 맞팔 관계를 확인하는 메서드
+    @Query("select f1.followingMemberId from Follow f1 join Follow f2 " +
+            "on f1.user.id = f2.followingMemberId and f1.followingMemberId = f2.user.id " +
+            "where f1.user.id = :userId")
+    List<Long> findMutualFollowIds(@Param("userId") Long userId);
 }

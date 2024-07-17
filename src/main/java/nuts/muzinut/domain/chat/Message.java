@@ -2,6 +2,7 @@ package nuts.muzinut.domain.chat;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import nuts.muzinut.domain.member.User;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -11,13 +12,14 @@ import java.util.List;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Message {
 
     @Id @GeneratedValue
     @Column(name = "message_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_id")
     private Chat chat;
 
@@ -26,10 +28,10 @@ public class Message {
     private User user;
 
     private String message;
-    private int read; //읽은 사람 수
+    private Boolean read;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime send_time;
+    private LocalDateTime sendTime;
 
     @OneToMany(mappedBy = "message")
     List<ReadMessage> readMessages = new ArrayList<>();
@@ -37,19 +39,39 @@ public class Message {
     //연관 관계 메서드
 
     /**
-     * @param user:  채팅 작성자
+     * @param user:    채팅 작성자
      * @param chat:    채팅방
      * @param message: 메시지
      */
-    public void createMessage(User user, Chat chat, String message) {
+    public Message(User user, Chat chat, String message) {
         this.user = user;
         this.chat = chat;
         this.message = message;
-        this.send_time = LocalDateTime.now();
+        this.sendTime = LocalDateTime.now();
         user.getMessages().add(this);
         chat.getMessages().add(this);
     }
 
     //비지니스 로직
+    public Message createNotReadMessage(User user, Chat chat, String message) {
+        this.user = user;
+        this.chat = chat;
+        this.message = message;
+        this.sendTime = LocalDateTime.now();
+        this.read = false; //메시지를 상대방이 읽지 않음
+        user.getMessages().add(this);
+        chat.getMessages().add(this);
+        return this;
+    }
 
+    public Message createReadMessage(User user, Chat chat, String message) {
+        this.user = user;
+        this.chat = chat;
+        this.message = message;
+        this.sendTime = LocalDateTime.now();
+        this.read = true; //메시지를 상대방이 읽음
+        user.getMessages().add(this);
+        chat.getMessages().add(this);
+        return this;
+    }
 }

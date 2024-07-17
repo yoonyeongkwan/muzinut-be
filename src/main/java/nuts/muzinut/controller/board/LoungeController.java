@@ -9,7 +9,7 @@ import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
-import nuts.muzinut.dto.board.lounge.LoungesDto;
+import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
 import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
@@ -28,16 +28,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
 @Slf4j
 @Controller
-@RequestMapping("/community/lounges")
+@RequestMapping("/profile/lounges")
 @RequiredArgsConstructor
 public class LoungeController {
 
@@ -65,25 +63,24 @@ public class LoungeController {
         lounge.setFilename(filenames.get(STORE_FILENAME)); //라운지 파일명 설정
         loungeService.save(lounge); //라운지 게시판 저장
         HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/community/lounges/" + lounge.getId())); //생성한 라운지로 리다이렉트
+        header.setLocation(URI.create("/profile/lounges/" + lounge.getId())); //생성한 라운지로 리다이렉트
 
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .headers(header)
                 .body(new MessageDto("라운지 게시판이 생성되었습니다"));
     }
 
-    //특정 게시판 조회
+    //특정 라운지 조회 및 댓글과 대댓글 불러오기
     @GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
+    public ResponseEntity<MultiValueMap<String, Object>> getDetailLounge(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
         User findUser = userService.getUserWithUsername().orElse(null);
         DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id, findUser);
 
         if (detailLoungeDto == null) {
-            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+            throw new BoardNotFoundException("해당 라운지가 존재하지 않습니다");
         }
-
 
         String jsonString = objectMapper.writeValueAsString(detailLoungeDto);
 
@@ -108,11 +105,11 @@ public class LoungeController {
 
     //Todo 모든 라운지 게시판 조회
     @GetMapping(produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getFreeBoards(
+    public ResponseEntity<MultiValueMap<String, Object>> getLounges(
             @RequestParam(value = "page", defaultValue = "0") int page) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
-        LoungesDto loungesDto = loungeService.getLounges(page);
+        LoungeDto loungesDto = loungeService.getLounges(page);
         String jsonString = objectMapper.writeValueAsString(loungesDto);
 
         // JSON 데이터를 Multipart-form 데이터에 추가
@@ -135,7 +132,7 @@ public class LoungeController {
     //라운지 게시판 수정
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
-    public ResponseEntity<MessageDto> updateFreeBoard(
+    public ResponseEntity<MessageDto> updateLounges(
             @RequestPart @NotNull MultipartFile quillFile, @PathVariable Long id) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("닉네임을 설정해주세요"));
@@ -146,7 +143,7 @@ public class LoungeController {
             String changeFilename = fileStore.updateFile(quillFile, lounge.getFilename());
             loungeService.updateLounge(lounge.getId(), changeFilename); //라운지 게시판 저장
             HttpHeaders header = new HttpHeaders();
-            header.setLocation(URI.create("/community/lounges/" + lounge.getId())); //수정한 게시판으로 리다이렉트
+            header.setLocation(URI.create("/profile/lounges/" + lounge.getId())); //수정한 게시판으로 리다이렉트
 
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                     .headers(header)
@@ -161,7 +158,7 @@ public class LoungeController {
     //라운지 게시판 삭제
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageDto> deleteFreeBoard(@PathVariable Long id) throws IOException {
+    public ResponseEntity<MessageDto> deleteLounges(@PathVariable Long id) throws IOException {
         User user = userService.getUserWithUsername()
                 .orElseThrow(() -> new NotFoundMemberException("닉네임을 설정해주세요"));
         boolean isAuthorized = loungeService.checkAuth(id, user);
@@ -172,7 +169,7 @@ public class LoungeController {
             loungeService.deleteLounge(id); //라운지 게시판 삭제
 
             HttpHeaders header = new HttpHeaders();
-            header.setLocation(URI.create("/community/lounges")); //Todo 라운지 게시판 홈페이지로 리다이렉트 (논의 필요)
+            header.setLocation(URI.create("/profile/lounges")); //Todo 라운지 게시판 홈페이지로 리다이렉트 (논의 필요)
 
             return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                     .headers(header)

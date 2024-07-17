@@ -21,7 +21,7 @@ public class DetailEventBoardDto extends DetailBaseDto {
     private int view;
     private String quillFilename;
     private String profileImg;
-    private Long likeCount;
+    private int likeCount;
 
     private List<CommentDto> comments = new ArrayList<>();
 

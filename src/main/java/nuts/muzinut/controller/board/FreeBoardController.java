@@ -11,6 +11,7 @@ import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardForm;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.token.ExpiredTokenException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.FreeBoardService;
 import nuts.muzinut.service.member.UserService;
@@ -72,10 +73,15 @@ public class FreeBoardController {
     @GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
-
+        User findUser;
 
         //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
-        User findUser = userService.getUserWithUsername().orElse(null);
+        try {
+            findUser = userService.getUserWithUsername().orElse(null);
+        } catch (ExpiredTokenException e) {
+            log.info("잡힘");
+            findUser = null;
+        }
         DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id, findUser);
 
         if (detailFreeBoardDto == null) {
@@ -95,20 +101,16 @@ public class FreeBoardController {
         String fullPath = fileStore.getFullPath(quillFilename);
         formData.add("quillFile", new FileSystemResource(fullPath));
 
-        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-        Set<String> profileImages = freeBoardService.getProfileImages(detailFreeBoardDto.getProfileImg(),
-                detailFreeBoardDto.getComments());
-        fileStore.setImageHeaderWithData(profileImages, formData);
-
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }
 
     //모든 자유 게시판 조회
     @GetMapping()
     public ResponseEntity<FreeBoardsDto> getFreeBoards(
-            @RequestParam(value = "page", defaultValue = "0") int page) {
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "sort", defaultValue = "DATE") SortType sort) {
         try {
-            FreeBoardsDto freeBoards = freeBoardService.getFreeBoards(page);
+            FreeBoardsDto freeBoards = freeBoardService.getFreeBoards(page, sort);
             return ResponseEntity.ok()
                     .body(freeBoards);
         } catch (BoardNotExistException e) {

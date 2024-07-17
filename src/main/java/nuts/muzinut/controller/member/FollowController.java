@@ -87,10 +87,10 @@ public class FollowController {
 
     // 팔로우 알림 토글 메소드
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("/follow-notification")
-    public ResponseEntity<MessageDto> toggleNotification(@RequestBody @Valid FollowNotificationDto toggleNotificationDto) {
+    @PostMapping("/follow-notification/{userId}")
+    public ResponseEntity<MessageDto> toggleNotification(@PathVariable Long userId) {
         User user = getAuthenticatedUser();
-        return followService.toggleNotification(user, toggleNotificationDto.getFollowingMemberId());
+        return followService.toggleNotification(user, userId);
     }
 
     // 팔로잉(특정 유저가 팔로우한 회원의) 리스트를 반환하는 메소드

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>프로필 수정</title>
+</head>
+<body>
+<h1>프로필 수정</h1>
+<form th:action="@{/users/set-profile-nickname-intro}" method="post" th:object="${user}">
+    <input type="hidden" th:field="*{id}" />
+    <div>
+        <label for="nickname">닉네임</label>
+        <input type="text" id="nickname" th:field="*{nickname}" />
+    </div>
+    <div>
+        <label for="intro">자기소개</label>
+        <textarea id="intro" th:field="*{intro}"></textarea>
+    </div>
+    <div>
+        <button type="submit">수정</button>
+    </div>
+</form>
+</body>
+</html>

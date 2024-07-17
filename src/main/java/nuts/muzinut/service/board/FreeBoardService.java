@@ -3,6 +3,7 @@ package nuts.muzinut.service.board;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.controller.board.SortType;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.DetailBaseDto;
@@ -27,6 +28,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.*;
 
+import static nuts.muzinut.controller.board.SortType.LIKE;
+import static nuts.muzinut.controller.board.SortType.VIEW;
 import static nuts.muzinut.domain.board.QBoard.board;
 import static nuts.muzinut.domain.board.QFreeBoard.*;
 
@@ -61,8 +64,17 @@ public class FreeBoardService extends DetailCommon{
         freeBoardRepository.updateFreeBoard(filename, title, id);
     }
 
-    public FreeBoardsDto getFreeBoards(int startPage){
-        PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, "createdDt")); //Todo 한 페이지에 가져올 게시판 수를 정하기
+    //모든 게시판 조회
+    public FreeBoardsDto getFreeBoards(int startPage, SortType sortType){
+
+        String sortColumn = "createdDt"; //default 값
+        if (sortType == LIKE) {
+            sortColumn = "likeCount";
+        } else if (sortType == VIEW) {
+            sortColumn = "view";
+        }
+
+        PageRequest pageRequest = PageRequest.of(startPage, 10, Sort.by(Sort.Direction.DESC, sortColumn)); //Todo 한 페이지에 가져올 게시판 수를 정하기
         Page<FreeBoard> page = freeBoardRepository.findAll(pageRequest);
         List<FreeBoard> freeBoards = page.getContent();
 
@@ -74,7 +86,7 @@ public class FreeBoardService extends DetailCommon{
         boardsDto.setPaging(page.getNumber(), page.getTotalPages(), page.getTotalElements()); //paging 처리
         for (FreeBoard f : freeBoards) {
             boardsDto.getFreeBoardsForms().add(new FreeBoardsForm(f.getId() ,f.getTitle(), f.getUser().getNickname(),
-                    f.getCreatedDt(), f.getLikes().size(), f.getView()));
+                    f.getCreatedDt(), f.getLikeCount(), f.getView()));
         }
         return boardsDto;
     }
@@ -94,7 +106,6 @@ public class FreeBoardService extends DetailCommon{
         Tuple first = result.getFirst();
         Board findBoard = first.get(board);
         FreeBoard findFreeBoard = first.get(freeBoard);
-        log.info("comment size: {}", findFreeBoard.getComments().size());
         int view = findFreeBoard.addView();
 
         if (findBoard == null || findFreeBoard == null) {
@@ -103,11 +114,11 @@ public class FreeBoardService extends DetailCommon{
 
         DetailFreeBoardDto detailFreeBoardDto =
                 new DetailFreeBoardDto(findFreeBoard.getId() ,findFreeBoard.getTitle(),
-                        findFreeBoard.getUser().getNickname(), view, findFreeBoard.getFilename(), findFreeBoard.getUser().getProfileImgFilename());
+                        findFreeBoard.getUser().getNickname(), view, findFreeBoard.getFilename(),
+                        encodeFileToBase64(findFreeBoard.getUser().getProfileImgFilename()));
 
-        Long likeCount = first.get(2, Long.class);
-        DetailBaseDto detailBaseDto = first.get(3, DetailBaseDto.class);
-        detailFreeBoardDto.setLikeCount(likeCount); //좋아요 수 셋팅
+        DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
+        detailFreeBoardDto.setLikeCount(findBoard.getLikeCount()); //좋아요 수 셋팅
         detailFreeBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
         detailFreeBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
 

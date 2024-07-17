@@ -2,6 +2,7 @@ package nuts.muzinut.repository.music;
 
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.PlayNut;
+import nuts.muzinut.domain.music.PlayNutMusic;
 import nuts.muzinut.dto.music.PlayNutDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,4 +24,6 @@ public interface PlayNutRepository extends JpaRepository<PlayNut, Long> {
     List<PlayNutDto> findByPlayNut(@Param("user")User user);
 
     Optional<PlayNut> findByIdAndUser(Long id, User user);
+    @Query("SELECT pn FROM PlayNut pn WHERE pn.user.id = :userId")
+    List<PlayNut> findByUserId(@Param("userId") Long userId);
 }

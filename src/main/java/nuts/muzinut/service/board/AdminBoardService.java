@@ -25,6 +25,7 @@ import nuts.muzinut.repository.member.UserRepository;
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -170,4 +171,12 @@ public class AdminBoardService extends DetailCommon{
 
         return detailAdminBoardDto;
     }
+
+    /**
+     * 어드민 게시판 검색
+     */
+    public AdminBoardsDto search(String searchCond) {
+        return null;
+    }
+
 }

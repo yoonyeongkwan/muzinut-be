@@ -26,7 +26,7 @@ public class MailController {
     @PostMapping("/send")
     public String mailSend(@RequestBody @Valid EmailRequestDto emailDto){
         log.info("이메일 인증 이메일 :{}", emailDto.getUsername());
-        boolean isAlreadyUser = userService.checkDuplicateNickname(emailDto.getUsername());
+        boolean isAlreadyUser = userService.checkAlreadyExistUsername(emailDto.getUsername());
         if (isAlreadyUser) {
             throw new AlreadyExistUser("이미 가입된 회원입니다");
         }

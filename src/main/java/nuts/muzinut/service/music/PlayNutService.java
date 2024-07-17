@@ -81,7 +81,7 @@ public class PlayNutService {
     public void updatePlayNut(Long playNutId, PlaynutTitleDto data) {
         User user = getUser();
         Optional<PlayNut> optional = playNutRepository.findById(playNutId);
-        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        optional.orElseThrow(() -> new NoDataFoundException("플리넛이 없습니다"));
         if (!optional.get().getUser().equals(user)) {
             throw new AccessDeniedException("플리넛 이름 변경 권한이 없습니다");
         }
@@ -92,7 +92,7 @@ public class PlayNutService {
     public void playNutDelete(Long playNutId) {
         User user = getUser();
         Optional<PlayNut> optional = playNutRepository.findById(playNutId);
-        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        optional.orElseThrow(() -> new NoDataFoundException("플리넛이 없습니다"));
         if (!optional.get().getUser().equals(user)) {
             throw new AccessDeniedException("플리넛 삭제 권한이 없습니다");
         }
@@ -103,7 +103,7 @@ public class PlayNutService {
     public void playNutMusicDelete(Long playNutId, Long playNutMusicId) {
         User user = getUser();
         Optional<PlayNut> optional = playNutRepository.findById(playNutId);
-        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        optional.orElseThrow(() -> new NoDataFoundException("플리넛이 없습니다"));
         if (!optional.get().getUser().equals(user)) {
             throw new AccessDeniedException("플리넛 곡 삭제에 대한 권한이 없습니다");
         }
@@ -126,7 +126,7 @@ public class PlayNutService {
     @Transactional(readOnly = true)
     public ResponseEntity<PlayNutMusicListDto> findPlayNutMusic(Long playNutId) {
         Optional<PlayNut> optional = playNutRepository.findById(playNutId);
-        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        optional.orElseThrow(() -> new NoDataFoundException("플리넛이 없습니다"));
         User user = getUser();
         if (!optional.get().getUser().equals(user)){
             throw new AccessDeniedException("해당 플리넛 조회 권한이 없습니다");

@@ -42,8 +42,9 @@ public class QSong extends EntityPathBase<Song> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;
 
-    public final ListPath<PlayNutMusic, QPlayNutMusic> playNutMusics = this.<PlayNutMusic, QPlayNutMusic>createList("playNutMusics", PlayNutMusic.class, QPlayNutMusic.class, PathInits.DIRECT2);
     public final ListPath<PlaylistMusic, QPlaylistMusic> playlistMusics = this.<PlaylistMusic, QPlaylistMusic>createList("playlistMusics", PlaylistMusic.class, QPlaylistMusic.class, PathInits.DIRECT2);
+
+    public final ListPath<PlayNutMusic, QPlayNutMusic> playNutMusics = this.<PlayNutMusic, QPlayNutMusic>createList("playNutMusics", PlayNutMusic.class, QPlayNutMusic.class, PathInits.DIRECT2);
 
     public final ListPath<PlayView, QPlayView> playViews = this.<PlayView, QPlayView>createList("playViews", PlayView.class, QPlayView.class, PathInits.DIRECT2);
 

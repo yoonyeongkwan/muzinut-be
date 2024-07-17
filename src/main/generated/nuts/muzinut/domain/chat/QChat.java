@@ -22,15 +22,13 @@ public class QChat extends EntityPathBase<Chat> {
 
     public final ListPath<ChatMember, QChatMember> chatMembers = this.<ChatMember, QChatMember>createList("chatMembers", ChatMember.class, QChatMember.class, PathInits.DIRECT2);
 
+    public final EnumPath<ChatStatus> chatStatus = createEnum("chatStatus", ChatStatus.class);
+
     public final DateTimePath<java.time.LocalDateTime> created_dt = createDateTime("created_dt", java.time.LocalDateTime.class);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final ListPath<Message, QMessage> messages = this.<Message, QMessage>createList("messages", Message.class, QMessage.class, PathInits.DIRECT2);
-
-    public final NumberPath<Integer> participateCount = createNumber("participateCount", Integer.class);
-
-    public final EnumPath<RoomType> roomType = createEnum("roomType", RoomType.class);
 
     public QChat(String variable) {
         super(Chat.class, forVariable(variable));

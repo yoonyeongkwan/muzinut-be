@@ -2,11 +2,10 @@ package nuts.muzinut.controller.music;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import nuts.muzinut.dto.music.PlayNutDto;
-import nuts.muzinut.dto.music.PlayNutMusicDto;
-import nuts.muzinut.dto.music.PlaynutTitleDto;
+import nuts.muzinut.dto.music.*;
 import nuts.muzinut.service.music.PlayNutService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -26,8 +25,8 @@ public class PlayNutController {
      * @return 플리넛의 데이터와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @GetMapping("/playnut")
-    public ResponseEntity<List<PlayNutDto>> getPlayNutDir() {
+    @GetMapping(value = "/playnut", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PlayNutListDto> getPlayNutDir() {
         return playNutService.findPlayNutDir();
     }
 
@@ -38,8 +37,8 @@ public class PlayNutController {
      * @return 플리넛 곡 데이터와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @GetMapping("/playnut/{id}")
-    public ResponseEntity<List<PlayNutMusicDto>> getPlayNutMusic(@Validated @PathVariable("id") @NotNull Long playNutId) {
+    @GetMapping(value = "/playnut/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PlayNutMusicListDto> getPlayNutMusic(@Validated @PathVariable("id") @NotNull Long playNutId) {
         return playNutService.findPlayNutMusic(playNutId);
     }
 
@@ -83,7 +82,7 @@ public class PlayNutController {
     }
 
     /**
-     * 플리넛의 곡을 추가 엔드포인트.
+     * 플리넛의 곡을 추가하는 엔드포인트.
      * @param playNutId 플리넛의 ID
      * @param songId 곡의 ID
      * @return 플리넛 곡 추가와 HTTP 상태 코드
@@ -98,15 +97,16 @@ public class PlayNutController {
     }
 
     /**
-     * 플리넛의 곡을 추가 엔드포인트.
+     * 플리넛의 곡을 삭제하는 엔드포인트.
      * @param playNutMusicId 플리넛 곡의 ID
      * @return 플리넛 곡 삭제 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
-    @DeleteMapping("/playnut/music/{playnutMusicid}")
+    @DeleteMapping("/playnut/{playnutid}/{playnutMusicid}")
     public ResponseEntity<String> DeletePlayMusic
-            (@Validated @PathVariable("playnutMusicid") @NotNull Long playNutMusicId) {
-        playNutService.playNutMusicDelete(playNutMusicId);
+            (@Validated @PathVariable("playnutid") @NotNull Long playNutId,
+             @Validated @PathVariable("playnutMusicid") @NotNull Long playNutMusicId) {
+        playNutService.playNutMusicDelete(playNutId, playNutMusicId);
         return new ResponseEntity<String>("플리넛 곡 삭제 완료되었습니다", HttpStatus.OK);
     }
 }

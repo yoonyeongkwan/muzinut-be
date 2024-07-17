@@ -90,11 +90,11 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(UNAUTHORIZED.value(), ex.getMessage());
     }
 
-    @ResponseStatus(BAD_REQUEST)
+    @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
     @ExceptionHandler(value = { LimitPlayNutException.class })
     @ResponseBody
     private ErrorDto limitPlayNut(RuntimeException ex, WebRequest request) {
-        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
+        return new ErrorDto(REQUEST_ENTITY_TOO_LARGE.value(), ex.getMessage());
     }
     // 앨범 Entity 생성 실패 핸들러 추가
     @ResponseStatus(SERVICE_UNAVAILABLE)

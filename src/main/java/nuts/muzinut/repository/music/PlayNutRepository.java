@@ -23,7 +23,10 @@ public interface PlayNutRepository extends JpaRepository<PlayNut, Long> {
     @Query("select new nuts.muzinut.dto.music.PlayNutDto(pn.id, pn.title) from PlayNut pn where pn.user = :user")
     List<PlayNutDto> findByPlayNut(@Param("user")User user);
 
+    Optional<PlayNut> findByTitle(String title);
+
     Optional<PlayNut> findByIdAndUser(Long id, User user);
+
     @Query("SELECT pn FROM PlayNut pn WHERE pn.user.id = :userId")
     List<PlayNut> findByUserId(@Param("userId") Long userId);
 }

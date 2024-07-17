@@ -124,7 +124,7 @@ public class PlaylistService {
         List<PlayNutMusic> allPlayNutMusic = playNutMusicRepository.findAllByPlayNut(playnut);
         List<Long> playnutMusicList = new ArrayList<>();
         for (PlayNutMusic playNutMusic : allPlayNutMusic) {
-            playnutMusicList.add(playNutMusic.getSongId());
+            playnutMusicList.add(playNutMusic.getSong().getId());
         }
 
         return playnutMusicList;

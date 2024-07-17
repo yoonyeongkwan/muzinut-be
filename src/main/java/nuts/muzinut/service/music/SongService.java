@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -213,6 +214,7 @@ public class SongService {
     }
 
     // 곡 수정 메소드
+    @Transactional
     public void updateSong(Long songId, SongUpdateDto songUpdateDto, MultipartFile songFile) {
         Optional<Song> optional = songRepository.findById(songId);
         Song song = optional.get();
@@ -233,6 +235,7 @@ public class SongService {
     }
 
     // 곡 삭제 메소드
+    @Transactional
     public void songDelete(Long songId) {
         Optional<Song> optional = songRepository.findById(songId);
         Song song = optional.get();

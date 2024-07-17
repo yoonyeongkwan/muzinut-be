@@ -351,7 +351,7 @@ public class ProfileService extends DetailCommon {
 
         List<ProfilePlayNutSongsForm> songDtos = playNut.getPlayNutMusics().stream()
                 .map(playNutMusic -> {
-                    Song song = songRepository.findById(playNutMusic.getSongId())
+                    Song song = songRepository.findById(playNutMusic.getSong().getId())
                             .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 곡입니다."));
                     return new ProfilePlayNutSongsForm(
                             song.getAlbum().getName(),

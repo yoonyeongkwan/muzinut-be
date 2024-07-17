@@ -37,7 +37,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class,
-            BoardNotFoundException.class, NoUploadFileException.class })
+            BoardNotFoundException.class, NoUploadFileException.class, NullPointerException.class })
     @ResponseBody
     private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
         log.info("BoardNotFoundException 호출");
@@ -90,9 +90,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     // 앨범 Entity 갯수 초과 핸들러 추가
     @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
-    @ExceptionHandler(value = { EntityOversizeException.class })
+    @ExceptionHandler(value = { EntityOversizeException.class, LackVoteAmountException.class })
     @ResponseBody
-    private ErrorDto REQUEST_ENTITY_TOO_LARGE(EntityOversizeException ex, WebRequest request) {
+    private ErrorDto REQUEST_ENTITY_TOO_LARGE(RuntimeException ex, WebRequest request) {
         return new ErrorDto(REQUEST_ENTITY_TOO_LARGE.value(), ex.getMessage());
     }
 }

@@ -78,6 +78,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final StringPath profileImgFilename = createString("profileImgFilename");
 
+    public final NumberPath<Integer> receiveVote = createNumber("receiveVote", Integer.class);
+
     public final ListPath<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard> recruitBoards = this.<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard>createList("recruitBoards", nuts.muzinut.domain.board.RecruitBoard.class, nuts.muzinut.domain.board.QRecruitBoard.class, PathInits.DIRECT2);
 
     public final ListPath<nuts.muzinut.domain.board.Reply, nuts.muzinut.domain.board.QReply> replies = this.<nuts.muzinut.domain.board.Reply, nuts.muzinut.domain.board.QReply>createList("replies", nuts.muzinut.domain.board.Reply.class, nuts.muzinut.domain.board.QReply.class, PathInits.DIRECT2);

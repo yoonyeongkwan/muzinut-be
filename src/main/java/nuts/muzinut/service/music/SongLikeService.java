@@ -17,7 +17,7 @@ import java.util.Optional;
 @Service
 public class SongLikeService {
 
-    private  final SongRepository songRepository;
+    private final SongRepository songRepository;
     private final SongLikeRepository songLikeRepository;
     private final UserRepository userRepository;
 

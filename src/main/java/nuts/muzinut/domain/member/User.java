@@ -9,6 +9,7 @@ import nuts.muzinut.domain.chat.Message;
 import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.music.Playlist;
 import nuts.muzinut.domain.music.Song;
+import nuts.muzinut.domain.mypick.MypickComment;
 import nuts.muzinut.domain.nuts.NutsUsageHistory;
 import nuts.muzinut.domain.nuts.PaymentHistory;
 import nuts.muzinut.domain.nuts.SupportMsg;
@@ -62,6 +63,7 @@ public class User {
     private int nuts; //보유 너츠
     private int vote; //투표권
     private int declaration; //신고 횟수~
+    private int receiveVote;
 
     @ManyToMany
     @JoinTable(

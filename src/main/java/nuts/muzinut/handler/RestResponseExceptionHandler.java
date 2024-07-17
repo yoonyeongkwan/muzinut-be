@@ -3,11 +3,17 @@ package nuts.muzinut.handler;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
-import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.chat.AlreadyExistRequestException;
+import nuts.muzinut.exception.chat.BlockUserException;
+import nuts.muzinut.exception.chat.InvalidChatRoomException;
+import nuts.muzinut.exception.token.ExpiredTokenException;
+import nuts.muzinut.exception.token.IllegalTokenException;
+import nuts.muzinut.exception.token.TokenException;
+import nuts.muzinut.exception.token.UnsupportedTokenException;
+import nuts.muzinut.exception.user.AlreadyExistUser;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
@@ -22,28 +28,38 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     //이미 존재하는 회원이 회원가입을 시도할 때 발생한다
     @ResponseStatus(CONFLICT)
-    @ExceptionHandler(value = { DuplicateMemberException.class })
+    @ExceptionHandler(value = { DuplicateMemberException.class, AlreadyExistUser.class })
     @ResponseBody
     private ErrorDto conflict(RuntimeException ex, WebRequest request) {
         return new ErrorDto(CONFLICT.value(), ex.getMessage());
     }
 
     @ResponseStatus(FORBIDDEN)
-    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class, InvalidPasswordException.class })
+    @ExceptionHandler(value = { NotFoundMemberException.class, AccessDeniedException.class,
+            InvalidPasswordException.class, BlockUserException.class})
     @ResponseBody
     private ErrorDto forbidden(RuntimeException ex, WebRequest request) {
         return new ErrorDto(FORBIDDEN.value(), ex.getMessage());
     }
 
+    //토큰에 대한 예외처리 추가
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class,
-            BoardNotFoundException.class, NoUploadFileException.class })
+            BoardNotFoundException.class, NoUploadFileException.class, TokenException.class,
+            UnsupportedTokenException.class, IllegalTokenException.class, NullPointerException.class})
     @ResponseBody
     private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
-        log.info("BoardNotFoundException 호출");
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
     }
 
+    @ResponseStatus(NOT_ACCEPTABLE)
+    @ExceptionHandler(value = { ExpiredTokenException.class, AlreadyExistRequestException.class})
+    @ResponseBody
+    private ErrorDto NOT_ACCEPTABLE(RuntimeException ex, WebRequest request){
+        return new ErrorDto(NOT_ACCEPTABLE.value(), ex.getMessage());
+    }
+
+    
     @ResponseStatus(NO_CONTENT)
     @ExceptionHandler(value = {BoardNotExistException.class, NotFoundFileException.class})
     @ResponseBody
@@ -90,9 +106,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     // 앨범 Entity 갯수 초과 핸들러 추가
     @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
-    @ExceptionHandler(value = { EntityOversizeException.class })
+    @ExceptionHandler(value = { EntityOversizeException.class, LackVoteAmountException.class })
     @ResponseBody
-    private ErrorDto REQUEST_ENTITY_TOO_LARGE(EntityOversizeException ex, WebRequest request) {
+    private ErrorDto REQUEST_ENTITY_TOO_LARGE(RuntimeException ex, WebRequest request) {
         return new ErrorDto(REQUEST_ENTITY_TOO_LARGE.value(), ex.getMessage());
     }
 }

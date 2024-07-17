@@ -62,16 +62,12 @@ public class LoungeQueryRepository {
 
         return queryFactory
                 .select(board, lounge,
-                        JPAExpressions
-                                .select(like.count())
-                                .from(like)
-                                .where(like.board.id.eq(boardId)),
                         Projections.fields(DetailBaseDto.class,
-                                isLikeExpression.as("isLike"),
+                                isLikeExpression.as("boardLikeStatus"),
                                 isBookmarkExpression.as("isBookmark")))
                 .from(board)
                 .leftJoin(lounge).on(board.id.eq(lounge.id))
-                .leftJoin(board.user, QUser.user).fetchJoin() //추가
+                .leftJoin(board.user, QUser.user) //추가
                 .leftJoin(board.comments, comment).fetchJoin()
                 .where(board.id.eq(boardId))
                 .fetch();

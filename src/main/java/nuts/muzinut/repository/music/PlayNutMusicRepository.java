@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface PlayNutMusicRepository extends JpaRepository<PlayNutMusic, Long>, PlayNutMusicRepositoryCustom {
 
     @Transactional
@@ -18,4 +20,6 @@ public interface PlayNutMusicRepository extends JpaRepository<PlayNutMusic, Long
     void deleteByPlayNutIdANDPlayNutMusicId(@Param("playNutId")Long playNutId, @Param("playNutMusicId")Long playNutMusicId);
 
     List<PlayNutMusic> findByPlayNut(PlayNut playNut);
+
+    List<PlayNutMusic> findAllByPlayNut(PlayNut playnut);
 }

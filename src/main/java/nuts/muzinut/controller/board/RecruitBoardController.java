@@ -12,6 +12,7 @@ import nuts.muzinut.dto.board.recruit.RecruitBoardDto;
 import nuts.muzinut.dto.board.recruit.RecruitBoardForm;
 import nuts.muzinut.dto.board.recruit.SaveRecruitBoardDto;
 import nuts.muzinut.exception.BoardNotExistException;
+import nuts.muzinut.exception.BoardNotFoundException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.RecruitBoardService;
 import nuts.muzinut.service.member.UserService;
@@ -58,27 +59,20 @@ public class RecruitBoardController {
 
     // 특정 모집 게시판을 조회하는 메소드
     @ResponseBody
-    @GetMapping(value = "/recruit-boards/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getRecruitBoard(@PathVariable("id") Long id) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
-
+    @GetMapping(value = "/recruit-boards/{id}")
+    public ResponseEntity<DetailRecruitBoardDto> getRecruitBoard(@PathVariable("id") Long id) throws JsonProcessingException {
         //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
         User findUser = userService.getUserWithUsername().orElse(null);
 
-        DetailRecruitBoardDto detailRecruitBoardDto = recruitBoardService.getDetailBoard(id, findUser);
+        DetailRecruitBoardDto detailRecruitBoardDto = recruitBoardService.getDetailRecruitBoard(id, findUser);
+
+        if (detailRecruitBoardDto == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+
         String jsonString = objectMapper.writeValueAsString(detailRecruitBoardDto);
 
-        // JSON 데이터를 Multipart-form 데이터에 추가
-        HttpHeaders jsonHeaders = new HttpHeaders();
-        jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> jsonEntity = new HttpEntity<>(jsonString, jsonHeaders);
-        formData.add("json_data", jsonEntity);
-
-        //해당 게시판의 작성자, 댓글 & 대댓글 작성자의 프로필 추가
-        Set<String> profileImages = recruitBoardService.getProfileImages(detailRecruitBoardDto);
-        fileStore.setImageHeaderWithData(profileImages, formData);
-
-        return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
+        return new ResponseEntity<DetailRecruitBoardDto>(detailRecruitBoardDto, HttpStatus.OK);
     }
 
     // 모든 모집 게시판을 최신 순으로 조회하는 메소드 (페이징 처리)

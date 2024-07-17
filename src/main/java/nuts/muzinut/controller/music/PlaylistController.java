@@ -1,7 +1,9 @@
 package nuts.muzinut.controller.music;
 
 import lombok.RequiredArgsConstructor;
+import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.dto.music.playlist.PlaylistAddDto;
+import nuts.muzinut.dto.music.playlist.PlaylistChangeDto;
 import nuts.muzinut.dto.music.playlist.PlaylistDeleteDto;
 import nuts.muzinut.dto.music.playlist.PlaylistMusicsDto;
 import nuts.muzinut.service.music.PlaylistService;
@@ -66,5 +68,19 @@ public class PlaylistController {
 
         return ResponseEntity.ok()
                 .body("delete all success");
+    }
+
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @PostMapping("/change")
+    public ResponseEntity<String> playlistChange(@RequestBody PlaylistChangeDto playnutIdBody) {
+        Long changePlaynutId = playnutIdBody.getPlaynutId();
+        Long userId = playlistService.getCurrentUserId();
+        PlayNut playnut = playlistService.findPlaynut(changePlaynutId, userId);
+        List<Long> playnutMusicList = playlistService.findAllPlaynutMusics(playnut);
+        playlistService.deleteAllPlaylistMusics();
+        playlistService.addPlaylistMusics(playnutMusicList, userId);
+
+        return ResponseEntity.ok()
+                .body("플레이리스트가 {" + playnut.getTitle() + "}로 변경되었습니다.");
     }
 }

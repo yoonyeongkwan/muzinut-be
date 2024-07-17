@@ -1,5 +1,6 @@
 package nuts.muzinut.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import nuts.muzinut.jwt.JwtAccessDeniedHandler;
 import nuts.muzinut.jwt.JwtAuthenticationEntryPoint;
 import nuts.muzinut.jwt.JwtSecurityConfig;
@@ -7,6 +8,7 @@ import nuts.muzinut.jwt.TokenProvider;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,7 +19,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+
+import java.util.Collections;
+import java.util.List;
 
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -59,7 +67,8 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
                         //Todo 경로 허용 반경 조정
-                        .requestMatchers("/api/hello", "/api/authenticate", "/api/signup", "/mail/**", "/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**/*").permitAll()
+                        .requestMatchers("/api/hello", "/api/authenticate", "/api/signup", "/mail/**", "/**", "**").permitAll()
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .anyRequest().authenticated()
                 )

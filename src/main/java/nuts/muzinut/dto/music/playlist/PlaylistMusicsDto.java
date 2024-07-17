@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PlaylistMusicsDto {
     private Long playlistId;
+    private Long songId;
     private String title;
     private String artist;
     private String albumImg;

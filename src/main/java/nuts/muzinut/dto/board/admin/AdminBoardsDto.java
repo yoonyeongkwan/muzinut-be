@@ -18,4 +18,9 @@ public class AdminBoardsDto {
         this.totalPage = totalPage;
         this.totalContent = totalContent;
     }
+
+    public void setPaging(int currentPage, int totalPage) {
+        this.currentPage = currentPage;
+        this.totalPage = totalPage;
+    }
 }

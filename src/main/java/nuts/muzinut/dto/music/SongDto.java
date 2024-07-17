@@ -3,9 +3,6 @@ package nuts.muzinut.dto.music;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nuts.muzinut.domain.member.User;
-import nuts.muzinut.domain.music.Genre;
-import nuts.muzinut.domain.music.Song;
 
 import java.util.List;
 

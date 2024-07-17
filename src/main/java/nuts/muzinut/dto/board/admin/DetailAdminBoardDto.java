@@ -18,7 +18,7 @@ import java.util.List;
 @Data
 public class DetailAdminBoardDto extends DetailBaseDto {
 
-    private Long likeCount;
+    private int likeCount;
     private String title;
     private String writer = "muzi";
     private String quillFilename;

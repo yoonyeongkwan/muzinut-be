@@ -6,18 +6,18 @@ import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.common.Base64Encoding;
 import nuts.muzinut.domain.member.Authority;
 import nuts.muzinut.domain.member.User;
-import nuts.muzinut.dto.member.ProfileDto;
 import nuts.muzinut.dto.member.UserDto;
 import nuts.muzinut.exception.DuplicateMemberException;
 import nuts.muzinut.exception.InvalidPasswordException;
+import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.AuthorityRepository;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.service.security.SecurityRole;
 import nuts.muzinut.service.security.SecurityUtil;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserService extends Base64Encoding {
     private final UserRepository userRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
@@ -36,10 +36,27 @@ public class UserService {
         userRepository.updateFilename(filename, user);
     }
 
+    //username 으로 회원 찾기
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow(() -> new NotFoundEntityException("없는 회원입니다"));
+    }
+
     // 프로필 닉네임, 자기소개 설정
     @Transactional
     public void updateNicknameAndIntro(Long userId, String nickname, String intro) {
+        Boolean exists = userRepository.existsByNickname(nickname);
+        if (exists) {
+            throw new DuplicateMemberException("이미 사용중인 닉네임 입니다");
+        }
         userRepository.updateNicknameAndIntro(userId, nickname, intro);
+    }
+
+    public boolean checkDuplicateNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
+    }
+
+    public boolean checkAlreadyExistUsername(String username) {
+        return userRepository.existsByUsername(username);
     }
 
     // 프로필 배너 이미지 설정
@@ -47,6 +64,14 @@ public class UserService {
         userRepository.updateProfileBannerImg(filename, user);
     }
 
+    //닉네임으로 유저 찾기
+    public Optional<User> findByNickname(String nickname) {
+        return userRepository.findByNickname(nickname);
+    }
+
+    public String findProfileImage(String profileImg) {
+        return encodeFileToBase64(profileImg);
+    }
 
     /**
      *

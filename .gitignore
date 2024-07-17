@@ -7,7 +7,8 @@ file/**
 src/main/java/nuts/muzinut/file/**
 AlbumDataInit.java
 BoardDataInit.java
-DataInit.Java
+DataInit.java
+DataInitService.java
 src/test/**
 application.yml
 !gradle/wrapper/gradle-wrapper.jar

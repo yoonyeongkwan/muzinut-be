@@ -19,7 +19,7 @@ import java.util.Optional;
 @Transactional
 public class SongLikeService {
 
-    private  final SongRepository songRepository;
+    private final SongRepository songRepository;
     private final SongLikeRepository songLikeRepository;
     private final UserRepository userRepository;
 

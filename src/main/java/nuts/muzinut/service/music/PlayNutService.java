@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.PlayNut;
 import nuts.muzinut.domain.music.PlayNutMusic;
+import nuts.muzinut.domain.music.Song;
 import nuts.muzinut.dto.music.*;
 import nuts.muzinut.exception.LimitPlayNutException;
 import nuts.muzinut.exception.NoDataFoundException;
@@ -11,6 +12,7 @@ import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.member.UserRepository;
 import nuts.muzinut.repository.music.PlayNutMusicRepository;
 import nuts.muzinut.repository.music.PlayNutRepository;
+import nuts.muzinut.repository.music.SongRepository;
 import nuts.muzinut.service.encoding.EncodeFiile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -35,6 +37,7 @@ public class PlayNutService {
     private final UserRepository userRepository;
     private final PlayNutRepository playNutRepository;
     private final PlayNutMusicRepository playNutMusicRepository;
+    private final SongRepository songRepository;
     private final EncodeFiile encodeFiile;
 
     @Value("${spring.file.dir}")
@@ -57,14 +60,16 @@ public class PlayNutService {
     public void saveMusic(Long playNutId, Long songId) {
         User user = getUser();
         Optional<PlayNut> optional = playNutRepository.findById(playNutId);
-        optional.orElseThrow(() -> new NotFoundMemberException("플리넛이 없습니다"));
+        optional.orElseThrow(() -> new NoDataFoundException("플리넛이 없습니다"));
         if (!optional.get().getUser().equals(user)) {
             throw new AccessDeniedException("플리넛 곡 추가 권한이 없습니다");
         }
         List<PlayNutMusicDto> findMusicCount = playNutMusicRepository.findPlayNutMusic(playNutId);
         if (findMusicCount.size() < 1000){
             PlayNut playNut = optional.get();
-            PlayNutMusic playNutMusic = new PlayNutMusic(playNut, songId);
+            Optional<Song> bySongId = songRepository.findById(songId);
+            bySongId.orElseThrow(() -> new NoDataFoundException("곡이 없습니다"));
+            PlayNutMusic playNutMusic = new PlayNutMusic(playNut, bySongId.get());
             playNutMusicRepository.save(playNutMusic);
         }else {
             throw new LimitPlayNutException("플리넛 곡 추가는 1000개 까지입니다");

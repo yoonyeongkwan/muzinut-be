@@ -2,6 +2,7 @@ package nuts.muzinut.controller.music;
 
 
 import jakarta.validation.constraints.NotNull;
+import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.dto.music.AlbumDetaillResultDto;
 import nuts.muzinut.dto.music.AlbumDto;
 import nuts.muzinut.dto.music.AlbumUpdateDto;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/album")
 public class AlbumController {
@@ -46,6 +48,8 @@ public class AlbumController {
         if(albumId == null) throw new AlbumCreateFailException("앨범 등록에 실패하였습니다. (Entity Create Error)");
         Map<String, Long> body = new HashMap<>();
         body.put("albumId", albumId);
+
+        log.info("upload information : {}", body);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(body);

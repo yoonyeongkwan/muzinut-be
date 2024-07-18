@@ -41,6 +41,9 @@ public class QEventBoard extends EntityPathBase<EventBoard> {
     public final StringPath img = createString("img");
 
     //inherited
+    public final NumberPath<Integer> likeCount;
+
+    //inherited
     public final ListPath<Like, QLike> likes;
 
     //inherited
@@ -78,6 +81,7 @@ public class QEventBoard extends EntityPathBase<EventBoard> {
         this.comments = _super.comments;
         this.createdDt = _super.createdDt;
         this.id = _super.id;
+        this.likeCount = _super.likeCount;
         this.likes = _super.likes;
         this.modifiedDt = _super.modifiedDt;
         this.title = _super.title;

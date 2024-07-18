@@ -16,7 +16,7 @@ import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutDto;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongDto;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.*;
 import nuts.muzinut.service.member.ProfileService;
@@ -33,7 +33,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;

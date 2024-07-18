@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @NoArgsConstructor
-@Getter @Setter
+@Getter
 public class Song extends BaseTimeEntity {
 
     @Id @GeneratedValue
@@ -46,6 +46,9 @@ public class Song extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
     private List<PlaylistMusic> playlistMusics = new ArrayList<>();
+
+    @OneToMany(mappedBy = "song", cascade = CascadeType.ALL)
+    private List<PlayNutMusic> playNutMusics = new ArrayList<>();
 
     //연관 관계 편의 메서드
     public void createMusic(User user) {

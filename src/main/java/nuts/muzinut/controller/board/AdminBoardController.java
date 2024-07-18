@@ -15,6 +15,8 @@ import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.admin.AdminBoardForm;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.UserService;
@@ -36,7 +38,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Slf4j

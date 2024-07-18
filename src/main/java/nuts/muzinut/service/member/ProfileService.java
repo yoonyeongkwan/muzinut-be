@@ -21,8 +21,8 @@ import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutForm;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongDto;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongsForm;
 import nuts.muzinut.dto.member.profile.ProfileDto;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.board.BoardRepository;
@@ -351,7 +351,7 @@ public class ProfileService extends DetailCommon {
 
         List<ProfilePlayNutSongsForm> songDtos = playNut.getPlayNutMusics().stream()
                 .map(playNutMusic -> {
-                    Song song = songRepository.findById(playNutMusic.getSongId())
+                    Song song = songRepository.findById(playNutMusic.getSong().getId())
                             .orElseThrow(() -> new NotFoundMemberException("존재하지 않는 곡입니다."));
                     return new ProfilePlayNutSongsForm(
                             song.getAlbum().getName(),

@@ -6,19 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.controller.board.SortType;
 import nuts.muzinut.domain.board.Board;
 import nuts.muzinut.domain.board.EventBoard;
-import nuts.muzinut.domain.board.FreeBoard;
 import nuts.muzinut.domain.board.QEventBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.event.DetailEventBoardDto;
 import nuts.muzinut.dto.board.event.EventBoardsDto;
 import nuts.muzinut.dto.board.event.EventBoardsForm;
-import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
-import nuts.muzinut.dto.board.free.FreeBoardsDto;
-import nuts.muzinut.dto.board.free.FreeBoardsForm;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
-import nuts.muzinut.exception.NotFoundEntityException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.repository.board.EventBoardRepository;
 import nuts.muzinut.repository.board.query.EventBoardQueryRepository;
 import org.springframework.data.domain.Page;
@@ -33,7 +28,6 @@ import java.util.Optional;
 import static nuts.muzinut.controller.board.SortType.LIKE;
 import static nuts.muzinut.controller.board.SortType.VIEW;
 import static nuts.muzinut.domain.board.QBoard.board;
-import static nuts.muzinut.domain.board.QFreeBoard.freeBoard;
 
 @Slf4j
 @Service

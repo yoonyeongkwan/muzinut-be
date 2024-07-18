@@ -1,4 +1,4 @@
-package nuts.muzinut.exception;
+package nuts.muzinut.exception.board;
 
 public class BoardNotFoundException extends RuntimeException{
 

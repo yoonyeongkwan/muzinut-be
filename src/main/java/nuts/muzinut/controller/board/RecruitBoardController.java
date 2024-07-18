@@ -11,8 +11,8 @@ import nuts.muzinut.dto.board.recruit.DetailRecruitBoardDto;
 import nuts.muzinut.dto.board.recruit.RecruitBoardDto;
 import nuts.muzinut.dto.board.recruit.RecruitBoardForm;
 import nuts.muzinut.dto.board.recruit.SaveRecruitBoardDto;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.RecruitBoardService;
 import nuts.muzinut.service.member.UserService;
@@ -21,12 +21,9 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.Set;
 
 @Slf4j
 @Controller

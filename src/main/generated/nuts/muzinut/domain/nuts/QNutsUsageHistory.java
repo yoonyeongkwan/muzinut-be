@@ -26,8 +26,6 @@ public class QNutsUsageHistory extends EntityPathBase<NutsUsageHistory> {
 
     public final StringPath supportMsg = createString("supportMsg");
 
-    public final StringPath usedChannel = createString("usedChannel");
-
     public final StringPath usedContent = createString("usedContent");
 
     public final DateTimePath<java.time.LocalDateTime> usedDt = createDateTime("usedDt", java.time.LocalDateTime.class);

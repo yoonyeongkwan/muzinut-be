@@ -9,7 +9,6 @@ import lombok.Setter;
 @Table(name = "song_genre")
 @NoArgsConstructor
 @Getter
-@Setter
 public class SongGenre {
 
     @Id @GeneratedValue

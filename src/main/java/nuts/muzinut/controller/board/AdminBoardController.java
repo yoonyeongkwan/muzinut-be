@@ -212,16 +212,6 @@ public class AdminBoardController {
         }
     }
 
-    //for test
-    @GetMapping(value = "/multipartdata", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> gerMultipartData() {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
-        formData.add("first_name",  "ganesh");
-        formData.add("last_name", "patil");
-        formData.add("file-data_1", new FileSystemResource("C:\\Users\\dnjswo\\study\\project\\muzinut\\file\\sample1.png"));
-        return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
-    }
-
     private void adminBoardFileStore(MultipartFile quillFile, List<MultipartFile> attachedFiles, AdminBoard adminBoard) throws IOException {
         if (attachedFiles == null) {
             fileStore.storeFile(quillFile, adminBoard); //퀼 파일 저장

@@ -28,11 +28,11 @@ public class QMessage extends EntityPathBase<Message> {
 
     public final StringPath message = createString("message");
 
-    public final NumberPath<Integer> read = createNumber("read", Integer.class);
+    public final BooleanPath read = createBoolean("read");
 
     public final ListPath<ReadMessage, QReadMessage> readMessages = this.<ReadMessage, QReadMessage>createList("readMessages", ReadMessage.class, QReadMessage.class, PathInits.DIRECT2);
 
-    public final DateTimePath<java.time.LocalDateTime> send_time = createDateTime("send_time", java.time.LocalDateTime.class);
+    public final DateTimePath<java.time.LocalDateTime> sendTime = createDateTime("sendTime", java.time.LocalDateTime.class);
 
     public final nuts.muzinut.domain.member.QUser user;
 

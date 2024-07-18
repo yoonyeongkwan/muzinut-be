@@ -11,6 +11,7 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.*;
 import nuts.muzinut.dto.member.follow.ProfileUpdateDto;
+import nuts.muzinut.dto.member.login.LoginSuccessDto;
 import nuts.muzinut.dto.member.profile.ProfileDto;
 import nuts.muzinut.dto.security.RefreshTokenDto;
 import nuts.muzinut.dto.security.TokenDto;
@@ -79,11 +80,23 @@ public class UserController {
     public MessageDto join(@Validated @RequestBody JoinDto joinDto) {
         Boolean Checked = mailService.CheckAuthNum(joinDto.getUsername(), joinDto.getAuthNum());
         if (Checked) {
-            userService.signup(new UserDto(joinDto.getUsername(), joinDto.getPassword()));
+            userService.signup(new UserDto(joinDto.getUsername(), joinDto.getPassword(), joinDto.getNickname()));
             return new MessageDto("회원 가입 성공");
         } else {
+
             throw new EmailVertFailException("인증 번호가 일치하지 않습니다");
         }
+    }
+
+    @ResponseBody
+    @PostMapping("/nickname-check")
+    public MessageDto checkNicknameDuplicate(@RequestBody @Validated NicknameCheckDupForm form) {
+        log.info("들어온 이름: {}", form.getNickname());
+        boolean isDuplicate = userService.checkDuplicateNickname(form.getNickname());
+        if (isDuplicate) {
+            throw new DuplicateMemberException("이미 사용중인 닉네임입니다.");
+        }
+        return new MessageDto("사용 가능한 닉네임입니다");
     }
 
     /**
@@ -93,7 +106,7 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/authenticate")
-    public ResponseEntity<TokenDto> login(@Validated @RequestBody LoginDto loginDto) {
+    public ResponseEntity<LoginSuccessDto> login(@Validated @RequestBody LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
@@ -106,9 +119,21 @@ public class UserController {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + token);
 
-        return new ResponseEntity<>(new TokenDto(token, refreshToken), httpHeaders, HttpStatus.OK);
+        User findUser = userService.findByUsername(loginDto.getUsername());
+
+        return new ResponseEntity<>(new LoginSuccessDto(token, refreshToken,
+                userService.findProfileImage(findUser.getProfileImgFilename()),
+                findUser.getNickname()), httpHeaders, HttpStatus.OK);
     }
 
+    @ResponseBody
+    @PostMapping("/simple-authenticate")
+    public MessageDto simpleLogin() {
+
+        return new MessageDto("간편 로그인");
+    }
+
+    //리프레시 토큰 발급
     @ResponseBody
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping("/re-authenticate")

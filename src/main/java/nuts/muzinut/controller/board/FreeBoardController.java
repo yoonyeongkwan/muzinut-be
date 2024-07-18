@@ -11,6 +11,7 @@ import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardForm;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.token.ExpiredTokenException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.FreeBoardService;
 import nuts.muzinut.service.member.UserService;
@@ -72,10 +73,15 @@ public class FreeBoardController {
     @GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getDetailFreeBoard(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
-
+        User findUser;
 
         //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
-        User findUser = userService.getUserWithUsername().orElse(null);
+        try {
+            findUser = userService.getUserWithUsername().orElse(null);
+        } catch (ExpiredTokenException e) {
+            log.info("잡힘");
+            findUser = null;
+        }
         DetailFreeBoardDto detailFreeBoardDto = freeBoardService.detailFreeBoard(id, findUser);
 
         if (detailFreeBoardDto == null) {

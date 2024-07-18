@@ -18,18 +18,19 @@ public class PlayNutMusic {
     @JoinColumn(name = "playnut_id")
     private PlayNut playNut;
 
-    @Column(name = "song_id")
-    private Long songId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "song_id")
+    private Song song;
 
     //연관 관계 메서드
     public void addPlaylistMusic(PlayNut playlist, Song song) {
         this.playNut = playlist;
-        this.songId = song.getId();
+        this.song = song;
         playlist.getPlayNutMusics().add(this);
     }
 
-    public PlayNutMusic(PlayNut playNut, Long songId) {
+    public PlayNutMusic(PlayNut playNut, Song song) {
         this.playNut = playNut;
-        this.songId = songId;
+        this.song = song;
     }
 }

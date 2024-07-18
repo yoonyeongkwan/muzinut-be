@@ -24,6 +24,8 @@ public class QBaseBoardEntity extends EntityPathBase<BaseBoardEntity> {
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdDt = _super.createdDt;
 
+    public final NumberPath<Integer> likeCount = createNumber("likeCount", Integer.class);
+
     //inherited
     public final DateTimePath<java.time.LocalDateTime> modifiedDt = _super.modifiedDt;
 

@@ -23,12 +23,13 @@ public class PlaylistQueryRepository {
         return queryFactory
                 .select(Projections.constructor(PlaylistMusicsDto.class,
                         playlistMusic.id,
+                        song.id,
                         song.title,
                         user.nickname,
                         album.albumImg
                 ))
                 .from(playlistMusic)
-                .join(song).on(song.id.eq(playlistMusic.songId))
+                .join(playlistMusic.song, song)
                 .join(song.user, user)
                 .join(song.album, album)
                 .where(playlistMusic.playlist.user.id.eq(userId))

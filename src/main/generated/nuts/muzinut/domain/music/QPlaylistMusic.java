@@ -26,7 +26,7 @@ public class QPlaylistMusic extends EntityPathBase<PlaylistMusic> {
 
     public final QPlaylist playlist;
 
-    public final NumberPath<Long> songId = createNumber("songId", Long.class);
+    public final QSong song;
 
     public QPlaylistMusic(String variable) {
         this(PlaylistMusic.class, forVariable(variable), INITS);
@@ -47,6 +47,7 @@ public class QPlaylistMusic extends EntityPathBase<PlaylistMusic> {
     public QPlaylistMusic(Class<? extends PlaylistMusic> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.playlist = inits.isInitialized("playlist") ? new QPlaylist(forProperty("playlist"), inits.get("playlist")) : null;
+        this.song = inits.isInitialized("song") ? new QSong(forProperty("song"), inits.get("song")) : null;
     }
 
 }

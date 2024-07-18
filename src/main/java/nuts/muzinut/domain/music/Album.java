@@ -11,7 +11,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 public class Album {
 
@@ -32,11 +31,6 @@ public class Album {
     @OneToMany(mappedBy = "album", cascade = CascadeType.ALL)
     private List<Song> songList = new ArrayList<>();
 
-    //연관 관계 메서드
-    public void addSongIntoAlbum(Song song) {
-        this.songList.add(song);
-        song.setAlbum(this);
-    }
 
     // 생성 메서드
     public Album(User user, String albumName, String bio, String albumImg) {

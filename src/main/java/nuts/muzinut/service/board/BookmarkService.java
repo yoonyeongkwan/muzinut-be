@@ -5,7 +5,7 @@ import nuts.muzinut.domain.board.Board;
 import nuts.muzinut.domain.board.Bookmark;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.BookmarkRepository;
 import org.springframework.http.HttpStatus;

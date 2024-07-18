@@ -1,4 +1,4 @@
-package nuts.muzinut.exception;
+package nuts.muzinut.exception.board;
 
 //게시판이 존재하지 않는 예외
 public class BoardNotExistException extends RuntimeException {

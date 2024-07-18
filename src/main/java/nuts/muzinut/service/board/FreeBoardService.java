@@ -7,14 +7,11 @@ import nuts.muzinut.controller.board.SortType;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.DetailBaseDto;
-import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
-import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.comment.ReplyDto;
 import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
 import nuts.muzinut.dto.board.free.FreeBoardsForm;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.FreeBoardRepository;
@@ -24,7 +21,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 

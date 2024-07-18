@@ -11,10 +11,8 @@ import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsForm;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
-import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.comment.ReplyDto;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
@@ -22,14 +20,11 @@ import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
 import nuts.muzinut.repository.member.MailboxRepository;
 import nuts.muzinut.repository.member.UserRepository;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 

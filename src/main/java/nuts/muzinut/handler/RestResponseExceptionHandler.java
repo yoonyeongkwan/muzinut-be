@@ -1,19 +1,18 @@
 package nuts.muzinut.handler;
 
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.dto.ErrorResult;
 import nuts.muzinut.dto.ErrorDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.chat.AlreadyExistRequestException;
 import nuts.muzinut.exception.chat.BlockUserException;
-import nuts.muzinut.exception.chat.InvalidChatRoomException;
 import nuts.muzinut.exception.token.ExpiredTokenException;
 import nuts.muzinut.exception.token.IllegalTokenException;
 import nuts.muzinut.exception.token.TokenException;
 import nuts.muzinut.exception.token.UnsupportedTokenException;
 import nuts.muzinut.exception.user.AlreadyExistUser;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;

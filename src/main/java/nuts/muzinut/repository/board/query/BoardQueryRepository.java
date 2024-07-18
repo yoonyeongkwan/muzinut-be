@@ -1,5 +1,6 @@
 package nuts.muzinut.repository.board.query;
 
+import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -14,6 +15,11 @@ import nuts.muzinut.dto.board.board.BoardsForm;
 import nuts.muzinut.dto.board.board.QBoardsForm;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
+import nuts.muzinut.exception.board.BoardSearchTypeNotExistException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -28,6 +34,7 @@ import static nuts.muzinut.domain.board.QComment.*;
 import static nuts.muzinut.domain.board.QEventBoard.*;
 import static nuts.muzinut.domain.board.QFreeBoard.*;
 import static nuts.muzinut.domain.board.QLike.*;
+import static nuts.muzinut.domain.board.QRecruitBoard.*;
 import static nuts.muzinut.domain.board.QReply.*;
 import static nuts.muzinut.domain.member.QUser.*;
 import static org.springframework.util.StringUtils.*;
@@ -39,7 +46,7 @@ public class BoardQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<BoardsForm> search(BoardType boardType, String searchCond) {
+    public Page<BoardsForm> search(BoardType boardType, String searchCond, Pageable pageable) {
 
         JPAQuery<BoardsForm> selectQuery = queryFactory
                 .select(new QBoardsForm(board.id, board.title, board.user.nickname, board.view, board.likeCount, board.createdDt))
@@ -48,12 +55,20 @@ public class BoardQueryRepository {
         selectQuery = innerJoinBoardType(selectQuery, boardType);
 
         if (selectQuery == null) {
-            return new ArrayList<>();
+            throw new BoardSearchTypeNotExistException("검색하려는 게시판 타입을 입력해주세요");
         }
 
-        return selectQuery
+        QueryResults<BoardsForm> result = selectQuery
                 .where(titleInclude(searchCond))
-                .fetch();
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(board.createdDt.desc())
+                .fetchResults();
+
+        List<BoardsForm> content = result.getResults();
+        long total = result.getTotal();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     private BooleanExpression titleInclude(String title) {
@@ -67,6 +82,8 @@ public class BoardQueryRepository {
             return selectQuery.rightJoin(eventBoard).on(board.id.eq(eventBoard.id));
         } else if (boardType == FREE) {
             return selectQuery.rightJoin(freeBoard).on(board.id.eq(freeBoard.id));
+        } else if (boardType == RECRUIT) {
+            return selectQuery.rightJoin(recruitBoard).on(board.id.eq(recruitBoard.id));
         }
 
         return null;
@@ -100,5 +117,4 @@ public class BoardQueryRepository {
 
         return Optional.ofNullable(boardResult);
     }
-
 }

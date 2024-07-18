@@ -5,6 +5,7 @@ import nuts.muzinut.dto.ErrorDto;
 import nuts.muzinut.exception.*;
 import nuts.muzinut.exception.board.BoardNotExistException;
 import nuts.muzinut.exception.board.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardSearchTypeNotExistException;
 import nuts.muzinut.exception.chat.AlreadyExistRequestException;
 import nuts.muzinut.exception.chat.BlockUserException;
 import nuts.muzinut.exception.token.ExpiredTokenException;
@@ -45,7 +46,8 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class,
             BoardNotFoundException.class, NoUploadFileException.class, TokenException.class,
-            UnsupportedTokenException.class, IllegalTokenException.class, NullPointerException.class})
+            UnsupportedTokenException.class, IllegalTokenException.class, NullPointerException.class,
+            BoardSearchTypeNotExistException.class})
     @ResponseBody
     private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());

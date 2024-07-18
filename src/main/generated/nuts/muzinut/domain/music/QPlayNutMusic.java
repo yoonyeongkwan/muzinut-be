@@ -26,7 +26,7 @@ public class QPlayNutMusic extends EntityPathBase<PlayNutMusic> {
 
     public final QPlayNut playNut;
 
-    public final NumberPath<Long> songId = createNumber("songId", Long.class);
+    public final QSong song;
 
     public QPlayNutMusic(String variable) {
         this(PlayNutMusic.class, forVariable(variable), INITS);
@@ -47,6 +47,7 @@ public class QPlayNutMusic extends EntityPathBase<PlayNutMusic> {
     public QPlayNutMusic(Class<? extends PlayNutMusic> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.playNut = inits.isInitialized("playNut") ? new QPlayNut(forProperty("playNut"), inits.get("playNut")) : null;
+        this.song = inits.isInitialized("song") ? new QSong(forProperty("song"), inits.get("song")) : null;
     }
 
 }

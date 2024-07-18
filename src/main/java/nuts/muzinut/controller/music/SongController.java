@@ -7,7 +7,6 @@ import nuts.muzinut.dto.music.SongPageDto;
 import nuts.muzinut.dto.music.SongUpdateDto;
 import nuts.muzinut.dto.page.PageDto;
 import nuts.muzinut.service.music.SongService;
-import nuts.muzinut.service.music.TestPlayViewService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,12 +24,6 @@ import java.net.URI;
 public class SongController {
 
     private final SongService songService;
-    private final TestPlayViewService testPlayViewService;
-    @PostMapping("/test/{id}")
-    public ResponseEntity<String> testPlayView(@PathVariable("id") Long id){
-        testPlayViewService.TestPlayView(id);
-        return ResponseEntity.ok("성공");
-    }
 
     /**
      * 최신 노래 목록을 가져오는 엔드포인트.
@@ -88,7 +81,7 @@ public class SongController {
      *
      * @param songId 노래의 ID
      * @param songFile  
-     * @return 노래 상세 정보와 HTTP 상태 코드
+     * @return 노래 수정 완료 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
@@ -97,19 +90,14 @@ public class SongController {
             @RequestPart("songFile")MultipartFile songFile,
             @RequestPart("songData")SongUpdateDto songData){
         songService.updateSong(songId, songData, songFile);
-        HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/music/" + songId)); //수정한 음원디테일패이지로 리다이렉트
-
-        return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
-                .headers(header)
-                .body("음원 수정 완료 되었습니다");
+        return new ResponseEntity<String>("음원 수정 완료 되었습니다", HttpStatus.OK);
     }
 
     /**
      * 곡 삭제를 가져오는 엔드포인트.
      *
      * @param songId 노래의 ID
-     * @return 노래 상세 정보와 HTTP 상태 코드
+     * @return 노래 삭제 완료 메시지와 HTTP 상태 코드
      */
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @DeleteMapping("/{id}")

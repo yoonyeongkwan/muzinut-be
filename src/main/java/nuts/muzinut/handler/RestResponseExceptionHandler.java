@@ -45,7 +45,7 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
     @ResponseStatus(BAD_REQUEST)
     @ExceptionHandler(value = { EmailVertFailException.class, NotFoundEntityException.class,
             BoardNotFoundException.class, NoUploadFileException.class, TokenException.class,
-            UnsupportedTokenException.class, IllegalTokenException.class})
+            UnsupportedTokenException.class, IllegalTokenException.class, NullPointerException.class})
     @ResponseBody
     private ErrorDto BAD_REQUEST(RuntimeException ex, WebRequest request){
         return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
@@ -89,11 +89,11 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
         return new ErrorDto(UNAUTHORIZED.value(), ex.getMessage());
     }
 
-    @ResponseStatus(BAD_REQUEST)
+    @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
     @ExceptionHandler(value = { LimitPlayNutException.class })
     @ResponseBody
     private ErrorDto limitPlayNut(RuntimeException ex, WebRequest request) {
-        return new ErrorDto(BAD_REQUEST.value(), ex.getMessage());
+        return new ErrorDto(REQUEST_ENTITY_TOO_LARGE.value(), ex.getMessage());
     }
     // 앨범 Entity 생성 실패 핸들러 추가
     @ResponseStatus(SERVICE_UNAVAILABLE)
@@ -105,9 +105,9 @@ public class RestResponseExceptionHandler extends ResponseEntityExceptionHandler
 
     // 앨범 Entity 갯수 초과 핸들러 추가
     @ResponseStatus(REQUEST_ENTITY_TOO_LARGE)
-    @ExceptionHandler(value = { EntityOversizeException.class })
+    @ExceptionHandler(value = { EntityOversizeException.class, LackVoteAmountException.class })
     @ResponseBody
-    private ErrorDto REQUEST_ENTITY_TOO_LARGE(EntityOversizeException ex, WebRequest request) {
+    private ErrorDto REQUEST_ENTITY_TOO_LARGE(RuntimeException ex, WebRequest request) {
         return new ErrorDto(REQUEST_ENTITY_TOO_LARGE.value(), ex.getMessage());
     }
 }

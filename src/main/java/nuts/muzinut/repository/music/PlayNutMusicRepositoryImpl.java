@@ -36,7 +36,7 @@ public class PlayNutMusicRepositoryImpl implements PlayNutMusicRepositoryCustom 
                 .join(song.album, album)
                 .join(song.user, user)
                 .leftJoin(playNutMusic)
-                .on(song.id.eq(playNutMusic.songId))
+                .on(song.id.eq(playNutMusic.song.id))
                 .where(playNutMusic.playNut.id.eq(playNutId))
                 .fetch();
 

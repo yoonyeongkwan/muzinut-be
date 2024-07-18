@@ -30,6 +30,10 @@ public class QUser extends EntityPathBase<User> {
 
     public final SetPath<Authority, QAuthority> authorities = this.<Authority, QAuthority>createSet("authorities", Authority.class, QAuthority.class, PathInits.DIRECT2);
 
+    public final ArrayPath<byte[], Byte> base64Data = createArray("base64Data", byte[].class);
+
+    public final ListPath<Block, QBlock> blocks = this.<Block, QBlock>createList("blocks", Block.class, QBlock.class, PathInits.DIRECT2);
+
     public final ListPath<nuts.muzinut.domain.board.Board, nuts.muzinut.domain.board.QBoard> boards = this.<nuts.muzinut.domain.board.Board, nuts.muzinut.domain.board.QBoard>createList("boards", nuts.muzinut.domain.board.Board.class, nuts.muzinut.domain.board.QBoard.class, PathInits.DIRECT2);
 
     public final ListPath<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark> bookmarks = this.<nuts.muzinut.domain.board.Bookmark, nuts.muzinut.domain.board.QBookmark>createList("bookmarks", nuts.muzinut.domain.board.Bookmark.class, nuts.muzinut.domain.board.QBookmark.class, PathInits.DIRECT2);
@@ -77,6 +81,8 @@ public class QUser extends EntityPathBase<User> {
     public final StringPath profileBannerImgFilename = createString("profileBannerImgFilename");
 
     public final StringPath profileImgFilename = createString("profileImgFilename");
+
+    public final NumberPath<Integer> receiveVote = createNumber("receiveVote", Integer.class);
 
     public final ListPath<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard> recruitBoards = this.<nuts.muzinut.domain.board.RecruitBoard, nuts.muzinut.domain.board.QRecruitBoard>createList("recruitBoards", nuts.muzinut.domain.board.RecruitBoard.class, nuts.muzinut.domain.board.QRecruitBoard.class, PathInits.DIRECT2);
 

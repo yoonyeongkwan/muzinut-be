@@ -33,6 +33,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -58,20 +60,40 @@ public class ProfileController {
     }
 
     // 프로필 페이지 - 라운지 탭
-    @GetMapping(value = "lounge", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+//    @GetMapping(value = "lounge", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @GetMapping(value = "lounge")
+    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId) throws IOException {
+//        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+//        ProfileLoungeDto profileLoungeDto = profileService.getLoungeTab(userId, 0);
+//
+//        addJsonEntityToFormData(formData, profileLoungeDto);
+//        // 해당 게시판의 quill 파일 추가
+//        HttpHeaders fileHeaders = new HttpHeaders();
+//        for (ProfileLoungesForm l : profileLoungeDto.getLoungesForms()) {
+//            String fullPath = fileStore.getFullPath(l.getFilename());
+//            fileHeaders.setContentType(MediaType.TEXT_HTML); // quill 파일이므로 html
+//            formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
+//        }
+//        return new ResponseEntity<>(formData, HttpStatus.OK);
+
         ProfileLoungeDto profileLoungeDto = profileService.getLoungeTab(userId, 0);
 
-        addJsonEntityToFormData(formData, profileLoungeDto);
-        // 해당 게시판의 quill 파일 추가
-        HttpHeaders fileHeaders = new HttpHeaders();
         for (ProfileLoungesForm l : profileLoungeDto.getLoungesForms()) {
             String fullPath = fileStore.getFullPath(l.getFilename());
-            fileHeaders.setContentType(MediaType.TEXT_HTML); // quill 파일이므로 html
-            formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
+            String content = Files.readString(Paths.get(fullPath));
+            l.setContent(content); // 파일의 내용을 설정
         }
-        return new ResponseEntity<>(formData, HttpStatus.OK);
+
+        return ResponseEntity.ok(profileLoungeDto);
+
+//        try {
+//            ProfileLoungeDto profileLoungeDto = profileService.getLoungeTab(userId, 0);
+//            return ResponseEntity.ok(profileLoungeDto);
+//        } catch (Exception e) {
+//            log.error("Failed to get user profile lounge for userId: {}", userId, e);
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+//                    .body("Failed to get user profile lounge");
+//        }
     }
 
     // 프로필 페이지 - 게시글 탭

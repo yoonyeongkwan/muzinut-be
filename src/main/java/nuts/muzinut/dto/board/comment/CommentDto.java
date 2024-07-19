@@ -22,8 +22,6 @@ public class CommentDto {
 
     private List<ReplyDto> replies = new ArrayList<>();
 
-    private String profileImgFilename; // 프로필 이미지 파일명 추가
-
     @QueryProjection
     public CommentDto(Long id, String content, String commentWriter,
                       LocalDateTime createdDt, String commentProfileImg, int likeCount) {

@@ -39,6 +39,11 @@ public class AlbumController {
             @RequestPart("songFiles") List<MultipartFile> songFiles,
             @RequestPart("albumData") AlbumDto albumData
     ) throws IOException {
+        // 곡 파일의 갯수와 곡 정보의 갯수가 다를때 Exception
+        if (songFiles.size() != albumData.getSongs().size()) throw new AlbumCreateFailException("등록하려는 음원 파일의 갯수와 음원 파일 정보의 갯수가 다릅니다.");
+        // 각 곡 파일의 이름이 서로 같은지 확인 후 Exception
+        albumService.isSongFileSameName(songFiles);
+
         // 앨범 이미지 저장
         String storeAlbumImg = albumService.saveAlbumImg(albumImg);
         // 각 곡들 저장

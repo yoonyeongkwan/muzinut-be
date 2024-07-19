@@ -18,6 +18,7 @@ import java.util.List;
 @Data
 public class DetailAdminBoardDto extends DetailBaseDto {
 
+    private Long id;
     private int likeCount;
     private String title;
     private String writer = "muzi";

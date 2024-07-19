@@ -5,19 +5,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import nuts.muzinut.domain.board.AdminUploadFile;
 import nuts.muzinut.domain.board.Lounge;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.NotFoundFileException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.LoungeService;
 import nuts.muzinut.service.member.UserService;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -25,9 +29,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Set;
 
@@ -71,7 +78,7 @@ public class LoungeController {
     }
 
     //특정 라운지 조회 및 댓글과 대댓글 불러오기
-    @GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
+    /*@GetMapping(value = "/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getDetailLounge(@PathVariable Long id) throws JsonProcessingException {
         MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
 
@@ -101,6 +108,20 @@ public class LoungeController {
         fileStore.setImageHeaderWithData(profileImages, formData);
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
+    }*/
+
+    //특정 라운지 조회 및 댓글과 대댓글 불러오기
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<DetailLoungeDto> getDetailLounge(@PathVariable Long id) throws JsonProcessingException {
+
+        User findUser = userService.getUserWithUsername().orElse(null);
+        DetailLoungeDto detailLoungeDto = loungeService.detailLounge(id, findUser);
+
+        if (detailLoungeDto == null) {
+            throw new BoardNotFoundException("해당 라운지가 존재하지 않습니다");
+        }
+
+        return new ResponseEntity<DetailLoungeDto>(detailLoungeDto, HttpStatus.OK);
     }
 
     //Todo 모든 라운지 게시판 조회
@@ -191,4 +212,29 @@ public class LoungeController {
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }
 
+    /*//공지 사항 게시판 첨부 파일 다운로드 (회원들만 가능)
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
+    @GetMapping("/quill")
+    public ResponseEntity<Resource> getQuillFile(
+            @PathVariable Long id, @RequestParam String quillFilename) throws MalformedURLException {
+
+        try {
+            AdminUploadFile uploadFile = adminBoardService.getAttachFile(id);
+            String storeFilename = uploadFile.getStoreFilename();
+            String originFilename = uploadFile.getOriginFilename();
+
+            UrlResource resource = new UrlResource("file:" + fileStore.getFullPath(storeFilename));
+            log.info("originFilename={}", originFilename);
+
+            String encodedOriginFilename = UriUtils.encode(originFilename, StandardCharsets.UTF_8);
+            String contentDisposition = "attachment; filename=\"" + encodedOriginFilename + "\"";
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                    .body(resource);
+
+        } catch (NotFoundFileException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(null);
+        }
+    }*/
 }

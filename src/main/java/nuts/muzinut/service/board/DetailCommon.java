@@ -1,12 +1,21 @@
 package nuts.muzinut.service.board;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.board.BoardsDto;
+import nuts.muzinut.dto.board.board.BoardsForm;
 import nuts.muzinut.dto.board.comment.CommentDto;
 import nuts.muzinut.dto.board.comment.ReplyDto;
+import nuts.muzinut.repository.board.query.BoardQueryRepository;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
@@ -17,6 +26,7 @@ import java.util.*;
 //모든 상세 게시판 페이지에서 공통으로 쓰는 기능
 @Slf4j
 public class DetailCommon {
+
 
     @Value("${spring.file.dir}")
     private String fileDir;

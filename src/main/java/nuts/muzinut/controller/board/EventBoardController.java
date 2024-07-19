@@ -2,27 +2,20 @@ package nuts.muzinut.controller.board;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.EventBoard;
-import nuts.muzinut.domain.board.FreeBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.event.DetailEventBoardDto;
 import nuts.muzinut.dto.board.event.EventBoardForm;
 import nuts.muzinut.dto.board.event.EventBoardsDto;
-import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
-import nuts.muzinut.dto.board.free.FreeBoardForm;
-import nuts.muzinut.dto.board.free.FreeBoardsDto;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
 import nuts.muzinut.exception.NotFoundMemberException;
-import nuts.muzinut.repository.board.EventBoardRepository;
 import nuts.muzinut.service.board.EventBoardService;
 import nuts.muzinut.service.board.FileStore;
-import nuts.muzinut.service.board.FreeBoardService;
 import nuts.muzinut.service.member.UserService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
@@ -37,7 +30,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.Set;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
 

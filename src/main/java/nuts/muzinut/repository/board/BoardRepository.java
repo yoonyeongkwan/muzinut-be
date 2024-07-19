@@ -15,4 +15,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 
     @Query(value = "SELECT DTYPE FROM BOARD WHERE board_id = :id", nativeQuery = true)
     String findBoardTypeById(@Param("id") Long id);
+
+    Optional<Board> findByFilename(String filename);
 }

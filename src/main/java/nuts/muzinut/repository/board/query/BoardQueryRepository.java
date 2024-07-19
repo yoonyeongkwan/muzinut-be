@@ -4,6 +4,8 @@ import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.*;
 import nuts.muzinut.domain.member.QUser;
+import nuts.muzinut.domain.member.User;
+import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.board.BoardsForm;
 import nuts.muzinut.dto.board.board.QBoardsForm;
 import nuts.muzinut.dto.board.comment.CommentDto;
@@ -29,7 +33,9 @@ import java.util.Optional;
 
 import static nuts.muzinut.domain.board.BoardType.*;
 import static nuts.muzinut.domain.board.QAdminBoard.*;
+import static nuts.muzinut.domain.board.QAdminUploadFile.adminUploadFile;
 import static nuts.muzinut.domain.board.QBoard.*;
+import static nuts.muzinut.domain.board.QBookmark.bookmark;
 import static nuts.muzinut.domain.board.QComment.*;
 import static nuts.muzinut.domain.board.QEventBoard.*;
 import static nuts.muzinut.domain.board.QFreeBoard.*;
@@ -46,6 +52,7 @@ public class BoardQueryRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    //게시판 검색기능
     public Page<BoardsForm> search(BoardType boardType, String searchCond, Pageable pageable) {
 
         JPAQuery<BoardsForm> selectQuery = queryFactory
@@ -87,26 +94,6 @@ public class BoardQueryRepository {
         }
 
         return null;
-    }
-
-    public List<Tuple> getDetailBoard(Long boardId) {
-
-        return queryFactory
-                .select(board,
-                        Projections.fields(CommentDto.class, comment.id, comment.content,
-                                comment.user.nickname.as("commentWriter"), comment.createdDt),
-                        Projections.fields(ReplyDto.class, reply.id, reply.content, reply.comment.id.as("commentId"),
-                                reply.user.nickname.as("replyWriter"), reply.createdDt),
-                        JPAExpressions
-                                .select(like.count())
-                                .from(like)
-                                .where(like.board.id.eq(boardId)))
-                .from(board)
-                .leftJoin(board.comments, comment).fetchJoin()
-                .leftJoin(comment.replies, reply)
-                .leftJoin(reply.user, user)
-                .where(board.id.eq(boardId))
-                .fetch();
     }
 
     public Optional<Board> findById(Long boardId) {

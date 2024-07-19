@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 public class EventBoard extends Board {
 
 
-    private String filename; //본문 내용이 담긴 html 파일 (react.quails)
     private String img;
 
     public void setFilename(String filename) {

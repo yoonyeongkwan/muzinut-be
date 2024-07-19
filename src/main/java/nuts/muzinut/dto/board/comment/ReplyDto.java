@@ -14,7 +14,6 @@ public class ReplyDto {
     private String replyWriter;
     private String replyProfileImg; //대댓글을 작성한 사람의 프로필 이미지
     private LocalDateTime createdDt;
-    private String profileImgFilename; // 프로필 이미지 파일명 추가
     private Long commentId;
 
     @QueryProjection

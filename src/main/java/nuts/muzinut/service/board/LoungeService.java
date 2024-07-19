@@ -88,7 +88,7 @@ public class LoungeService extends DetailCommon{
      * tuple (board, lounge, detailBaseDto)
      */
     public DetailLoungeDto detailLounge(Long boardId, User user) {
-        List<Tuple> result = queryRepository.getDetailLounge(boardId, user);
+        List<Tuple> result = queryRepository.getDetatilLounge(boardId, user);
 
         log.info("tuple: {}", result);
         if (result.isEmpty()) {

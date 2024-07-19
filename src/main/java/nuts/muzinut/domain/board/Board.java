@@ -22,6 +22,8 @@ public class Board extends BaseBoardEntity {
     @JoinColumn(name = "user_id")
     public User user;
 
+    public String filename;
+
     //관계 매핑
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private List<Comment> comments = new ArrayList<>();

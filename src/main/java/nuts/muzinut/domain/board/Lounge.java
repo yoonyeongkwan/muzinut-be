@@ -9,7 +9,7 @@ import nuts.muzinut.domain.member.User;
 @Getter
 public class Lounge extends Board {
 
-    private String filename; //react quill file
+//    private String filename; //react quill file
 
     public void setFilename(String filename) {
         this.filename = filename;

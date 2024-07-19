@@ -9,25 +9,19 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import nuts.muzinut.domain.board.QLounge;
 import nuts.muzinut.domain.member.QUser;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.board.DetailBaseDto;
-import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.comment.ReplyDto;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static nuts.muzinut.domain.board.QAdminBoard.adminBoard;
 import static nuts.muzinut.domain.board.QBoard.board;
 import static nuts.muzinut.domain.board.QBookmark.bookmark;
 import static nuts.muzinut.domain.board.QComment.comment;
-import static nuts.muzinut.domain.board.QFreeBoard.freeBoard;
 import static nuts.muzinut.domain.board.QLike.like;
 import static nuts.muzinut.domain.board.QLounge.*;
 import static nuts.muzinut.domain.board.QReply.reply;
-import static nuts.muzinut.domain.member.QUser.user;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -53,7 +47,7 @@ public class LoungeQueryRepository {
                 .fetch();
     }*/
 
-    public List<Tuple> getDetailLounge(Long boardId, User user) {
+    public List<Tuple> getDetatilLounge(Long boardId, User user) {
 
         CaseBuilder caseBuilder = new CaseBuilder();
 
@@ -97,5 +91,39 @@ public class LoungeQueryRepository {
                             .and(bookmark.user.eq(user)))
                     .exists();
         }
+    }
+
+    public List<Tuple> getLoungeTab(Long userId) {
+
+        return queryFactory
+                .select(board, lounge,
+                        Projections.fields(DetailBaseDto.class,
+                                isLikeExpression(userId).as("boardLikeStatus"),
+                                isBookmarkExpression(userId).as("isBookmark"),
+                                comment.content.as("commentContent"), // 댓글 내용을 선택
+                                reply.content.as("replyContent") // 대댓글 내용을 선택
+                        ))
+                .from(lounge)
+                .leftJoin(lounge.user, QUser.user) // 사용자가 작성한 라운지
+                .leftJoin(board).on(board.id.eq(lounge.id)) // 명시적으로 Board 객체 조인
+                .leftJoin(lounge.comments, comment)
+                .leftJoin(comment.replies, reply)
+                .where(lounge.user.id.eq(userId))
+                .fetch();
+    }
+    private BooleanExpression isLikeExpression(Long userId) {
+        return JPAExpressions
+                .selectOne()
+                .from(like)
+                .where(like.user.id.eq(userId))
+                .exists();
+    }
+
+    private BooleanExpression isBookmarkExpression(Long userId) {
+        return JPAExpressions
+                .selectOne()
+                .from(bookmark)
+                .where(bookmark.user.id.eq(userId))
+                .exists();
     }
 }

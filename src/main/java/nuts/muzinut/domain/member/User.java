@@ -111,6 +111,11 @@ public class User {
         this.nickname = nickname;
         this.intro = intro;
     }
+    public void updateNicknameAndIntro(String nickname, String intro) {
+        this.nickname = nickname;
+        this.intro = intro;
+    }
+
 
     //회원 관련
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

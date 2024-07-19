@@ -7,6 +7,7 @@ import lombok.SneakyThrows;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.domain.music.*;
 import nuts.muzinut.dto.music.*;
+import nuts.muzinut.exception.AlbumCreateFailException;
 import nuts.muzinut.exception.AlbumHaveNoAuthorizationException;
 import nuts.muzinut.exception.NoDataFoundException;
 import nuts.muzinut.repository.member.UserRepository;
@@ -274,6 +275,16 @@ public class AlbumService {
             throw new RuntimeException(e);
         }
 
+    }
+
+    // 음원 파일 올릴때 각 음원의 파일 이름은 같으면 안된다!
+    // 음원 파일 이름이 각 음원파일의 이름이 같다면 Exception
+    public void isSongFileSameName(List<MultipartFile> songFiles) {
+        for(int i=0; i<songFiles.size(); i++) {
+            for(int j=i+1; j<songFiles.size(); j++) {
+                if(songFiles.get(i).getOriginalFilename().equals(songFiles.get(j).getOriginalFilename())) throw new AlbumCreateFailException("각 음원 파일의 이름은 같을 수 없습니다.");
+            }
+        }
     }
 }
 

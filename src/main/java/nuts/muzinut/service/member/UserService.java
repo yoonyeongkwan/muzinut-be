@@ -44,11 +44,15 @@ public class UserService extends Base64Encoding {
     // 프로필 닉네임, 자기소개 설정
     @Transactional
     public void updateNicknameAndIntro(Long userId, String nickname, String intro) {
-        Boolean exists = userRepository.existsByNickname(nickname);
-        if (exists) {
-            throw new DuplicateMemberException("이미 사용중인 닉네임 입니다");
-        }
-        userRepository.updateNicknameAndIntro(userId, nickname, intro);
+//        userRepository.updateNicknameAndIntro(userId, nickname, intro);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundMemberException("회원이 아닙니다."));
+        user.updateNicknameAndIntro(nickname, intro);
+    }
+
+    // 중복 닉네임 확인
+    public boolean isDuplicateNickname(String nickname) {
+        return userRepository.existsByNickname(nickname);
     }
 
     public boolean checkDuplicateNickname(String nickname) {

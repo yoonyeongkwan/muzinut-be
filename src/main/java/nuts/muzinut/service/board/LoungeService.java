@@ -9,8 +9,8 @@ import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungeDto;
 import nuts.muzinut.dto.board.lounge.LoungesForm;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.board.LoungeRepository;
 import nuts.muzinut.repository.board.query.LoungeQueryRepository;
@@ -88,7 +88,7 @@ public class LoungeService extends DetailCommon{
      * tuple (board, lounge, detailBaseDto)
      */
     public DetailLoungeDto detailLounge(Long boardId, User user) {
-        List<Tuple> result = queryRepository.getDetailLounge(boardId, user);
+        List<Tuple> result = queryRepository.getDetatilLounge(boardId, user);
 
         log.info("tuple: {}", result);
         if (result.isEmpty()) {
@@ -105,7 +105,7 @@ public class LoungeService extends DetailCommon{
         }
 
         DetailLoungeDto detailLoungeDto = new DetailLoungeDto(findLounge.getId(), findLounge.getUser().getNickname(),
-                view ,findLounge.getFilename(), findLounge.getUser().getProfileImgFilename());
+                view ,findLounge.getFilename(), encodeFileToBase64(findLounge.getUser().getProfileImgFilename()), findLounge.getCreatedDt());
 
         DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
         detailLoungeDto.setLikeCount(findBoard.getLikeCount()); //좋아요 수 셋팅

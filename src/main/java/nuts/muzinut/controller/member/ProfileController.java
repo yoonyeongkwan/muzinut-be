@@ -11,12 +11,11 @@ import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
-import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutDto;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongDto;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.service.board.*;
 import nuts.muzinut.service.member.ProfileService;
@@ -33,7 +32,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
@@ -58,20 +58,17 @@ public class ProfileController {
     }
 
     // 프로필 페이지 - 라운지 탭
-    @GetMapping(value = "lounge", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<>();
+    @GetMapping(value = "lounge")
+    public ResponseEntity<?> getUserProfileLounge(@RequestParam("userId") Long userId) throws IOException {
         ProfileLoungeDto profileLoungeDto = profileService.getLoungeTab(userId, 0);
 
-        addJsonEntityToFormData(formData, profileLoungeDto);
-        // 해당 게시판의 quill 파일 추가
-        HttpHeaders fileHeaders = new HttpHeaders();
         for (ProfileLoungesForm l : profileLoungeDto.getLoungesForms()) {
             String fullPath = fileStore.getFullPath(l.getFilename());
-            fileHeaders.setContentType(MediaType.TEXT_HTML); // quill 파일이므로 html
-            formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
+            String content = Files.readString(Paths.get(fullPath));
+            l.setContent(content); // 파일의 내용을 설정
         }
-        return new ResponseEntity<>(formData, HttpStatus.OK);
+
+        return ResponseEntity.ok(profileLoungeDto);
     }
 
     // 프로필 페이지 - 게시글 탭
@@ -109,15 +106,6 @@ public class ProfileController {
         return new ResponseEntity<>(profilePlayNutDto, HttpStatus.OK);
     }
 
-    // 데이터를 json으로 변환하여 form-data에 추가하는 메서드
-    private void addJsonEntityToFormData(MultiValueMap<String, Object> formData, Object value) throws JsonProcessingException {
-        String jsonValue = objectMapper.writeValueAsString(value);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<>(jsonValue, headers);
-        formData.add("json-data", entity);
-    }
-
     // 라운지 생성 메소드
     @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PostMapping(value = "/lounge")
@@ -132,34 +120,11 @@ public class ProfileController {
         lounge.setFilename(filenames.get(STORE_FILENAME)); //라운지 파일명 설정
         loungeService.save(lounge); //라운지 게시판 저장
         HttpHeaders header = new HttpHeaders();
-        header.setLocation(URI.create("/profile/lounges/" + lounge.getId())); //생성한 라운지로 리다이렉트
+        header.setLocation(URI.create("/profile/lounge?userId=" + user.getId())); // 라운지 탭으로 리다이렉트
 
         return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY)
                 .headers(header)
                 .body(new MessageDto("라운지 게시판이 생성되었습니다"));
-    }
-
-    // 라운지 댓글 클릭시 특정 라운지의 댓글, 대댓글 조회하는 메소드
-    @GetMapping(value = "/lounge/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MultiValueMap<String, Object>> getDetailLounge(@PathVariable Long id) throws JsonProcessingException {
-        MultiValueMap<String, Object> formData = new LinkedMultiValueMap<String, Object>();
-
-        User findUser = userService.getUserWithUsername().orElse(null);
-        ProfileDetailLoungeDto profileDetailLoungeDto = profileService.detailLounge(id, findUser);
-
-        if (profileDetailLoungeDto == null) {
-            throw new BoardNotFoundException("해당 라운지가 존재하지 않습니다");
-        }
-
-        // JSON 데이터를 Multipart-form 데이터에 추가
-        addJsonEntityToFormData(formData, profileDetailLoungeDto);
-
-        // 해당 게시판의 quill 파일 추가
-        String quillFilename = profileDetailLoungeDto.getQuillFilename();
-        String fullPath = fileStore.getFullPath(quillFilename);
-        formData.add("quillFile", new FileSystemResource(fullPath)); // 파일 가져와서 셋팅
-
-        return new ResponseEntity<>(formData, HttpStatus.OK);
     }
 
     // 라운지 수정 메서드

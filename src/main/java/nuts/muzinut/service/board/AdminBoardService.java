@@ -11,10 +11,8 @@ import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.AdminBoardsForm;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
-import nuts.muzinut.dto.board.comment.CommentDto;
-import nuts.muzinut.dto.board.comment.ReplyDto;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundFileException;
 import nuts.muzinut.repository.board.AdminBoardRepository;
 import nuts.muzinut.repository.board.AdminUploadFileRepository;
@@ -22,14 +20,11 @@ import nuts.muzinut.repository.board.BoardRepository;
 import nuts.muzinut.repository.board.query.AdminBoardQueryRepository;
 import nuts.muzinut.repository.member.MailboxRepository;
 import nuts.muzinut.repository.member.UserRepository;
-import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -155,13 +150,14 @@ public class AdminBoardService extends DetailCommon{
         //첨부파일이 있는 경우 & 없는 경우
         if (files != null) {
             detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view, files, findAdminBoard.getFilename(),
-                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename())); //어드민 게시판 관련 파일 셋팅
+                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename()), findBoard.getCreatedDt()); //어드민 게시판 관련 파일 셋팅
         } else {
             detailAdminBoardDto = new DetailAdminBoardDto(findBoard.getTitle(), view, findAdminBoard.getFilename(),
-                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename())); //어드민 게시판 관련 셋팅
+                    encodeFileToBase64(findAdminBoard.getUser().getProfileImgFilename()), findBoard.getCreatedDt()); //어드민 게시판 관련 셋팅
         }
 
         DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
+        detailAdminBoardDto.setWriterId(findAdminBoard.getUser().getId());
         detailAdminBoardDto.setLikeCount(findAdminBoard.getLikeCount()); //좋아요 수 셋팅
         detailAdminBoardDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
         detailAdminBoardDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부

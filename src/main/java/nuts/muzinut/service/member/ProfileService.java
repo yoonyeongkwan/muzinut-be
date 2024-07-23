@@ -1,6 +1,7 @@
 package nuts.muzinut.service.member;
 
 import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.Expressions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.Board;
@@ -13,7 +14,6 @@ import nuts.muzinut.dto.board.DetailBaseDto;
 import nuts.muzinut.dto.member.profile.Album.ProfileSongDto;
 import nuts.muzinut.dto.member.profile.Album.ProfileAlbumDto;
 import nuts.muzinut.dto.member.profile.Board.ProfileBoardDto;
-import nuts.muzinut.dto.member.profile.Lounge.ProfileDetailLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungeDto;
 import nuts.muzinut.dto.member.profile.Lounge.ProfileLoungesForm;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutDto;
@@ -21,8 +21,8 @@ import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutForm;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongDto;
 import nuts.muzinut.dto.member.profile.PlayNut.ProfilePlayNutSongsForm;
 import nuts.muzinut.dto.member.profile.ProfileDto;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NotFoundEntityException;
 import nuts.muzinut.exception.NotFoundMemberException;
 import nuts.muzinut.repository.board.BoardRepository;
@@ -62,8 +62,6 @@ public class ProfileService extends DetailCommon {
     private final LoungeRepository loungeRepository;
     private final LoungeQueryRepository queryRepository;
     private final PlayNutRepository playNutRepository;
-    private final PlayNutMusicRepository playNutMusicRepository;
-
 
     // 프로필 페이지 보여주는 메소드
     public ProfileDto getUserProfile(Long userId) {
@@ -193,14 +191,23 @@ public class ProfileService extends DetailCommon {
             );
         }
         List<ProfileLoungesForm> loungesForms = lounges.stream()
-                .map(l -> new ProfileLoungesForm(
-                        l.getId(),
-                        l.getUser().getNickname(),
-                        l.getFilename(),
-                        l.getCreatedDt(),
-                        l.getLikes().size(),
-                        l.getComments().size()
-                ))
+                .map(lounge -> {
+                    // 각 라운지에 대한 세부 정보 가져오기
+                    List<Tuple> details = queryRepository.getLoungeTab(userId);
+                    DetailBaseDto detailBaseDto = details.getFirst().get(2, DetailBaseDto.class);
+
+                    ProfileLoungesForm form = new ProfileLoungesForm(
+                            lounge.getId(),
+                            lounge.getUser().getNickname(),
+                            lounge.getFilename(),
+                            lounge.getCreatedDt(),
+                            lounge.getLikes().size()
+                    );
+                    form.setComments(setCommentsAndReplies(user, lounge));          // 라운지 댓글 & 대댓글 셋팅
+                    form.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus());    // 사용자가 특정 게시판의 좋아요를 눌렀는지 여부
+                    form.setIsBookmark(detailBaseDto.getIsBookmark());              // 사용자가 특정 게시판을 북마크했는지 여부
+                    return form;
+                })
                 .collect(Collectors.toList());
 
         return new ProfileLoungeDto(
@@ -216,50 +223,6 @@ public class ProfileService extends DetailCommon {
                 page.getTotalPages(),
                 page.getTotalElements()
         );
-    }
-
-    // 특정 라운지 게시판 댓글, 대댓글 조회 메소드
-    public ProfileDetailLoungeDto detailLounge(Long boardId, User user) {
-        List<Tuple> result = queryRepository.getDetailLounge(boardId, user);
-
-        log.info("tuple: {}", result);
-        if (result.isEmpty()) {
-            throw new BoardNotFoundException("라운지 게시판이 존재하지 않습니다.");
-        }
-
-        Tuple first = result.getFirst();
-        Board findBoard = first.get(board);
-        Lounge findLounge = first.get(lounge);
-
-        if (findBoard == null || findLounge == null) {
-            return null;
-        }
-
-        // getUserProfile 메소드 호출
-        ProfileDto profileDto = getUserProfile(findLounge.getUser().getId());
-
-        ProfileDetailLoungeDto profileDetailLoungeDto = new ProfileDetailLoungeDto(
-                findLounge.getId(),
-                findLounge.getUser().getNickname(),
-                findLounge.getFilename(),
-                encodeFileToBase64(profileDto.getProfileBannerImgName(), true),
-                encodeFileToBase64(profileDto.getProfileImgName(), false),
-                profileDto.getNickname(),
-                profileDto.getIntro(),
-                profileDto.getFollowingCount(),
-                profileDto.getFollowersCount(),
-                profileDto.isFollowStatus()
-        );
-
-        DetailBaseDto detailBaseDto = first.get(2, DetailBaseDto.class);
-        profileDetailLoungeDto.setLikeCount(findBoard.getLikeCount()); //좋아요 수 셋팅
-        profileDetailLoungeDto.setBoardLikeStatus(detailBaseDto.getBoardLikeStatus()); //사용자가 특정 게시판의 좋아요를 눌렀는지 여부
-        profileDetailLoungeDto.setIsBookmark(detailBaseDto.getIsBookmark()); //사용자가 특정 게시판을 북마크했는지 여부
-
-        //게시판 댓글 & 대댓글 셋팅
-        profileDetailLoungeDto.setComments(setCommentsAndReplies(user, findBoard));
-
-        return profileDetailLoungeDto;
     }
 
     // 게시글 탭을 보여주는 메소드
@@ -280,7 +243,7 @@ public class ProfileService extends DetailCommon {
                 bookmarkTitle
         );
     }
-    
+
     // 게시물 상세 정보를 가져오는 메소드
     public Map<String, Object> getBoardDetails(Long id) {
         Map<String, Object> postDetails = new HashMap<>();

@@ -2,27 +2,21 @@ package nuts.muzinut.controller.board;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jdk.jfr.Event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import nuts.muzinut.domain.board.EventBoard;
-import nuts.muzinut.domain.board.FreeBoard;
 import nuts.muzinut.domain.member.User;
 import nuts.muzinut.dto.MessageDto;
 import nuts.muzinut.dto.board.event.DetailEventBoardDto;
 import nuts.muzinut.dto.board.event.EventBoardForm;
 import nuts.muzinut.dto.board.event.EventBoardsDto;
-import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
-import nuts.muzinut.dto.board.free.FreeBoardForm;
-import nuts.muzinut.dto.board.free.FreeBoardsDto;
-import nuts.muzinut.exception.BoardNotExistException;
-import nuts.muzinut.exception.BoardNotFoundException;
+import nuts.muzinut.dto.board.lounge.DetailLoungeDto;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.NoUploadFileException;
 import nuts.muzinut.exception.NotFoundMemberException;
-import nuts.muzinut.repository.board.EventBoardRepository;
 import nuts.muzinut.service.board.EventBoardService;
 import nuts.muzinut.service.board.FileStore;
-import nuts.muzinut.service.board.FreeBoardService;
 import nuts.muzinut.service.member.UserService;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
@@ -37,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.Set;
 
 import static nuts.muzinut.controller.board.FileType.STORE_FILENAME;
 
@@ -113,6 +106,20 @@ public class EventBoardController {
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
     }
+//특정 라운지 조회 및 댓글과 대댓글 불러오기
+@GetMapping(value = "/{id}")
+public ResponseEntity<DetailEventBoardDto> getDetailLounge(@PathVariable Long id) throws JsonProcessingException {
+
+    User findUser = userService.getUserWithUsername().orElse(null);
+    DetailEventBoardDto detailEventBoard = eventBoardService.getDetailEventBoard(id, findUser);
+
+    if (detailEventBoard == null) {
+        throw new BoardNotFoundException("해당 라운지가 존재하지 않습니다");
+    }
+
+    return new ResponseEntity<DetailEventBoardDto>(detailEventBoard, HttpStatus.OK);
+}
+
 
     //모든 이벤트 게시판 조회
     @GetMapping()

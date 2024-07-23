@@ -15,6 +15,8 @@ import nuts.muzinut.dto.board.admin.AdminBoardsDto;
 import nuts.muzinut.dto.board.admin.DetailAdminBoardDto;
 import nuts.muzinut.dto.board.admin.AdminBoardForm;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.service.board.AdminBoardService;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.member.UserService;
@@ -36,7 +38,6 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Slf4j
@@ -90,7 +91,7 @@ public class AdminBoardController {
      * @param id: admin board pk
      * @throws: db로 부터 검색되는 엔티티가 없을 경우 NotFoundEntityException 예외 발생 (404 Not found)
      */
-    @ResponseBody
+    /*@ResponseBody
     @GetMapping(value = "/admin-boards/{id}", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MultiValueMap<String, Object>> getAdminBoard(@PathVariable Long id) throws JsonProcessingException {
 
@@ -119,6 +120,21 @@ public class AdminBoardController {
 
 
         return new ResponseEntity<MultiValueMap<String, Object>>(formData, HttpStatus.OK);
+    }*/
+
+    @ResponseBody
+    @GetMapping(value = "/admin-boards/{id}")
+    public ResponseEntity<DetailAdminBoardDto> getAdminBoard(@PathVariable Long id) throws JsonProcessingException {
+
+        //회원이 보는 상세페이지 인지, 비회원이 보는 상세페이지인지 구분
+        User findUser = userService.getUserWithUsername().orElse(null);
+
+        DetailAdminBoardDto detailAdminBoard = adminBoardService.getDetailAdminBoard(id, findUser);
+        if (detailAdminBoard == null) {
+            throw new BoardNotFoundException("해당 게시판이 존재하지 않습니다");
+        }
+
+        return new ResponseEntity<DetailAdminBoardDto>(detailAdminBoard, HttpStatus.OK);
     }
 
     //특정 어드민 게시판 수정

@@ -11,6 +11,8 @@ import nuts.muzinut.dto.board.free.DetailFreeBoardDto;
 import nuts.muzinut.dto.board.free.FreeBoardForm;
 import nuts.muzinut.dto.board.free.FreeBoardsDto;
 import nuts.muzinut.exception.*;
+import nuts.muzinut.exception.board.BoardNotExistException;
+import nuts.muzinut.exception.board.BoardNotFoundException;
 import nuts.muzinut.exception.token.ExpiredTokenException;
 import nuts.muzinut.service.board.FileStore;
 import nuts.muzinut.service.board.FreeBoardService;
@@ -27,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
-import java.util.Set;
 
 import static nuts.muzinut.controller.board.FileType.*;
 
